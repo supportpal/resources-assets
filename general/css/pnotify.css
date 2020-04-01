@@ -1,0 +1,29 @@
+[ui-pnotify].ui-pnotify .brighttheme-notice {
+    background: #feebc8;
+    border-left: 2px solid #ed8936;
+    border-radius: 0.25rem;
+}
+
+[ui-pnotify].ui-pnotify .brighttheme-notice div, [ui-pnotify].ui-pnotify .brighttheme-notice h4 {
+    color: #9c4221;
+}
+
+.sp-theme-dark [ui-pnotify].ui-pnotify .brighttheme-notice {
+    background: #c05621;
+    border-left: 0;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    color: #fff;
+}
+
+.sp-theme-dark [ui-pnotify].ui-pnotify .brighttheme-notice div,
+.sp-theme-dark [ui-pnotify].ui-pnotify .brighttheme-notice h4 {
+    color: #fff;
+}
+
+.sp-theme-dark .ui-pnotify-text a {
+    color: var(--color-text-primary);
+}
+
+.sp-theme-dark .ui-pnotify-text a:hover {
+    color: #fff;
+}

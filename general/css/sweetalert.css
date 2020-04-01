@@ -1,0 +1,167 @@
+body.swal2-height-auto {
+    height: 100% !important;
+}
+
+.swal2-container {
+    z-index: 10002;
+}
+
+.swal2-modal {
+    font-family: inherit;
+}
+
+.sp-theme-dark .swal2-modal {
+    background: var(--color-background-primary);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.swal2-popup {
+    padding: 1.5em;
+}
+
+.swal2-title {
+    color: var(--color-text-primary);
+    margin-bottom: 1rem;
+}
+
+.swal2-content {
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+    z-index: 10;
+}
+
+.swal2-modal hr {
+    margin: 0.5rem 0;
+}
+
+.swal2-icon::before {
+    flex-direction: column;
+}
+
+.swal2-icon.swal2-info,
+.swal2-icon.swal2-question {
+    border-color: #3182ce;
+    color: #3182ce;
+}
+
+.swal2-icon.swal2-error {
+    border-color: #e53e3e;
+}
+
+.swal2-icon.swal2-error [class^=swal2-x-mark-line] {
+    background-color: #e53e3e;
+}
+
+.swal2-icon.swal2-success,
+.swal2-icon.swal2-success .swal2-success-ring {
+    border-color: #38a169;
+}
+
+.swal2-icon.swal2-success [class^=swal2-success-line] {
+    background-color: #38a169;
+}
+
+.swal2-icon.swal2-warning {
+    border-color: #dd6b20;
+    color: #dd6b20;
+}
+
+.swal2-modal button {
+    height: auto;
+}
+
+.swal2-styled:focus {
+    box-shadow: none;
+}
+
+.swal2-file,
+.swal2-input,
+.swal2-textarea {
+    border-radius: 0.25rem;
+    color: var(--color-text-primary);
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+.swal2-file,
+.swal2-input,
+.swal2-textarea,
+.swal2-file:focus,
+.swal2-input:focus,
+.swal2-textarea:focus {
+    border: 2px solid var(--color-background-secondary);
+    box-shadow: none;
+}
+
+.swal2-actions:not(.swal2-loading) .swal2-styled:active,
+.swal2-actions:not(.swal2-loading) .swal2-styled:hover {
+    background-image: none;
+}
+
+.sp-theme-dark .swal2-actions:not(.swal2-loading) .swal2-styled:active,
+.sp-theme-dark .swal2-actions:not(.swal2-loading) .swal2-styled:hover {
+    color: #fff;
+}
+
+.swal2-actions:not(.swal2-loading) .swal2-styled[style*="background-color"]:not(.swal2-cancel):hover {
+    background-image: linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.2));
+}
+
+.swal2-styled.swal2-confirm {
+    background: var(--color-primary-800);
+}
+
+.swal2-styled.swal2-confirm:hover {
+    background: var(--color-primary-900);
+}
+
+button.swal2-styled.swal2-confirm:hover {
+    color: #fff;
+}
+
+.swal2-styled.swal2-cancel {
+    background: var(--color-background-secondary);
+    color: var(--color-text-primary);
+}
+
+.swal2-styled.swal2-cancel:hover {
+    background: var(--color-background-tertiary);
+}
+
+.swal2-actions.swal2-loading .swal2-styled.swal2-confirm {
+    margin: 0.375em;
+}
+
+.swal2-file.swal2-inputerror, .swal2-input.swal2-inputerror, .swal2-textarea.swal2-inputerror {
+    border-color: #e53e3e !important;
+    box-shadow: none !important;
+}
+
+.swal2-validation-message {
+    background: var(--color-background-secondary);
+    color: var(--color-text-secondary);
+    margin-top: 1.5em;
+}
+
+.swal2-validation-message::before {
+    background: #e53e3e;
+}
+
+/* Modal form inputs */
+
+.swal2-modal .sp-form-row {
+    @apply block;
+}
+
+.swal2-modal .sp-form-row:last-child {
+    @apply mb-0;
+}
+
+.swal2-modal .sp-form-row > label {
+    @apply w-auto pt-0 pr-0 text-left;
+}
+
+.swal2-modal .sp-form-row > label:empty {
+    @apply p-0;
+}

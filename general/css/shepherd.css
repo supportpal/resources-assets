@@ -1,0 +1,83 @@
+@charset "utf-8";
+
+.shepherd-element {
+    background: var(--color-background-primary);
+    border: 1px solid var(--color-background-tertiary);
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,.1), 0 2px 4px -1px rgba(0,0,0,.06);
+    color: var(--color-text-primary);
+    z-index: 10005;
+}
+
+.sp-theme-dark .shepherd-element {
+    background: var(--color-background-secondary);
+}
+
+.shepherd-arrow:before {
+    background: var(--color-background-primary);
+}
+
+.sp-theme-dark .shepherd-arrow:before {
+    background: var(--color-background-secondary);
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before {
+    background-color: var(--color-background-tertiary);
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,
+.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before {
+    border-bottom: 1px solid var(--color-background-tertiary);
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,
+.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{
+    border-right: 1px solid var(--color-background-tertiary);
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before {
+    border-left: 1px solid var(--color-background-tertiary);
+}
+
+.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before {
+    border-top: 1px solid var(--color-background-tertiary);
+}
+
+.shepherd-has-title .shepherd-content .shepherd-header {
+    background: var(--color-background-tertiary);
+    padding: 0.5rem 1rem;
+}
+
+.shepherd-title {
+    color: var(--color-text-primary);
+    font-size: 1.125rem;
+    font-weight: 700;
+}
+
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+    box-shadow: none;
+    color: var(--color-text-secondary);
+}
+
+.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+    color: var(--color-text-primary);
+}
+
+.shepherd-cancel-icon {
+    font-size: 1.5em;
+    font-weight: 700;
+}
+
+.shepherd-text {
+    color: var(--color-text-primary);
+}
+
+.shepherd-button {
+    background-color: var(--color-primary-800);
+    color: #fff;
+    border-radius: 0.25rem;
+}
+
+.shepherd-button:not(:disabled):hover {
+    background-color: var(--color-primary-900);
+    color: #fff;
+}

@@ -1,0 +1,16 @@
+.minicolors-theme-default .minicolors-swatch {
+    border: 1px solid var(--color-background-primary);
+    height: 1.5rem;
+    left: 0.5rem;
+    top: 0.5rem;
+    width: 1.5rem;
+}
+
+.minicolors-theme-default .minicolors-input {
+    height: auto;
+    padding-left: 2.5rem;
+}
+
+.minicolors-panel {
+    border: 0;
+}
