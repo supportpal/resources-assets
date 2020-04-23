@@ -81,7 +81,7 @@ $(function () {
                 url: $action.find('input[name$="[url]"]').val(),
                 content_type: $action.find('select[name$="[content_type]"]').val(),
                 content: getCodeMirror($action.find('textarea[name$="[content]"]')),
-                ticket_id: typeof ticketId !== 'undefined' ? ticketId : null
+                ticket_id: typeof ticket !== 'undefined' ? ticket.parameters().ticketId : null
             };
 
         $action.find('.test-webhook-response')
@@ -237,7 +237,7 @@ $(function () {
                     }
 
                     // Search for users
-                    $.get(laroute.route('user.operator.search'), { brand_id: typeof brandId !== 'undefined' ? brandId : null, q: query })
+                    $.get(laroute.route('user.operator.search'), { brand_id: typeof ticket !== 'undefined' ? ticket.parameters().brandId : null, q: query })
                         .done(function (res) {
                             res.data = res.data.map(function (value) {
                                 // Add needed info for search and selected item to work.

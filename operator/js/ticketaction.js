@@ -295,10 +295,10 @@
     /**
      * Link tickets together
      *
-     * @param ticket
+     * @param model
      * @returns {*}
      */
-    TicketAction.link = function (ticket) {
+    TicketAction.link = function (model) {
         /**
          * Generate the HTML used for the modal.
          *
@@ -331,7 +331,7 @@
                             return $(this).data('id');
                         })
                         .get(),
-                    excludeIds = [ticket].concat(linkedTickets);
+                    excludeIds = [model].concat(linkedTickets);
 
                 // Fetch recent tickets.
                 return $.get(laroute.route('ticket.operator.action.search'), {include_ids: recentTicketIds, exclude_ids: excludeIds})
@@ -342,7 +342,7 @@
                                 html: makeInterface(response.data),
                                 showCancelButton: true
                             });
-                            registerSelectize($(Swal.getContent().querySelector('#swal2-select')), [ticket]);
+                            registerSelectize($(Swal.getContent().querySelector('#swal2-select')), [model]);
                         } else {
                             throw new Error(response.statusText);
                         }
@@ -360,7 +360,7 @@
                 return $.ajax({
                     url: laroute.route('ticket.operator.action.link'),
                     type: 'POST',
-                    data: {'ticket': ticketId + ',' + $('#swal2-select').val()},
+                    data: {'ticket': ticket.parameters().ticketId + ',' + $('#swal2-select').val()},
                     dataType: 'json'
                 }).then(function (response) {
                     if (response.status == 'success') {

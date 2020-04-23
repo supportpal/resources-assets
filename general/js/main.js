@@ -165,12 +165,13 @@ $.fn.timepicker = function (options) {
     });
 };
 
-// Polyfill for matches and closest (IE11), needed for tippy.js
-// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
+// Polyfill for matches, closest and find (IE11), needed for tippy.js
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
 if (!Element.prototype.matches) {
     Element.prototype.matches = Element.prototype.msMatchesSelector ||
         Element.prototype.webkitMatchesSelector;
 }
+// https://developer.mozilla.org/en-US/docs/Web/API/Element/closest#Polyfill
 if (!Element.prototype.closest) {
     Element.prototype.closest = function (s) {
         var el = this;
@@ -181,6 +182,52 @@ if (!Element.prototype.closest) {
         } while (el !== null && el.nodeType === 1);
         return null;
     };
+}
+// https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array/find#Polyfill
+if (!Array.prototype.find) {
+    Object.defineProperty(Array.prototype, 'find', {
+        value: function(predicate) {
+            // 1. Let O be ? ToObject(this value).
+            if (this == null) {
+                throw TypeError('"this" is null or not defined');
+            }
+
+            var o = Object(this);
+
+            // 2. Let len be ? ToLength(? Get(O, "length")).
+            var len = o.length >>> 0;
+
+            // 3. If IsCallable(predicate) is false, throw a TypeError exception.
+            if (typeof predicate !== 'function') {
+                throw TypeError('predicate must be a function');
+            }
+
+            // 4. If thisArg was supplied, let T be thisArg; else let T be undefined.
+            var thisArg = arguments[1];
+
+            // 5. Let k be 0.
+            var k = 0;
+
+            // 6. Repeat, while k < len
+            while (k < len) {
+                // a. Let Pk be ! ToString(k).
+                // b. Let kValue be ? Get(O, Pk).
+                // c. Let testResult be ToBoolean(? Call(predicate, T, « kValue, k, O »)).
+                // d. If testResult is true, return kValue.
+                var kValue = o[k];
+                if (predicate.call(thisArg, kValue, k, o)) {
+                    return kValue;
+                }
+                // e. Increase k by 1.
+                k++;
+            }
+
+            // 7. Return undefined.
+            return undefined;
+        },
+        configurable: true,
+        writable: true
+    });
 }
 
 // Wait for DOM to load before running the below.
@@ -195,7 +242,6 @@ $(function () {
 
     // Tooltip - tippy.js
     tippy.delegate(document.body, {
-        allowHTML: false,
         content: function (reference) {
             var title = reference.getAttribute('title');
             reference.removeAttribute('title');
@@ -203,7 +249,7 @@ $(function () {
         },
         target: '[title]',
         touch: ['hold', 500],
-        zIndex: 10003
+        zIndex: 10003,
     });
 
     // Global event events.

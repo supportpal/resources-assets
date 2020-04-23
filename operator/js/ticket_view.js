@@ -353,19 +353,19 @@ $(document).ready(function() {
      * Split to new ticket
      */
     // If more than one message, show split ticket button and checkboxes
-    if ($('.messages-header').nextAll('.sp-message').length > 1) {
-        $('input.split-ticket').show();
+    if ($('.sp-messages-container[data-position="inline"]').children('.sp-message').length > 1) {
+        $('span.split-ticket').removeClass('sp-hidden');
     }
 
     // Enable button if at least one checkbox ticked
-    $(document.body).on('click', 'input.split-ticket', function(event) {
+    $(document.body).on('click', 'span.split-ticket input', function(event) {
         event.stopPropagation();
 
         // Ensure if notes, any other instances of same message is ticked
-        $('input.split-ticket[data-id="' + $(this).data('id') + '"]').prop('checked', $(this).prop('checked'));
+        $('span.split-ticket input[data-id="' + $(this).data('id') + '"]').prop('checked', $(this).prop('checked'));
 
         // Show button if at least one is ticked
-        if ($('input.split-ticket:checked').length) {
+        if ($('span.split-ticket input:checked').length) {
             $('.split-ticket-action').removeClass('sp-hidden');
             $('.split-ticket-button').prop('disabled', false);
         } else {
@@ -378,7 +378,7 @@ $(document).ready(function() {
     $('.split-ticket-button').on('click', function() {
         var selected = '';
         // Add checked fields to form
-        $('input.split-ticket:checked').each(function() {
+        $('span.split-ticket input:checked').each(function() {
             selected += $(this).data('id') + ',';
         });
         $('<input>').attr({
@@ -440,6 +440,11 @@ $(document).ready(function() {
         // AJAX load the message into the view.
         ticket.loadMessage($this);
 
+        // If we're collapsing and the edit view is showing, hide it and show the normal message view.
+        if ($this.hasClass('sp-message-collapsible') && $this.find('.sp-message-text-edit').is(':visible')) {
+            $this.find('.sp-message-text, .sp-message-text-edit').toggle();
+        }
+
         // Toggle between collapsed and collapsible mode
         $this.find('.sp-message-text').children('.sp-message-text-original, .sp-message-text-trimmed').toggle();
         $this.toggleClass('sp-message-collapsible sp-message-collapsed');
@@ -448,11 +453,11 @@ $(document).ready(function() {
     // Collapse tickets with more than 2 collapsed messages
     if ($('.sp-message.sp-message-collapsed').length > 2 && ! scrollToMessage) {
         // Staff notes and ticket content regions of the screen
-        var regions = [".notes-header", ".messages-header"];
+        var regions = [".sp-messages-container[data-position='top']", ".sp-messages-container[data-position='inline']"];
 
         for (var i = 0; i < regions.length; i++) {
             // Build the basic selector
-            var basicSelector = $(regions[i] + ' + .sp-messages-container > .sp-message.sp-message-collapsed');
+            var basicSelector = $(regions[i] + ' > .sp-message.sp-message-collapsed');
 
             // If this region of the screen has more than 2 collapsed messages, let's shrink it!
             if (basicSelector.length > 2) {
@@ -534,6 +539,7 @@ $(document).ready(function() {
             reply_type: type,
             is_draft: 1,
             text: message,
+            redactor: [ $form.find('textarea:not(.CodeMirror textarea):eq(0)').attr('name') ],
             from_address: type == '2' ? $form.find('select[name="from_address"]').val() : null,
             to_address: type == '2' ? $form.find('select[name="to_address[]"]').val() : null,
             cc_address: type == '2' ? $form.find('select[name="cc_address[]"]').val() : null,
@@ -821,7 +827,7 @@ $(document).ready(function() {
         create: false,
         render: {
             optgroup_header: function(item, escape) {
-                return '<div class="optgroup_header">' + escape(item.label) + '</div>';
+                return '<div class="optgroup_header sp-px-3 sp-py-3/2 sp-font-bold">' + escape(item.label) + '</div>';
             },
             option: function(item, escape) {
                 return '<div>' +

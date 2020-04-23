@@ -46,7 +46,7 @@ var SupportPalSlugGenerator = function (parameters)
         // Get the slug for the given name.
         return $.get(route, $.extend({}, {value: value, prevent_duplicate: preventDuplicate|0}, parameters))
             .done(function (json) {
-                $slugText.text(json.data);
+                $slugText.text(decodeURI(json.data));
                 $slug.find(':input').val(json.data);
                 $slug.find('.slug-uri').contents().unwrap();
 

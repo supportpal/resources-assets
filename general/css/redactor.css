@@ -218,6 +218,8 @@
 .re-button-tooltip {
     background: #212121;
     color: #fff;
+    font-family: var(--font-display);
+    z-index: 10010;
 }
 
 .re-button-tooltip:after {
@@ -272,11 +274,7 @@
 
 /* Redactor plugins (modals) */
 
-#redactor-overlay {
-    z-index: 10002;
-}
-
-#redactor-modal {
+.redactor-modal-box {
     background: rgba(0,0,0,0.4);
     font-family: var(--font-display);
     line-height: inherit;
@@ -450,4 +448,8 @@ ul.redactor-search li .sp-title {
 
 .redactor-modal-body ul li.sp-disabled {
     opacity: 0.5;
+}
+
+.redactor-in p {
+    margin: 0; /* act like breaklines */
 }

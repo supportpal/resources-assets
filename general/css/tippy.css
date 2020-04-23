@@ -1,27 +1,27 @@
 @charset "utf-8";
 
-.sp-theme-dark .tippy-tooltip {
+.tippy-box {
     text-align: center;
 }
 
-.sp-theme-dark .tippy-tooltip {
+.sp-theme-dark .tippy-box {
     background: var(--color-primary-100);
     color: var(--color-primary-900);
     text-align: center;
 }
 
-.sp-theme-dark .tippy-tooltip[data-placement^=top] > .tippy-arrow {
+.sp-theme-dark .tippy-box[data-placement^=top] > .tippy-arrow::before {
     border-top-color: var(--color-primary-100);
 }
 
-.sp-theme-dark .tippy-tooltip[data-placement^=bottom] > .tippy-arrow {
+.sp-theme-dark .tippy-box[data-placement^=bottom] > .tippy-arrow::before {
     border-bottom-color: var(--color-primary-100);
 }
 
-.sp-theme-dark .tippy-tooltip[data-placement^=left] > .tippy-arrow {
+.sp-theme-dark .tippy-box[data-placement^=left] > .tippy-arrow::before {
     border-left-color: var(--color-primary-100);
 }
 
-.sp-theme-dark .tippy-tooltip[data-placement^=right] > .tippy-arrow {
+.sp-theme-dark .tippy-box[data-placement^=right] > .tippy-arrow::before {
     border-right-color: var(--color-primary-100);
 }

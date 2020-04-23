@@ -67,7 +67,13 @@
         var showFeedback = function (failure) {
             failure = failure || false;
 
-            $('.sp-ticket-update.' + (failure ? 'sp-alert-error' : 'sp-alert-success')).show(500).delay(5000).hide(500);
+            if ($('.sp-ticket-update').length) {
+                $('.sp-ticket-update.' + (failure ? 'sp-alert-error' : 'sp-alert-success')).show(500).delay(5000).hide(500);
+            } else {
+                if (failure) {
+                    Swal.fire(Lang.get('messages.error'), Lang.get('messages.general_error'), 'error');
+                }
+            }
         };
 
         /**
@@ -84,8 +90,8 @@
             form.find('.draft-success, .discard-draft').hide();
 
             // If more than one message, show split ticket button and checkboxes
-            if ($('sp-message').length > 1) {
-                $('.split-ticket').fadeIn();
+            if ($('.sp-message').length > 1) {
+                $('span.split-ticket').removeClass('sp-hidden');
             }
 
             // If we have one or more CC email in the reply form, show the reply-all button, else hide it (if it's there)
@@ -186,11 +192,11 @@
                 $('.notes-header, .messages-header').show();
 
                 // Definitely want to add to notes area
-                var place = $('.notes-header + .sp-messages-container');
+                var place = $('.sp-messages-container[data-position="top"]');
 
                 // Also want to add to message area
                 if (parameters.notesPosition === 0) {
-                    place = place.add($('.messages-header + .sp-messages-container'));
+                    place = place.add($('.sp-messages-container[data-position="inline"]'));
                 }
 
                 if (parameters.replyOrder == 'ASC') {
@@ -204,10 +210,10 @@
                 // We need to just show it in the messages block
                 if (parameters.replyOrder == 'ASC') {
                     // Add to end of messages block
-                    message = code.appendTo('.messages-header + .sp-messages-container');
+                    message = code.appendTo('.sp-messages-container[data-position="inline"]');
                 } else {
                     // Add to start of messages block
-                    message = code.prependTo('.messages-header + .sp-messages-container');
+                    message = code.prependTo('.sp-messages-container[data-position="inline"]');
                 }
             }
 
@@ -335,10 +341,14 @@
 
                 // Replace message view with response (we use the message ID in case it's a note as it could be showing in
                 // two places).
-                var message = $(response.data.view).replaceAll($('.sp-message.sp-message-' + $form.parents('.sp-message').data('id')));
+                var message = $form.parents('.sp-message');
+                message.find('.sp-message-text').html(response.data.message);
+                message.find('.sp-message-text-trimmed').addClass('sp-hidden');
+                message.find('.sp-message-text-original').removeClass('sp-hidden');
+                message.find('.sp-message-edit-history').html(response.data.editHistory);
 
-                // Show the edited message (otherwise it's collapsed).
-                message.trigger('click');
+                // Close the edit form.
+                $form.find('button.edit-button').trigger('click');
 
                 // Update editor for editing this updated message
                 showFeedback();
@@ -391,9 +401,6 @@
                         if (!$messageContainer.find('textarea').parents('.redactor-box').length) {
                             $messageContainer.find('textarea').redactor(instance.defaultRedactorConfig());
                         }
-
-                        // Update the editing message form text too.
-                        $messageContainer.find('form.edit textarea[name="text"]').redactor('source.setCode', ajax.data.purified_text);
 
                         // If a callback exists, run it.
                         typeof successCallback === 'function' && successCallback();
@@ -713,12 +720,26 @@
 
             // Get messages.
             var messages = $('.sp-message-' + components[1]).filter(function () {
-                var len = $(this).prevAll('.messages-header').length;
+                var isInline = instance.getMessagePosition($(this)) === "inline";
 
-                return notesOnly ? len === 0 : len > 0;
+                return notesOnly ? ! isInline : isInline;
             });
 
             return messages.length >= 1 ? messages.first() : false;
+        };
+
+        /**
+         * Whether the message is displayed at the top are inline.
+         *
+         * @param $message
+         * @returns {string}
+         */
+        this.getMessagePosition = function ($message) {
+            if ($message.parents(".sp-messages-container[data-position='top']").length) {
+                return "top";
+            }
+
+            return "inline";
         };
 
         /**
@@ -730,7 +751,7 @@
         this.getId = function ($message) {
             // If the .messages-header doesn't exist in the previous siblings then we've been given
             // a note that's displayed at the top of the page.
-            if ($message.prevAll('.messages-header').length === 0) {
+            if (instance.getMessagePosition($message) === "top") {
                 return NOTES_PLACEHOLDER.replace('%ID%', $message.data('id'))
             } else {
                 return MESSAGE_PLACEHOLDER.replace('%ID%', $message.data('id'));
@@ -1074,22 +1095,41 @@
                         var url = $message.find('.sp-message-text .sp-message-text-original a.supportpal_clipped_vem').prop('href');
                         window.open(url + '?edit=true');
                     } else {
-                        // AJAX load the message if it hasn't already been loaded.
-                        var successCallback = function () {
-                            // Initialise redactor.
-                            if (!$message.find('textarea').parents('.redactor-box').length) {
-                                $message.find('textarea').redactor(instance.defaultRedactorConfig());
-                            }
+                        // Toggle the views. It will show a loading icon if it hasn't been loaded before.
+                        $message.find('.sp-message-text, .sp-message-text-edit').toggle();
 
-                            $message.find('.sp-message-text, .sp-message-text-edit').toggle();
+                        var $editView = $message.find('.sp-message-text-edit');
 
-                            // Focus the textarea, when editing the message.
-                            if ($message.find('.sp-message-text-edit').is(':visible')) {
-                                $message.find('textarea:not(.CodeMirror textarea):eq(0)').redactor('editor.startFocus');
-                            }
-                        };
+                        // If the edit message view is now visible and it hasn't already been loaded, we need
+                        // to AJAX load the edit view.
+                        if ($editView.is(':visible') && ! $editView.hasClass('sp-loaded')) {
+                            $.get(laroute.route('ticket.operator.message.edit', {id: $message.data('id')}))
+                                .then(function (response) {
+                                    if (response.status == 'success') {
+                                        // Replace the view and add a loaded class.
+                                        $editView.addClass('sp-loaded').html(response.data.view);
 
-                        instance.loadMessage($message, successCallback);
+                                        // Initialise redactor.
+                                        $message.find('form.edit textarea').redactor(instance.defaultRedactorConfig());
+
+                                        // Focus the editor.
+                                        $message.find('textarea:not(.CodeMirror textarea):eq(0)').redactor('editor.startFocus');
+                                    } else {
+                                        // Switch back to the message view.
+                                        $message.find('.sp-message-text, .sp-message-text-edit').toggle();
+
+                                        // Show error message.
+                                        $('.sp-message-update').show(500).delay(5000).hide(500);
+                                    }
+                                })
+                                .fail(function () {
+                                    // Switch back to the message view.
+                                    $message.find('.sp-message-text, .sp-message-text-edit').toggle();
+
+                                    // Show error message.
+                                    $('.sp-message-update').show(500).delay(5000).hide(500);
+                                });
+                        }
                     }
                 })
 

@@ -129,6 +129,7 @@
                 modules: {
                     Buttons: {
                         closerHover: false,
+                        labels: {close: ''},
                         sticker: false,
                         stickerHover: false
                     }
@@ -167,12 +168,8 @@
 
                 // Open the link if one is provided
                 if (typeof route !== 'undefined') {
-                    // Prevent the browser from focusing the Notification's tab
-                    e.preventDefault();
                     window.open(route, '_blank');
                 }
-
-                PNotify.modules.Desktop.close();
             });
         };
 
