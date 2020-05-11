@@ -394,9 +394,17 @@
     border-top-color: var(--color-background-tertiary);
 }
 
-.redactor-modal-body input.ui-autocomplete-loading + div::before {
+.redactor-modal-body .sp-loading:after {
+    animation: fa-spin 2s infinite linear;
     color: var(--color-text-secondary);
+    content: "\f110";
+    display: block;
+    font-family: var(--font-icon);
+    font-weight: bold;
+    position: absolute;
+    right: 0.75rem;
     top: 0.5rem;
+    z-index: 50;
 }
 
 .upload-redactor-box {

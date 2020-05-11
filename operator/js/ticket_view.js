@@ -34,6 +34,20 @@ $(document).ready(function() {
                 $form = $('.message-form:not(.edit)');
         }
 
+        // If a form is visible but out of view, just scroll to it.
+        if ($form.is(':visible')) {
+            var elementTop = $form.position().top;
+            var elementBottom = elementTop + $form.outerHeight();
+            var screenTop = $('#content').scrollTop();
+            var screenBottom = screenTop + $('#content').innerHeight();
+
+            if (screenBottom < elementTop || screenTop > elementBottom) {
+                // Element is not visible.
+                $('#content').animate({scrollTop: $form.position().top - 24}, 1000);
+                return;
+            }
+        }
+
         // See if we want to hide existing form if one is open.
         $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
         if (! $form.is(':visible')) {
@@ -1254,7 +1268,7 @@ $(document).ready(function() {
     function updateTicket(data) {
         // Disable buttons and dropdowns
         var selector = '#sidebar button, #sidebar select',
-            $disabled = $(selector).find(':disabled');
+            $disabled = $(selector).filter(':disabled');
         $(selector).prop('disabled', true);
 
         // Add ticket ID
@@ -1296,7 +1310,7 @@ $(document).ready(function() {
     function ticketAction(route, data) {
         // Disable buttons and dropdowns
         var selector = '.sp-quick-actions button, #sidebar button, #sidebar select',
-            $disabled = $(selector).find(':disabled');
+            $disabled = $(selector).filter(':disabled');
         $(selector).prop('disabled', true);
 
         // Post data to perform action
@@ -1324,7 +1338,7 @@ $(document).ready(function() {
     function changeDepartment(data) {
         // Disable buttons and dropdowns
         var selector = '.sp-quick-actions button, #sidebar button, #sidebar select',
-            $disabled = $(selector).find(':disabled');
+            $disabled = $(selector).filter(':disabled');
         $(selector).prop('disabled', true);
 
         // Post data to perform action

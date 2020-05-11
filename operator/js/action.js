@@ -61,6 +61,9 @@ $(function () {
 
         // Only show content for options listed below.
         $wrapper.toggle($.inArray($(this).val(), ['POST','PUT','PATCH']) !== -1);
+        $wrapper.find('textarea.codemirror').each(function () {
+            codeMirror($(this));
+        });
     });
     $(document).on('click', '.test-webhook', function (e) {
         e.preventDefault();
@@ -176,7 +179,13 @@ $(function () {
             return;
         }
 
-        CodeMirror.fromTextArea($element[0], CodeMirror.options);
+        $element.sourcecode({
+            toolbar: true,
+            mergeFields: {
+                tickets: true,
+                organisations: organisationsEnabled
+            }
+        });
         $element.data('init', true);
     }
 

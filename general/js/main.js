@@ -256,6 +256,21 @@ $(function () {
     // Avoid polluting the $(document) space with too many event listeners, try to place as close to element as possible
     // otherwise performance will be affected (https://api.jquery.com/on/).
     $(document.body)
+        // Tabs toggling
+        .on('click', 'ul.sp-tabs li', function () {
+            // Get name of tab
+            var name = $(this).attr('id');
+
+            // Hide current div
+            $(this).parent().siblings('div.sp-tab-content').hide();
+            // Show new div
+            $('#tab' + name).show();
+
+            // Remove active from old tab
+            $(this).parent().find('li.sp-active').removeClass('sp-active');
+            // Set to active
+            $(this).addClass('sp-active');
+        })
         // For dropdowns
         .on('click', '.sp-dropdown-container .sp-button, .sp-dropdown-container .sp-action, .sp-dropdown-container .sp-dropdown li', function () {
             $(this).parents('.sp-dropdown-container').find('.sp-dropdown').toggle();
@@ -268,7 +283,7 @@ $(function () {
         })
         // For opening/collapsing collapsible boxes
         .on('click', '.sp-collapsible', function () {
-            $(this).find('.fas').toggleClass('fa-chevron-down fa-chevron-up');
+            $(this).find('.fas.fa-chevron-down, .fas.fa-chevron-up').toggleClass('fa-chevron-down fa-chevron-up');
             $(this).next().toggle(500);
         })
         // Smooth scrolling for anchors
@@ -299,22 +314,6 @@ $(function () {
         .on('click', '.sp-alert .sp-alert-close', function () {
             $(this).parent().slideToggle(300);
         });
-
-    // Tabs toggling
-    $('ul.sp-tabs li').on('click', function () {
-        // Get name of tab
-        var name = $(this).attr('id');
-
-        // Hide current div
-        $(this).parent().siblings('div.sp-tab-content').hide();
-        // Show new div
-        $('#tab' + name).show();
-
-        // Remove active from old tab
-        $(this).parent().find('li.sp-active').removeClass('sp-active');
-        // Set to active
-        $(this).addClass('sp-active');
-    });
 
     // Handle anchors on page load
     if (window.location.hash) {

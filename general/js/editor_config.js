@@ -102,6 +102,9 @@
         breakline: false, // Use <p> instead of <br>.
                           // breakline mode is very buggy. We do not recommend to turn this on.
 
+        // Disable formatting shortcodes.
+        shortcodes: false,
+
         // Shortcuts.
         shortcuts: {
             'ctrl+b, meta+b': { api: 'module.inline.format', args: 'b' },
@@ -139,6 +142,7 @@
         linkTarget: '_blank', // Pre-check the 'Open Link in New Tab' checkbox.
 
         // Image settings.
+        imageFigure: false,
         imageUpload: laroute.route('core.embed.image'),
         imageData: {
             "_token": $('meta[name=csrf_token]').prop('content')

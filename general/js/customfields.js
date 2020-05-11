@@ -56,7 +56,8 @@ function customfieldRedactor()
 
             // Paste settings.
             pasteImages: false,
-            pastePlainText: true, // Convert pasted HTML into plain/text.
+            pasteBlockTags: ['p'],
+            pasteInlineTags: ['a', 'br'],
 
             // Toolbar settings.
             toolbar: false,

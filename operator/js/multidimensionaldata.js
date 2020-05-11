@@ -35,9 +35,12 @@ $(document).ready(function() {
                 [ 'name', 'for', 'id' ].map(attributeMapper.bind(null, elem, value));
             });
 
-            // Initialise redactor on new textarea.
-            if (newElem.find('textarea:not(.not-redactor)').length > 0) {
-                newElem.find('textarea:not(.not-redactor)').redactor(opts);
+            // Initialise redactor or source code editor on new textarea.
+            if (newElem.find('textarea.redactor').length > 0) {
+                newElem.find('textarea.redactor').redactor(opts);
+            }
+            if (newElem.find('textarea.source-code').length > 0) {
+                newElem.find('textarea.source-code').sourcecode(opts);
             }
 
             // Initialise file upload.

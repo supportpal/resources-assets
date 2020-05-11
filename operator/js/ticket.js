@@ -769,29 +769,10 @@
                 return;
             }
 
-            var content = false,
-                $original = $message.children('.sp-message-text').children('.sp-message-text-original'),
-                $parent = $quote;
+            var text = $message.children('.sp-message-text').children('.sp-message-text-original').text();
 
-            // Loop backwards from the quote element back up to the original class
-            while (!$parent.is($original)) {
-                $parent = $parent.parent();
-
-                // It needs to check if this container has any visible text in it (but not in invisible elements inside it)
-                // https://stackoverflow.com/questions/1846177/how-do-i-get-just-the-visible-text-with-jquery-or-javascript
-                var visibleText = $parent.find('*:not(:has(*)):visible').text(),
-                    textNodes = $parent.contents().filter(function () {
-                        return this.nodeType === 3;
-                    }).text();
-
-                if (visibleText.trim().length || textNodes.trim().length) {
-                    content = true;
-                    break;
-                }
-            }
-
-            // If no content found, remove the quote and expand button
-            if (!content) {
+            // Check if there is any text before the quoted text.
+            if (! text.substring(0, text.indexOf($quote.text())).trim().length) {
                 $quote.removeClass('supportpal_quote');
                 $quote.prev('.expandable').remove();
             }
@@ -1044,7 +1025,7 @@
             $(document)
                 // Expand quoted areas
                 .on('click', '.expandable', function () {
-                    $(this).next().toggle('show');
+                    $(this).next().toggle();
                 })
 
                 // Open links in a new window/tab. Needs rel="noopener" due to

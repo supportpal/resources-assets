@@ -1,19 +1,4 @@
 $(function() {
-    // Add CodeMirror editor.
-    if ($('textarea[name=global_email_header]').length) {
-        CodeMirror.fromTextArea($('textarea[name=global_email_header]')[0], CodeMirror.options);
-    }
-    if ($('textarea[name=global_email_footer]').length) {
-        CodeMirror.fromTextArea($('textarea[name=global_email_footer]')[0], CodeMirror.options);
-    }
-
-    // The editor needs refreshing if it's rendered while out-of-view for some reason..
-    $('.sp-tabs li').on('click', function () {
-        $('.CodeMirror').each(function(i, el){
-            el.CodeMirror.refresh();
-        });
-    });
-
     $('.validate-smtp').on('click', function () {
         // Get data
         var data = {
