@@ -362,6 +362,7 @@ table.dataTable.dtr-inline.collapsed > tbody > tr[role=row] > th:first-child:bef
     font-size: 0.75rem;
     font-weight: bold;
     left: 1.5rem;
+    margin-top: 0;
     padding: 0.125rem;
     top: 50%;
     transform: translateY(-50%);

@@ -3,7 +3,7 @@ $(document).ready(function () {
     $('.datepicker').datepicker();
 
     // Enable hide / show password toggle
-    callHideShowPassword();
+    $('input[type=password]').hideShowPassword();
 
     // Redactor
     $('textarea[name="text"]').redactor();

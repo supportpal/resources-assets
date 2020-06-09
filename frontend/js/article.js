@@ -244,7 +244,7 @@ $(document).ready(function () {
                                 showLoaderOnConfirm: true,
                                 allowOutsideClick: false,
                                 onOpen: function () {
-                                    callHideShowPassword();
+                                    $('input[type=password]').hideShowPassword();
 
                                     // Date picker
                                     $(Swal.getContent()).find('.datepicker').datepicker();

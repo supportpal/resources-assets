@@ -95,6 +95,11 @@
         // Disable default redactor styling.
         styles: false,
 
+        // Toolbar settings.
+        // Only fixed in the operator panel, not possible on frontend due to fixed header.
+        toolbarFixed: $('#content').length ? true : false, // This is needed to avoid a JS error on the frontend.
+        toolbarFixedTarget: '#content',
+
         // Height settings.
         minHeight: '150px',
 
@@ -143,6 +148,7 @@
 
         // Image settings.
         imageFigure: false,
+        imageResizable: true,
         imageUpload: laroute.route('core.embed.image'),
         imageData: {
             "_token": $('meta[name=csrf_token]').prop('content')

@@ -108,7 +108,7 @@ $(document).ready(function () {
                     x: 'hidden'
                 },
                 scrollbars: {
-                    autoHide: 'scroll'
+                    autoHide: 'leave'
                 }
             });
         };

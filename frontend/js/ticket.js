@@ -3,7 +3,7 @@ $(document).ready(function() {
     $('.datepicker').datepicker();
 
     // Enable hide / show password toggle
-    callHideShowPassword();
+    $('input[type=password]').hideShowPassword();
 
     // Load attachment previews
     App.attachments.loadPreviews($('.sp-message'));

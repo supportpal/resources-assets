@@ -5,12 +5,14 @@
 .sp-input-has-error input,
 .sp-input-has-error select,
 .sp-input-has-error .redactor-box,
+.sp-input-has-error .codemirror-box,
 input.sp-input-has-error,
 select.sp-input-has-error {
     border-color: #e53e3e !important;
 }
 
-.sp-input-has-error .redactor-box {
+.sp-input-has-error .redactor-box,
+.sp-input-has-error .codemirror-box {
     border-width: 2px;
 }
 

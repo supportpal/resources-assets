@@ -231,9 +231,9 @@ jQuery(function($){
         // Handle hiding delete downloaded option when POP3 is selected
         .on('change', '.email-protocol select', function() {
             if ($(this).val() == 0) {
-                $(this).parents('.email-download').find('.delete-downloaded').show();
+                $(this).parents('.email-download').find('.delete-downloaded').removeClass('sp-hidden');
             } else {
-                $(this).parents('.email-download').find('.delete-downloaded').hide();
+                $(this).parents('.email-download').find('.delete-downloaded').addClass('sp-hidden');
             }
         })
         // Validate email download details

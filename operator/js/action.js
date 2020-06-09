@@ -71,12 +71,14 @@ $(function () {
         var route = $(this).data('route'),
             $action = $(this).parents('.action'),
             getCodeMirror = function ($element) {
-                var $codemirror = $element.next('.CodeMirror');
-                if ($codemirror.length) {
-                    return $codemirror[0].CodeMirror.getValue();
+                if ($element[0].sourcecode) {
+                    return $element[0].sourcecode.codemirror().getValue();
+                } else if ($element.next('.CodeMirror').length) {
+                    // Deprecated (DEV-2447). To be removed in favour of .sourcecode in v4.
+                    return $element.next('.CodeMirror')[0].CodeMirror.getValue();
+                } else {
+                    return '';
                 }
-
-                return '';
             },
             data = {
                 headers: getCodeMirror($action.find('textarea[name$="[headers]"]')),
@@ -88,20 +90,18 @@ $(function () {
             };
 
         $action.find('.test-webhook-response')
-            .removeClass('text-success text-fail')
+            .removeClass('text-success sp-text-green-600 text-fail sp-text-red-600')
             .html('<i class="fa fa-spinner fa-pulse fa-fw"></i> ' + Lang.get('general.loading') + '...');
 
         $.post(route, data)
             .done(function (data) {
                 $action.find('.test-webhook-response')
-                    .removeClass('text-success text-fail')
-                    .addClass(data.status === 'success' ? 'text-success' : 'text-fail')
+                    .addClass(data.status === 'success' ? 'text-success sp-text-green-600' : 'text-fail sp-text-red-600')
                     .text(data.message);
             })
             .fail(function (jqXHR, textStatus, errorThrown) {
                 $action.find('.test-webhook-response')
-                    .removeClass('text-success')
-                    .addClass('text-fail')
+                    .addClass('text-fail sp-text-red-600')
                     .text(jqXHR.responseText);
             });
     });
@@ -157,7 +157,7 @@ $(function () {
                     organisations: organisationsEnabled
                 },
                 groups: $R.options.groups.concat(['sp-image']),
-                plugins: plugins.concat(['sp-mergefields']).concat($R.options.plugins)
+                plugins: $R.options.plugins.concat(plugins).concat(['sp-mergefields'])
             };
 
         // Redactor

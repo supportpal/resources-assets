@@ -128,7 +128,7 @@
 /* Loading/disabled */
 
 .selectize-control.loading:before {
-    background: url('../../libs/img/spinner.gif');
+    background: url('../../general/img/spinner.gif');
     content: "";
     height: 2rem;
     position: absolute;
@@ -139,7 +139,7 @@
 }
 
 .sp-theme-dark .selectize-control.loading:before {
-    background: url('../../libs/img/spinner-dark.gif');
+    background: url('../../general/img/spinner-dark.gif');
 }
 
 .selectize-control.single.loading:before {

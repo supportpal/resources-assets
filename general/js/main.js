@@ -370,9 +370,39 @@ $(function () {
         timeAgo.setLocale("supportpal");
     }
 
+    /**
+     * Get the form row that the error element sits in.
+     *
+     * @param  {HTMLElement} element
+     * @returns {jQuery}
+     */
+    function getErrorElementRow(element)
+    {
+        return $(element).closest('.sp-form-row');
+    }
+
+    /**
+     * Get the wrapper element around the element that failed validation.
+     *
+     * @param  {HTMLElement} element
+     * @returns {jQuery}
+     */
+    function getErrorElementWrapper(element)
+    {
+        var $row = getErrorElementRow(element);
+
+        return $row.find(':input:not(:button)').length > 1 &&
+            (! $(element).parent('.redactor-box').length && ! $(element).parent('.merge-field_container').length
+                && ! $(element).parent('.hideShowPassword-wrapper').length
+                && ! $(element).parent('.sp-input-translatable-container').length
+                && ! $(element).parent('.sp-input-group').length && $(element).prop('type') !== 'checkbox'
+                && $(element).prop('type') !== 'radio'
+            ) ? $(element) : $row;
+    }
+
     // jQuery validate.
     $.validator.setDefaults({
-        ignore: ':hidden:not(.redactor):not(input[type=hidden]), [contenteditable=\'true\']',
+        ignore: '[contenteditable=\'true\']',
 
         errorElement: 'span',
         errorClass: 'sp-input-error',
@@ -390,8 +420,8 @@ $(function () {
                 position = element.parent();
             }
 
-            // If it's selectize, add after sibling.
-            if (element.next().hasClass('selectize-control')) {
+            // If it's selectize or codemirror (source code), add after sibling.
+            if (element.next().hasClass('selectize-control') || element.hasClass('source-code')) {
                 position = element.next();
             }
 
@@ -410,38 +440,16 @@ $(function () {
         },
 
         highlight: function(element, errorClass, validClass) {
-            // If there's multiple inputs in the row, add the class to the input instead of the row
-            // Excluding If it's redactor, codemirror, show/hide button, a checkbox or radio
-            var $row = $(element).closest('.sp-form-row'),
-                $elm = $row.find(':input:not(:button)').length > 1 &&
-                (! $(element).parent('.redactor-box').length && ! $(element).parent('.merge-field_container').length
-                    && ! $(element).parent('.hideShowPassword-wrapper').length
-                    && ! $(element).parent('.sp-input-group').length && $(element).prop('type') !== 'checkbox'
-                    && $(element).prop('type') !== 'radio'
-                ) ? $(element) : $row;
-
-            // Add the Bootstrap error class to the control group
-            $elm.addClass('sp-input-has-error');
+            getErrorElementWrapper(element).addClass('sp-input-has-error');
         },
 
         unhighlight: function(element, errorClass, validClass) {
-            // If there's multiple inputs in the row, add the class to the input instead of the row
-            // Excluding If it's redactor, codemirror, show/hide button, a checkbox or radio
-            var $row = $(element).closest('.sp-form-row'),
-                $elm = $row.find(':input').length > 1 &&
-                (! $(element).parent('.redactor-box').length && ! $(element).parent('.merge-field_container').length
-                    && ! $(element).parent('.hideShowPassword-wrapper').length
-                    && ! $(element).parent('.sp-input-group').length && $(element).prop('type') !== 'checkbox'
-                    && $(element).prop('type') !== 'radio'
-                ) ? $(element) : $row;
-
-            // Remove the Bootstrap error class from the control group
-            $elm.removeClass('sp-input-has-error');
+            getErrorElementWrapper(element).removeClass('sp-input-has-error');
 
             // Hide error if it's "pending" (remote validation).
             var describer = $(element).attr("aria-describedby");
             if (describer) {
-                $row.find('#' + this.escapeCssMeta(describer)).hide();
+                getErrorElementRow(element).find('#' + this.escapeCssMeta(describer)).hide();
             }
         },
 
@@ -484,42 +492,62 @@ $(function () {
         invalidHandler: function(event, validator) {
             // Enable submit button again (necessary for invalid remote validation).
             $(this).find(':submit').prop('disabled', false);
+        },
 
-            if (!validator.numberOfInvalids())
-                return;
+        showErrors: function(errorMap, errorList) {
+            // Run default error message handler.
+            this.defaultShowErrors();
 
-            // If the error is on another tab, switch to it.
-            if ($(validator.errorList[0].element).parents('.sp-tab-content').length) {
-                // Get tab ID
-                var id = $(validator.errorList[0].element).parents('.sp-tab-content').attr('id');
+            // Move the screen to show the first error message.
+            if (typeof errorList[0] != "undefined") {
+                var $elm = getErrorElementWrapper(errorList[0].element);
 
-                // Get name from ID and click on the tab
-                if (typeof id !== 'undefined' && id.substring(0, 3) == 'tab') {
-                    $('.sp-tabs li#' + id.substring(3)).trigger('click');
+                // If the error is on another tab, switch to it.
+                if ($elm.parents('.sp-tab-content').length) {
+                    var id = $elm.parents('.sp-tab-content').attr('id');
+                    if (typeof id !== 'undefined' && id.substring(0, 3) === 'tab') {
+                        $('.sp-tabs li#' + id.substring(3)).trigger('click');
+                    }
+                }
+
+                // Scroll to the element.
+                $('html, body, #content').animate({scrollTop: $elm.position().top - 44}, 1000);
+            }
+        }
+    });
+
+    // Hide/Show Password library defaults.
+    $.extend(true, $.fn.hideShowPassword.defaults, {
+        show: false,
+        innerToggle: 'focus',
+        states: {
+            shown: {
+                toggle: {
+                    attr: {
+                        title: null
+                    }
+                }
+            },
+            hidden: {
+                toggle: {
+                    attr: {
+                        title: null
+                    }
                 }
             }
-
-            // Move towards the first error (only if visible).
-            if ($(validator.errorList[0].element).is(':visible')) {
-                $('html, body, #content').animate({
-                    scrollTop: $(validator.errorList[0].element).position().top - 44
-                }, 1000);
-            }
-
-        },
-    });
-});
-
-// Adds a button to show/hide passwords
-function callHideShowPassword()
-{
-    $('input[type=password]').hideShowPassword(false, 'focus', {
-        states: {
-            shown: { toggle: { attr: { title: null } } },
-            hidden: { toggle: { attr: { title: null } } }
         },
         toggle: {
             className: 'sp-button-sm'
         }
     });
+});
+
+/**
+ * Adds a button to show/hide passwords
+ *
+ * @deprecated To be removed in v4. Use $().hideShowPassword() instead.
+ */
+function callHideShowPassword()
+{
+    $('input[type=password]').hideShowPassword();
 }

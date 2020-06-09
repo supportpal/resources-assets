@@ -69,6 +69,7 @@
 
 .shepherd-text {
     color: var(--color-text-primary);
+    overflow: auto;
 }
 
 .shepherd-button {

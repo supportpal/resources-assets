@@ -84,6 +84,18 @@
     padding: 0 0.25rem;
 }
 
+.redactor-toolbar-fixed {
+    border-radius: 0;
+    display: block !important;
+    position: fixed !important;
+    top: 3rem !important;
+}
+
+.sp-quick-actions ~ .sp-content-inner .redactor-toolbar-fixed,
+.sp-alert-sticky:not(.sp-hidden) ~ .sp-content-inner .redactor-toolbar-fixed {
+    top: 6rem !important;
+}
+
 .sp-redactor-rounded-none .redactor-toolbar,
 .sp-redactor-rounded-t-none .redactor-toolbar {
     border-radius: 0;

@@ -1034,15 +1034,16 @@
                     $(this).attr('target', '_blank').attr('rel', 'noopener');
                 })
 
-                // Handle message actions button to show dropdown
+                // Handle message actions button to show dropdown.
                 .on('click', '.sp-message .sp-dropdown-container .sp-action', function (e) {
                     var $message = $(this).parents('.sp-message');
 
-                    // Don't collapse message if it's currently open
-                    // However we need to stop the propagation so the dropdown doesn't close itself
-                    if (!$message.hasClass('sp-message-collapsible')) {
+                    // Open message if it's currently not open, but this won't open the dropdown (need to click again).
+                    if ($message.hasClass('sp-message-collapsed')) {
                         $message.trigger('click');
                     }
+
+                    // We need to stop the propagation so the dropdown doesn't close itself.
                     e.stopPropagation();
                 })
 

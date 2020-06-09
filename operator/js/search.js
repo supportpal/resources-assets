@@ -83,6 +83,18 @@ $(document.body).ready(function () {
         onItemAdd: function (value, $item) {
             window.location.href = this.options[value].link;
         },
+        onFocus: function () {
+            // Set search box to be half page width in desktop mode.
+            $('#header .search-form').parent('.sp-flex-grow').addClass('lg:sp-w-1/2');
+        },
+        onBlur: function () {
+            $('#header .search-form').parent('.sp-flex-grow').removeClass('lg:sp-w-1/2');
+        },
+        onDropdownOpen: function ($dropdown) {
+            // Make dropdown bigger than normal selectize dropdown.
+            $dropdown.css('max-height', $(window).height() * 0.75);
+            $dropdown.css('overflow-y', 'auto');
+        },
         render: {
             optgroup_header: function (item, escape) {
                 return '<div class="sp-search-category sp-p-3 sp-pb-2 sp-text-secondary sp-uppercase">'

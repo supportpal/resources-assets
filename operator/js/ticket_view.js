@@ -577,6 +577,8 @@ $(document).ready(function() {
                     $form.find('.draft-success').text(response.message).show();
                     // Show discard button
                     $form.find('.discard-draft').show();
+                    // Show draft icon in quick action
+                    $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-draft-icon').removeClass('sp-hidden');
                     // Add attachment-id data to each attachment.
                     var attachments = response.data.attachments;
                     for (var upload_hash in attachments) {
@@ -693,6 +695,9 @@ $(document).ready(function() {
                     $('#newMessage').redactor('editor.startFocus');
                     ticket.setMessageDraft(null);
                 }
+
+                // Remove draft icon in quick action
+                $('.sp-reply-type .sp-action[data-type=' + replyType + '] .sp-draft-icon').addClass('sp-hidden');
 
                 // Hide button
                 $form.find('.discard-draft, .draft-success').hide();
@@ -1416,7 +1421,7 @@ $(document).ready(function() {
                             // We do - show custom fields box
                             $('#sidebar .customfields').parents('.sidebox').show();
                             // Enable hide/show password toggle and textarea redactor if needed
-                            callHideShowPassword();
+                            $('input[type=password]').hideShowPassword();
                             customfieldRedactor();
                         }
                     }
@@ -1730,7 +1735,7 @@ $(document).ready(function() {
                     if (typeof response.data.customfields != 'undefined') {
                         $('#sidebar .customfields').html(response.data.customfields);
                         // Enable hide/show password toggle, textarea redactor and flatpickr if needed
-                        callHideShowPassword();
+                        $('input[type=password]').hideShowPassword();
                         customfieldRedactor();
                         $('.datepicker').datepicker();
                     }
