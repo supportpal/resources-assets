@@ -298,12 +298,12 @@ $(document).ready(function () {
                 }
 
                 // Search for users
-                $.get(laroute.route('user.operator.search'), { brand_id: brandId, q: query })
+                $.get(laroute.route('user.operator.search'), { brand_id: ticket.brandId, q: query })
                     .done(function (res) {
                         // Remove user from list if included.
                         res.data = res.data
                             .filter(function (user) {
-                                return user.id != userId;
+                                return user.id != ticket.userId;
                             })
                             .map(function (value) {
                                 // Add needed info for search and selected item to work.

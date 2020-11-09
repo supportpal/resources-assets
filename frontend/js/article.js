@@ -230,7 +230,7 @@ $(document).ready(function () {
                                 return Swal.fire({
                                     title: null,
                                     html: Lang.get('selfservice.thank_you_for_feedback'),
-                                    type: 'success',
+                                    icon: 'success',
                                     showConfirmButton: false,
                                     timer: 2000,
                                 });
@@ -243,7 +243,7 @@ $(document).ready(function () {
                                 showCancelButton: true,
                                 showLoaderOnConfirm: true,
                                 allowOutsideClick: false,
-                                onOpen: function () {
+                                didOpen: function () {
                                     $('input[type=password]').hideShowPassword();
 
                                     // Date picker
@@ -264,7 +264,7 @@ $(document).ready(function () {
                                         title: null,
                                         html: Lang.get('selfservice.thank_you_for_feedback'),
                                         showConfirmButton: false,
-                                        type: 'success',
+                                        icon: 'success',
                                         timer: 2000,
                                     });
                                 }

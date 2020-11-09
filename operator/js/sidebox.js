@@ -1,6 +1,8 @@
 $(function () {
 
-    var $sidebar = $('#sidebar');
+    var $sidebar = $('#sidebar'),
+        sidebarOpenState = 'sp-sidebar-open',
+        sidebarClosedState = 'sp-sidebar-closed';
 
     // Collapse appropriate side boxes on DOM load.
     if (typeof Cookies !== 'undefined') {
@@ -24,6 +26,47 @@ $(function () {
         }
     });
 
+    // Toggle sidebar open/closed state.
+    $sidebar.on('click', '.sp-toggle-sidebar', function () {
+        toggleSidebar();
+
+        // The sidebar must have an ID to store the cookie.
+        if (typeof Cookies !== 'undefined' && typeof $sidebar.prop('id') !== 'undefined') {
+            Cookies.set(
+                $sidebar.prop('id'),
+                $sidebar.hasClass(sidebarClosedState) ? sidebarClosedState : sidebarOpenState
+            );
+        }
+    });
+
+    /**
+     * Open / close the sidebar.
+     */
+    function toggleSidebar() {
+        // Note: The remove and add classes are important to make sure this works when you change from small to large
+        // screen and vice versa after clicking the sidebar.
+        if ($(window).width() <= 1024) {
+            // Mobile view
+            $sidebar
+                .removeClass(sidebarClosedState)
+                .addClass('lg:sp-w-72')
+                .toggleClass('sp-w-72 sm:sp-w-72 ' + sidebarOpenState);
+
+            $sidebar.find('.sp-toggle-sidebar')
+                .addClass('lg:sp-ml-72')
+                .toggleClass('sp-ml-72 sm:sp-ml-72');
+        } else {
+            // Desktop view
+            $sidebar
+                .removeClass('sp-w-72 sm:sp-w-72 ' + sidebarOpenState)
+                .toggleClass('lg:sp-w-72 ' + sidebarClosedState);
+
+            $sidebar.find('.sp-toggle-sidebar')
+                .removeClass('sp-ml-72 sm:sp-ml-72')
+                .toggleClass('lg:sp-ml-72');
+        }
+    }
+
     /**
      * Toggle the visibility of a given side box.
      *
@@ -39,7 +82,9 @@ $(function () {
 
         if ($(window).width() <= 1024) {
             // Scroll to icon clicked on
-            $('#sidebar').overlayScrollbars().scroll($(context).parent().offset().top - $('header').outerHeight(), 500);
+            App.sidebarScrollbar
+                .overlayScrollbars()
+                .scroll($(context).parent().offset().top - $('header').outerHeight(), 500);
         }
     }
 

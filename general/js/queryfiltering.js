@@ -4,7 +4,7 @@ $(document).ready(function () {
     /**
      * Reload datables on changing filter
      */
-    $('.sp-filter-results :input').on('change input', function (event) {
+    $('.sp-filter-results').on('change input', ':input', function (event) {
         // Ignore if losing focus on text input
         if ($(this).is('input:text:not(.datepicker)') && event.type == 'change') {
             return;

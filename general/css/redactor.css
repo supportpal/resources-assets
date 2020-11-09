@@ -36,8 +36,13 @@
 .redactor-in,
 .redactor-read-only {
     background: var(--color-background-primary);
-    border-radius: 0 0 0.25rem 0.25rem;
+    border-radius: 0.25rem;
     padding: 0.75rem;
+}
+
+.redactor-toolbar-wrapper + .redactor-in,
+.redactor-toolbar-wrapper + .redactor-read-only {
+    border-radius: 0 0 0.25rem 0.25rem;
 }
 
 .sp-redactor-rounded-t-none .redactor-in,
@@ -76,29 +81,22 @@
     opacity: 0.75;
 }
 
+.redactor-toolbar-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.sp-quick-actions ~ .sp-content-inner .redactor-toolbar-wrapper,
+.sp-alert-sticky:not(.sp-hidden) ~ .sp-content-inner .redactor-toolbar-wrapper {
+    top: 3rem;
+}
+
 .redactor-toolbar {
     background: var(--color-background-secondary);
     border-bottom: 1px solid var(--color-background-tertiary);
-    border-radius: 0.25rem 0.25rem 0 0;
     line-height: 1.5 !important;
     padding: 0 0.25rem;
-}
-
-.redactor-toolbar-fixed {
-    border-radius: 0;
-    display: block !important;
-    position: fixed !important;
-    top: 3rem !important;
-}
-
-.sp-quick-actions ~ .sp-content-inner .redactor-toolbar-fixed,
-.sp-alert-sticky:not(.sp-hidden) ~ .sp-content-inner .redactor-toolbar-fixed {
-    top: 6rem !important;
-}
-
-.sp-redactor-rounded-none .redactor-toolbar,
-.sp-redactor-rounded-t-none .redactor-toolbar {
-    border-radius: 0;
 }
 
 .redactor-air a,

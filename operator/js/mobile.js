@@ -18,24 +18,4 @@ $(document).ready(function () {
             $('header nav').hide().addClass('');
         }
     });
-
-    // Toggle sidebar
-    $('#sidebar').on('click', '.sp-toggle-sidebar', function (e) {
-        // Note: The remove and add classes are important to make sure this works when you change from small to large
-        // screen and vice versa after clicking the sidebar.
-        if ($(window).width() <= 1024) {
-            // Mobile view
-            $('#sidebar').removeClass('sp-sidebar-closed')
-                .addClass('lg:sp-w-72')
-                .toggleClass('sp-w-72 sm:sp-w-72 sp-sidebar-open');
-            $('.sp-toggle-sidebar').addClass('lg:sp-ml-72')
-                .toggleClass('sp-ml-72 sm:sp-ml-72');
-        } else {
-            // Desktop view
-            $('#sidebar').removeClass('sp-w-72 sm:sp-w-72 sp-sidebar-open')
-                .toggleClass('lg:sp-w-72 sp-sidebar-closed');
-            $('.sp-toggle-sidebar').removeClass('sp-ml-72 sm:sp-ml-72')
-                .toggleClass('lg:sp-ml-72');
-        }
-    });
 });

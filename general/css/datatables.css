@@ -51,9 +51,16 @@
 .dataTables_wrapper .dataTables_sort select,
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_paginate .paginate_input {
+    background-color: var(--color-background-secondary);
+    border: 2px solid var(--color-background-secondary);
+    border-radius: 0.25rem;
     min-height: 2rem;
-    padding-top: 0.125rem;
-    padding-bottom: 0.125rem;
+    padding: 0.125rem 0.75rem;
+}
+
+.dataTables_wrapper .dataTables_length select,
+.dataTables_wrapper .dataTables_sort select {
+    padding-right: 2rem;
 }
 
 .dataTables_wrapper .dataTables_length select,

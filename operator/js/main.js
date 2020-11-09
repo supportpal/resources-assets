@@ -94,8 +94,8 @@ $(document).ready(function () {
     });
 
     // Scrolling for sidebar on desktop
-    var $sidebar = $('#sidebar');
-    if (typeof $.fn.overlayScrollbars !== 'undefined' && $sidebar.length) {
+    App.extend('sidebarScrollbar', $('.sp-sidebar-inner'));
+    if (typeof $.fn.overlayScrollbars !== 'undefined' && App.sidebarScrollbar.length) {
         /**
          * Initialise overlay scrollbars on the element.
          *
@@ -117,17 +117,17 @@ $(document).ready(function () {
          * Destroy the overlay scrollbars instance.
          */
         var destroyOverlayScrollbars = function () {
-            if (typeof $sidebar.overlayScrollbars() !== 'undefined') {
-                $sidebar.overlayScrollbars().destroy();
+            if (typeof App.sidebarScrollbar.overlayScrollbars() !== 'undefined') {
+                App.sidebarScrollbar.overlayScrollbars().destroy();
             }
         };
 
         // Initialise overlay scrollbars on the sidebar.
-        initOverlayScrollbars($sidebar);
+        initOverlayScrollbars(App.sidebarScrollbar);
 
         // Destroy and reinitialise overlay scrollbars on print event otherwise overflow content is hidden.
         $(window).beforeprint(destroyOverlayScrollbars)
-            .afterprint(initOverlayScrollbars.bind(null, $sidebar));
+            .afterprint(initOverlayScrollbars.bind(null, App.sidebarScrollbar));
     }
 
 });

@@ -93,8 +93,15 @@
                 showCancelButton: true,
                 showCloseButton: true,
                 showConfirmButton: false,
-                animation: false,
-                onBeforeOpen: function () {
+                showClass: {
+                    popup: 'swal2-noanimation',
+                    backdrop: 'swal2-noanimation'
+                },
+                hideClass: {
+                    popup: '',
+                    backdrop: ''
+                },
+                willOpen: function () {
                     mergeFields.appendMergeFields($(Swal.getContent()))
                         .on('mergefield:inserted', function () {
                             Swal.close();

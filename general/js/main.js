@@ -39,6 +39,7 @@ if (App.env === "production") {
 }
 
 // Convert Date objects to unix time.
+// Deprecated (DEV-2500). To be removed in v4.
 Date.prototype.getUnixTime = function() { return this.getTime()/1000|0 };
 
 // flatpickr.
@@ -134,7 +135,7 @@ $.fn.datepicker = function (options) {
 
     return $(this).each(function () {
         // Quick fix to stop flatpickr being loaded twice on an input
-        if (! $(this).hasClass('flatpickr-input')) {
+        if (this._flatpickr === undefined) {
             $(this).flatpickr(
                 $.extend(true, defaults, options)
             )
@@ -157,7 +158,7 @@ $.fn.timepicker = function (options) {
 
     return $(this).each(function () {
         // Quick fix to stop flatpickr being loaded twice on an input
-        if (! $(this).hasClass('flatpickr-input')) {
+        if (this._flatpickr === undefined) {
             $(this).flatpickr(
                 $.extend(true, defaults, options)
             )
@@ -250,6 +251,24 @@ $(function () {
         target: '[title]',
         touch: ['hold', 500],
         zIndex: 10003,
+    });
+
+    // Logout handler.
+    $('.logout-link').on('click', function (e) {
+        e.preventDefault();
+
+        var $form = $('<form>', {method: $(this).data('method'), action: $(this).data('url')})
+            .hide()
+            .append(
+                $('<input>', {
+                    type: "hidden",
+                    name: "_token",
+                    value: $('meta[name=csrf_token]').prop('content')
+                })
+            );
+
+        $(document.body).append($form);
+        $form.submit();
     });
 
     // Global event events.
@@ -392,12 +411,52 @@ $(function () {
         var $row = getErrorElementRow(element);
 
         return $row.find(':input:not(:button)').length > 1 &&
-            (! $(element).parent('.redactor-box').length && ! $(element).parent('.merge-field_container').length
+            (! $(element).parent('.redactor-box').length
+                && ! $(element).parent('.merge-field_container').length
                 && ! $(element).parent('.hideShowPassword-wrapper').length
                 && ! $(element).parent('.sp-input-translatable-container').length
-                && ! $(element).parent('.sp-input-group').length && $(element).prop('type') !== 'checkbox'
+                && ! $(element).parent('.sp-input-group').length
+                && ! $(element).next().has('selectize')
+                && $(element).prop('type') !== 'checkbox'
                 && $(element).prop('type') !== 'radio'
             ) ? $(element) : $row;
+    }
+
+    /**
+     * Get the container that we're going to add the error message after.
+     *
+     * @param element
+     * @returns {*}
+     */
+    function getErrorContainer(element)
+    {
+        var position = element;
+
+        // If it's redactor, codemirror, show/hide button, recaptcha, a checkbox or radio, add after parent
+        if (element.parent('.redactor-box').length || element.parent('.merge-field_container').length
+            || element.parent('.hideShowPassword-wrapper').length || element.parent('.sp-input-group').length
+            || element.parent().parent('.g-recaptcha').length || element.prop('type') === 'checkbox'
+            || element.prop('type') === 'radio'
+        ) {
+            position = element.parent();
+        }
+
+        // If it's selectize or codemirror (source code), add after sibling.
+        if (element.next().hasClass('selectize-control') || element.hasClass('source-code')) {
+            position = element.next();
+        }
+
+        // If it's got a translatable model, add afterwards.
+        if (element.next().hasClass('fa-language')) {
+            position = element.next().next();
+        }
+
+        // If it's a checkbox or radio, make sure we put the error after the last element.
+        if (position.is('label') && (element.prop('type') === 'checkbox' || element.prop('type') === 'radio')) {
+            position = position.siblings().last('label');
+        }
+
+        return position;
     }
 
     // jQuery validate.
@@ -409,34 +468,7 @@ $(function () {
         wrapper: 'div',
 
         errorPlacement: function(error, element) {
-            var position = element;
-
-            // If it's redactor, codemirror, show/hide button, recaptcha, a checkbox or radio, add after parent
-            if (element.parent('.redactor-box').length || element.parent('.merge-field_container').length
-                || element.parent('.hideShowPassword-wrapper').length || element.parent('.sp-input-group').length
-                || element.parent().parent('.g-recaptcha').length || element.prop('type') === 'checkbox'
-                || element.prop('type') === 'radio'
-            ) {
-                position = element.parent();
-            }
-
-            // If it's selectize or codemirror (source code), add after sibling.
-            if (element.next().hasClass('selectize-control') || element.hasClass('source-code')) {
-                position = element.next();
-            }
-
-            // If it's got a translatable model, add afterwards.
-            if (element.next().hasClass('fa-language')) {
-                position = element.next().next();
-            }
-
-            // If it's a checkbox or radio, make sure we put the error after the last element.
-            if (position.is('label') && (element.prop('type') === 'checkbox' || element.prop('type') === 'radio')) {
-                position = position.siblings().last('label');
-            }
-
-            // Show error
-            error.insertAfter(position);
+            error.insertAfter(getErrorContainer(element));
         },
 
         highlight: function(element, errorClass, validClass) {
@@ -499,8 +531,8 @@ $(function () {
             this.defaultShowErrors();
 
             // Move the screen to show the first error message.
-            if (typeof errorList[0] != "undefined") {
-                var $elm = getErrorElementWrapper(errorList[0].element);
+            $.each(errorList, function (key, error) {
+                var $elm = getErrorContainer($(error.element));
 
                 // If the error is on another tab, switch to it.
                 if ($elm.parents('.sp-tab-content').length) {
@@ -510,9 +542,14 @@ $(function () {
                     }
                 }
 
-                // Scroll to the element.
-                $('html, body, #content').animate({scrollTop: $elm.position().top - 44}, 1000);
-            }
+                // Make sure the element is visible otherwise it will scroll to the top of the page.
+                if ($elm.is(':visible')) {
+                    $('html, body, #content').animate({scrollTop: $elm.position().top - 44}, 1000);
+
+                    // Break loop.
+                    return false;
+                }
+            });
         }
     });
 

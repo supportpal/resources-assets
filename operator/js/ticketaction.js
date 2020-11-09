@@ -243,10 +243,10 @@
             html: '',
             confirmButtonText: Lang.get('ticket.merge'),
             showCancelButton: false,
-            onBeforeOpen: function () {
+            willOpen: function () {
                 Swal.showLoading();
             },
-            onOpen: function () {
+            didOpen: function () {
                 // Fetch details of the selected tickets and also recent tickets.
                 return $.get(laroute.route('ticket.operator.action.search'), {include_ids: tickets.concat(recentTicketIds)})
                     .then(function (response) {
@@ -320,10 +320,10 @@
             html: '',
             confirmButtonText: Lang.get('general.link'),
             showCancelButton: false,
-            onBeforeOpen: function () {
+            willOpen: function () {
                 Swal.showLoading();
             },
-            onOpen: function () {
+            didOpen: function () {
                 // Don't include already linked tickets.
                 var linkedTickets = $('ul.linked-tickets')
                         .find('a.unlink')

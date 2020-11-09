@@ -276,16 +276,21 @@
                     $redactor.redactor('insertion.set', '');
                     $($redactor.redactor('source.getElement').get()).val('');
 
+                    var replyType = $form.find('input[name="reply_type"]').val();
+
                     // Only add the signature back to the message reply box (not notes).
-                    if ($form.find('input[name="reply_type"]').val() == '1') {
+                    if (replyType == '1') {
                         self.setNoteDraft(null);
-                    } else if ($form.find('input[name="reply_type"]').val() == '2') {
+                    } else if (replyType == '2') {
                         self.setForwardDraft(null);
                     } else {
                         $redactor.redactor('insertion.set', '');
                         $redactor.redactor('insertion.insertHtml', parameters.signature, false);
                         self.setMessageDraft(null);
                     }
+
+                    // Remove draft icon in quick action
+                    $('.sp-reply-type .sp-action[data-type=' + replyType + '] .sp-draft-icon').addClass('sp-hidden');
                 }
 
                 // If posting a reply to the user, update the status in the notes and forwarding box.
@@ -879,7 +884,7 @@
                         title: Lang.get('messages.failed_attachments'),
                         html: failed_attachments.join(', ') + '<br /><br />'
                             + Lang.get('core.attachment_limit_reached', {size: parameters.forwardFileUpload.cumulativeMaxFileSize.fileSize()}),
-                        type: 'info'
+                        icon: 'info'
                     });
                 } else {
                     // Close the please wait modal...
@@ -1223,7 +1228,7 @@
             Swal.fire({
                 title: Lang.get('general.loading'),
                 allowOutsideClick: false,
-                onAfterClose: function () {
+                didClose: function () {
                     window.print();
                 }
             });

@@ -1,4 +1,23 @@
 $(function () {
+    // Row selection variables.
+    var selection = '',
+        all_selected = false;
+
+    /**
+     * Re-enable the buttons if at least one row selected.
+     */
+    function toggleActionButtons()
+    {
+        if ($('tr.selected').length) {
+            $('.sp-grid-actions').removeClass('sp-hidden');
+            $('.sp-grid-actions :input').prop('disabled', false);
+            $('.sp-action-group:not(.sp-grid-actions)').addClass('sp-hidden');
+        } else {
+            $('.sp-grid-actions').addClass('sp-hidden');
+            $('.sp-grid-actions :input').prop('disabled', true);
+            $('.sp-action-group:not(.sp-grid-actions)').removeClass('sp-hidden');
+        }
+    }
 
     // Add select all checkbox
     $('.dataTable thead th:first').html('<input type="checkbox" name="select-all" />');
@@ -13,12 +32,12 @@ $(function () {
             var checkbox = $(this).find('input[type=checkbox].selector');
 
             // Check all checkboxes, regardless of their current state.
-            if (is_checked && !checkbox.is(":checked")) {
+            if (is_checked && ! checkbox.is(":checked")) {
                 $(this).trigger('click');
             }
 
             // Unset all check boxes.
-            if (!is_checked && checkbox.is(':checked')) {
+            if (! is_checked && checkbox.is(':checked')) {
                 $(this).trigger('click');
             }
         });
@@ -33,9 +52,40 @@ $(function () {
             $(this).find('input[type=checkbox]').prop('disabled', false);
         })
 
-        // Disable checkboxes before every AJAX request.
+        // Before DataTables AJAX requests.
         .on('preXhr.dt', function (e, settings, data) {
+            // Disable checkboxes before every AJAX request.
             $(this).find('input[type=checkbox]').prop('disabled', true);
+
+            // Save the row selection
+            selection = getSelectedRows();
+            all_selected = $('input[name="select-all"]').is(':checked');
+        })
+
+        // DataTable redraw event.
+        .on('draw.dt', function (e, settings, data) {
+            if (selection !== '') {
+                // Restore the row selection
+                var array = selection.split(","); // explode the selected rows
+
+                // Trigger a row click for each previously selected row, this will trigger the necessary properties
+                // and events. Keep a track of how many we click.
+                var number_selected = 0;
+                $.each(array, function (index, item) {
+                    if (item != '' && $('tr#' + item).length) {
+                        $('tr#' + item).trigger('click');
+                        number_selected++;
+                    }
+                });
+
+                // Re-check the select all checkbox (only if all rows were selected still).
+                if (all_selected && number_selected === array.length) {
+                    $('input[name="select-all"]').prop('checked', true);
+                }
+            }
+
+            // Re-enable the buttons if at least one row selected.
+            toggleActionButtons();
         })
 
         .find('tbody')
@@ -66,15 +116,7 @@ $(function () {
                 }
 
                 // Re-enable buttons if at least one row is selected
-                if ($('tr.selected').length) {
-                    $('.sp-grid-actions').removeClass('sp-hidden');
-                    $('.sp-grid-actions :input').prop('disabled', false);
-                    $('.sp-action-group:not(.sp-grid-actions)').addClass('sp-hidden');
-                } else {
-                    $('.sp-grid-actions').addClass('sp-hidden');
-                    $('.sp-grid-actions :input').prop('disabled', true);
-                    $('.sp-action-group:not(.sp-grid-actions)').removeClass('sp-hidden');
-                }
+                toggleActionButtons();
             }
         })
         .on('click', '.selector', function () {
@@ -95,9 +137,11 @@ $(function () {
                 $(this).parent().trigger('click');
             }
         });
-
 });
 
+/**
+ * Return the selected rows as a comma delimited string.
+ */
 function getSelectedRows()
 {
     return $('.dataTable tbody tr.selected').map(function () {

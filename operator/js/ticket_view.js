@@ -675,7 +675,7 @@ $(document).ready(function() {
 
         // Delete any attachments currently showing
         $form.find('input[name="attachment[]"]:not(:first)').remove();
-        $form.find('.sp-attached-files li:not(.hide) .sp-delete-attachment').attr('data-silent', true).trigger('click');
+        $form.find('.sp-attached-files li:not(:first) .sp-delete-attachment').attr('data-silent', true).trigger('click');
 
         $.post(laroute.route('ticket.operator.message.discard'), params, function(response) {
             if (response.status == 'success') {
@@ -709,6 +709,36 @@ $(document).ready(function() {
         });
     });
 
+    // Show a draft message.
+    $('#tabMessages').on('click', '.sp-draft-message', function () {
+        var $draft = $(this);
+
+        // Toggle the content area.
+        $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
+        $draft.find('.sp-chevron i').toggleClass('fa-chevron-down fa-chevron-up');
+
+        // If it's now closed, we can stop here.
+        if ($draft.find('.fa-chevron-up').length) {
+            return;
+        }
+
+        // Otherwise, load the message and show it.
+        return $.get(laroute.route('ticket.operator.message.showJson', {id: $(this).data('message-id')}))
+            .done(function (ajax) {
+                // Load draft message.
+                $draft.find('.sp-draft-message-content-body').html(ajax.data.purified_text);
+            })
+            .catch(function (error) {
+                if (error.status === 404 || error.status === 403) {
+                    $draft.remove();
+                } else {
+                    // User should retry expanding the draft.
+                    $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
+                    $draft.find('.sp-chevron i').toggleClass('fa-chevron-down fa-chevron-up');
+                }
+            });
+    });
+
     // Apply macro
     $('.apply-macro').on('click', function() {
         var text = he.encode($(this).text()),
@@ -719,7 +749,7 @@ $(document).ready(function() {
         Swal.fire({
             title: Lang.get('ticket.run_macro'),
             html: Lang.get('ticket.run_macro_desc', {'macro': text, 'description': description}),
-            type: "warning",
+            icon: "warning",
             showCancelButton: true,
             confirmButtonColor: "#3B91CE",
             confirmButtonText: Lang.get('general.run'),
@@ -1226,7 +1256,7 @@ $(document).ready(function() {
             Swal.fire({
                 title: Lang.get('messages.are_you_sure'),
                 html: Lang.get('ticket.follow_up_no_actions'),
-                type: "warning",
+                icon: "warning",
                 showCancelButton: true,
                 confirmButtonColor: "#e74c3c",
                 confirmButtonText: Lang.get('messages.yes_im_sure'),
@@ -1353,6 +1383,13 @@ $(document).ready(function() {
             function(response) {
                 if (response.status == 'success') {
                     $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+
+                    // Check we're still allowed to view ticket.
+                    if (! response.data.operator_can_view) {
+                        window.location.reload(); // Reload, this will redirect back to the grid with an error message.
+                        return;
+                    }
+
                     // Update log
                     ticket.updateLogTable();
 
@@ -1629,11 +1666,39 @@ $(document).ready(function() {
                     $(window).trigger('resize');
 
                     // Show other operator's draft
-                    if (response.data.draft !== '') {
-                        $('.sp-draft-message').replaceWith(response.data.draft).show(500);
-                    } else {
-                        $('.sp-draft-message').hide(500);
-                    }
+                    $.each(response.data.drafts, function (type, value) {
+                        var elements = { 0: $(".message-form"), 1: $(".notes-form"), 2: $(".forward-form") },
+                            $draftsElm = elements[type].find('.sp-drafts'),
+                            $draftIcon = $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-other-draft-icon');
+
+                        // Remove drafts which were not returned in the response.
+                        $draftsElm.find('.sp-draft-message').each(function () {
+                            var id = $(this).data('message-id');
+                            if (typeof value[id] === "undefined") {
+                                $(this).remove();
+                                $draftIcon.addClass('sp-hidden');
+                            }
+                        });
+
+                        // Show new drafts, and update existing ones.
+                        $.each(value, function (id, message) {
+                            var $message = $draftsElm.find('.sp-draft-message[data-message-id=' + id + ']');
+                            if ($message.length > 0) {
+                                $message.find('.sp-draft-updated-at').html(message.model.updated_at);
+
+                                // If the draft message is visible, update the content (via AJAX).
+                                // If it's not visible, when the draft is expanded, it will automatically refresh via AJAX.
+                                var $content = $message.find('.sp-draft-message-content');
+                                if ($content.hasClass('sp-hidden') === false) {
+                                    $message.trigger('click').trigger('click');
+                                }
+                            } else {
+                                $draftsElm.append(message.template);
+                            }
+
+                            $draftIcon.removeClass('sp-hidden');
+                        });
+                    });
 
                     // Update ticket details
                     $('.last-action').html(response.data.details.updated_at);

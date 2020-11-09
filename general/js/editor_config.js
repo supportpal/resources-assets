@@ -33,7 +33,7 @@
             Swal.fire({
                 title: Lang.get('messages.error'),
                 html: message,
-                type: 'error'
+                icon: 'error'
             });
         } else {
             alert(message.replace(/<br \/>/g, "\n"));
@@ -96,9 +96,7 @@
         styles: false,
 
         // Toolbar settings.
-        // Only fixed in the operator panel, not possible on frontend due to fixed header.
-        toolbarFixed: $('#content').length ? true : false, // This is needed to avoid a JS error on the frontend.
-        toolbarFixedTarget: '#content',
+        toolbarFixed: false, // This is implemented for the operator panel in CSS instead.
 
         // Height settings.
         minHeight: '150px',
@@ -133,7 +131,7 @@
             'ctrl+alt+4, meta+alt+4': { api: 'plugin.sp-fontsize.set', args: {tag: 'h4'} },
             'ctrl+alt+5, meta+alt+5': { api: 'plugin.sp-fontsize.set', args: {tag: 'h5'} },
             'ctrl+alt+6, meta+alt+6': { api: 'plugin.sp-fontsize.set', args: {tag: 'h6'} },
-            'ctrl+shift+1, meta+shift+2': { api: 'plugin.sp-cannedresponses.show' },
+            'ctrl+shift+1, meta+shift+1': { api: 'plugin.sp-cannedresponses.show' },
             'ctrl+shift+2, meta+shift+2': { api: 'plugin.sp-selfservice.show' }
         },
 

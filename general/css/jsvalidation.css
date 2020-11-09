@@ -1,3 +1,7 @@
+.sp-form-row.sp-input-has-error {
+    display: flex;
+}
+
 .sp-input-has-error label {
     color: #e53e3e !important;
 }

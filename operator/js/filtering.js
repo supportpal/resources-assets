@@ -221,24 +221,25 @@ $(function () {
      */
     $(document.body).on('click', '.add-conditiongroup', function () {
         // Get unique index for this new group (before we insert the new DOM)
-        var index = Filtering.getUniqueGroupId(),
-            $this = $('.sp-condition-group:last');
+        var index = Filtering.getUniqueGroupId();
 
         // Insert new group into the DOM
         addNewItem('.sp-condition-group');
 
+        // This needs to be here, after we've added the item above.
+        var $this = $('.sp-condition-group:last');
+
         // Add a condition by default
-        $('.sp-condition-group:last .condition').removeClass('sp-hidden');
+        $this.find('.condition').removeClass('sp-hidden');
 
         // Disable unnecessary condition operator and values
-        $('.sp-condition-group:last .condition-operator, .sp-condition-group:last .condition-value').find(':input:not(:visible)').prop('disabled', true);
+        $this.find('.condition-operator, .condition-value').find(':input:not(:visible)').prop('disabled', true);
 
         // Hide the delete button for now as there's only one condition
-        $('.sp-condition-group:last .sp-condition-group-type, .sp-condition-group:last .condition .remove-button').addClass('sp-hidden');
+        $this.find('.sp-condition-group-type, .condition .remove-button').addClass('sp-hidden');
 
         // Set condition group ID on condition
-        $this.find('input[name ^=conditiongroups][name $="[local_id]"]').val(index);
-        $this.find('.conditiongroup-id, .condition-group-id').val(index);
+        $this.find('input[name^=conditiongroups][name$="[local_id]"], .conditiongroup-id, .condition-group-id').val(index);
 
         // If we more than one conditiongroup now, show the plan conditiongroup type dropdown
         if ($('.sp-condition-group:visible').length > 1) {
@@ -269,8 +270,8 @@ $(function () {
 
         // Set condition group ID on condition
         var $this = $(this).parents('.sp-condition-group'),
-            index = $this.find('.condition-group-id:first').val(); // Take the first ID in the group container - this should be correct
-        $this.find('.condition-group-id').val(index);              // as adding a group should set this value
+            index = $this.find('input[name$="[local_id]"').val();
+        $this.find('.condition-group-id').val(index);
 
         // Show table
         $this.find('table').removeClass('sp-hidden');

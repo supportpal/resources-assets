@@ -1,37 +1,51 @@
 $(function() {
-    $('.validate-smtp').on('click', function () {
-        // Get data
-        var data = {
-            brand_id: document.getElementsByName('brand_id')[0].value,
-            smtp_host: document.getElementsByName('smtp_host')[0].value,
-            smtp_port: document.getElementsByName('smtp_port')[0].value,
-            smtp_encryption: $("[name='smtp_encryption']").val(),
-            smtp_username: document.getElementsByName('smtp_username')[0].value,
-            smtp_password: document.getElementsByName('smtp_password')[0].value
-        };
+    $('#smtp')
+        // Get OAuth Access Token.
+        .on('click', '.get-access-token, .reset-access-token', function () {
+            var $form = $(this).parents('.sp-tab-content'),
+                defaultBrandId = $form.parents('form').find(':input[name="default_brand"]').val(),
+                brandId = $form.find(':input[name="brand_id"]').val() || defaultBrandId;
 
-        // Show in progress
-        $('.smtp-validate').hide();
-        $('.smtp-validate.text-progress').show();
+            var options = {
+                provider: $form.find('select[name="smtp_provider"]').val(),
+                action: 'smtp',
+                address: $form.find('input[name="smtp_username"]').val(),
+                brandId: brandId,
+                authMech: $form.find('select[name="smtp_auth_mech"]').val(),
+                $oauthData: $form.find('input[name="smtp_oauth_data"]'),
+            };
+            $form.oauth(options)
+                .done(function () {
+                    $form.find('.get-access-token').hide();
+                    $form.find('.reset-access-token').show();
+                });
+        })
+        // Validate SMTP authentication.
+        .on('click', '.validate-smtp', function () {
+            var $smtp = $(this).parents('#smtp');
 
-        // Post SMTP data
-        $.post(
-            laroute.route('core.operator.generalsetting.validatesmtp'),
-            data,
-            function (response) {
-                if (response.status == true) {
-                    $('.smtp-validate.text-progress').hide();
-                    $('.smtp-validate.text-success').show();
-                } else {
-                    $('.smtp-validate.text-progress').hide();
-                    $('.smtp-validate .error-message').text('').text(response.message);
-                    $('.smtp-validate.text-fail').show();
-                }
-            }, "json").fail(function () {
-            $('.smtp-validate.text-progress').hide();
-            $('.smtp-validate .error-message').text('');
-            $('.smtp-validate.text-fail').show();
+            // Show in progress
+            $('.validate-auth').hide();
+            $('.validate-auth.text-progress').show();
+
+            var data = $smtp.find(':input').serializeArray();
+
+            // Post SMTP data
+            $.post(laroute.route('core.operator.generalsetting.validatesmtp'), data)
+                .then(function () {
+                    $('.validate-auth.text-success').show();
+                })
+                .catch(function (error) {
+                    $('.validate-auth .error-message').text(error.responseJSON.message || '');
+                    $('.validate-auth.text-fail').show();
+                })
+                .always(function () {
+                    $('.validate-auth.text-progress').hide();
+                });
         });
+
+    $('select[name="smtp_auth_mech"]').on('change', function () {
+        $(this).parents('form').find('.password-form, .oauth-form').toggleClass('sp-hidden');
     });
 
     // On page load, if the radio is checked, show the sections...
@@ -120,12 +134,11 @@ function SslWarning(parameters)
 
             if (value == 1) {
                 Swal.fire({
-                    customClass: 'delete-modal',
                     title: Lang.get('messages.does_look_correct'),
                     html: '<div class="sp-alert sp-alert-warning">' + Lang.get('core.enable_ssl_warning') + '</div>'
                         + Lang.get('core.verify_frontend_loads') + '<br /><br />'
                         + '<iframe style="width: 100%;" src="' + instance.getSslRoute() + '"></iframe>',
-                    type: "warning",
+                    icon: "warning",
                     showCancelButton: true,
                     confirmButtonColor: "#e74c3c",
                     confirmButtonText: Lang.get('messages.no_revert'),
