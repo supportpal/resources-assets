@@ -63,30 +63,14 @@
         };
 
         /**
-         * Whether we can begin oauth.
-         *
-         * @returns {boolean}
-         */
-        var canAuthenticate = function ()
-        {
-            return ! ( parameters.authMech === 'password'
-                || ! parameters.address
-                || parameters.address.length === 0 );
-        }
-
-        /**
          * Begin authentication.
          *
          * @returns {jQuery}
          */
         this.start = function ()
         {
-            var dfd = $.Deferred();
-            if (canAuthenticate() === false) {
-                return dfd.reject().promise();
-            }
-
-            var child = openPopup(),
+            var dfd = $.Deferred(),
+                child = openPopup(),
                 interval,
                 callbackHasRan = false;
 

@@ -209,7 +209,7 @@ table.settings thead th:first-child {
 table.dataTable thead .sorting,
 table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
-    background-image: none;
+    background-image: none !important;
 }
 
 table.dataTable thead .sorting:before,
@@ -407,4 +407,20 @@ table.dataTable > tbody > tr.child span.dtr-title {
 
 .yadcf-filter > option {
     background: var(--color-background-secondary) !important;
+}
+
+.yadcf-filter-reset-button {
+    height: 2.5rem;
+    position: relative;
+    width: 2.25rem;
+}
+
+.yadcf-filter-reset-button:before {
+    color: var(--color-text-primary);
+    content: "\f00d";
+    font-family: var(--font-icon);
+    font-weight: bold;
+    left: 0.75rem;
+    position: absolute;
+    top: 0.5rem;
 }

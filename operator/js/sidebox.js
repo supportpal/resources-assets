@@ -45,7 +45,7 @@ $(function () {
     function toggleSidebar() {
         // Note: The remove and add classes are important to make sure this works when you change from small to large
         // screen and vice versa after clicking the sidebar.
-        if ($(window).width() <= 1024) {
+        if ($(window).width() < 1024) {
             // Mobile view
             $sidebar
                 .removeClass(sidebarClosedState)
@@ -80,7 +80,7 @@ $(function () {
         // Toggle sidebox content.
         $(context).next().toggle();
 
-        if ($(window).width() <= 1024) {
+        if ($(window).width() < 1024) {
             // Scroll to icon clicked on
             App.sidebarScrollbar
                 .overlayScrollbars()

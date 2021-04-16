@@ -37,7 +37,7 @@ function Article(parameters)
                 // Get the category selectize instance.
                 var select_categories = this.$input.parents(self.getClassName()).find('select[name$="[categories][]"]');
                 if (select_categories.length == 0 || typeof select_categories[0].selectize === 'undefined') {
-                    console.log('Failed to find associated category drop-down.');
+                    void 0;
 
                     return;
                 }
@@ -182,7 +182,7 @@ $(document).ready(function() {
         var $published_at = $('.published_at');
         if (this.checked) {
             $published_at.removeClass('sp-hidden');
-            $published_at.find(':input').removeAttr('disabled');
+            $published_at.find(':input').prop('disabled', false);
 
             // If the article is currently not published
             if ($published_at.hasClass('not-published')) {

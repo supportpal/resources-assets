@@ -62,6 +62,13 @@
         var selectizePlugins = ['restore_on_backspace', 'remove_button', 'max_items'];
 
         /**
+         * Queue to load messages synchronously, non blocking.
+         */
+        var messageDfd = $.Deferred(),
+            messageDfdNext = messageDfd;
+        messageDfd.resolve()
+
+        /**
          * Show a success / failure message for a short period.
          */
         var showFeedback = function (failure) {
@@ -388,36 +395,40 @@
                 );
                 $messageContainer.addClass('sp-message-text-loading');
 
-                return $.get(laroute.route('ticket.operator.message.showJson', {id: $messageContainer.data('id')}))
-                    .done(function (ajax) {
-                        // Load the message in, it should already be sanitized.
-                        $text.children('.sp-message-text-original')
-                            .html(ajax.data.purified_text)
-                            .addClass('sp-message-text-loaded');
+                messageDfdNext = messageDfdNext.then(function () {
+                    return $.get(laroute.route('ticket.operator.message.showJson', {id: $messageContainer.data('id')}))
+                        .done(function (ajax) {
+                            // Load the message in, it should already be sanitized.
+                            $text.children('.sp-message-text-original')
+                                .html(ajax.data.purified_text)
+                                .addClass('sp-message-text-loaded');
 
-                        // Remove expandable - ONLY when expanding a message.
-                        // We must do this after the content has been made visible to the user!
-                        instance.removeExpandable($messageContainer);
+                            // Remove expandable - ONLY when expanding a message.
+                            // We must do this after the content has been made visible to the user!
+                            instance.removeExpandable($messageContainer);
 
-                        // Load attachment previews if needed.
-                        instance.loadAttachmentPreviews($messageContainer);
+                            // Load attachment previews if needed.
+                            instance.loadAttachmentPreviews($messageContainer);
 
-                        // Load redactor for editing message if not already loaded
-                        if (!$messageContainer.find('textarea').parents('.redactor-box').length) {
-                            $messageContainer.find('textarea').redactor(instance.defaultRedactorConfig());
-                        }
+                            // Load redactor for editing message if not already loaded
+                            if (!$messageContainer.find('textarea').parents('.redactor-box').length) {
+                                $messageContainer.find('textarea').redactor(instance.defaultRedactorConfig());
+                            }
 
-                        // If a callback exists, run it.
-                        typeof successCallback === 'function' && successCallback();
-                    })
-                    .fail(function () {
-                        Swal.fire(Lang.get('messages.error'), Lang.get('messages.error_loading_message'), 'error');
-                    })
-                    .always(function () {
-                        // Unset loading icon.
-                        $messageContainer.removeClass('sp-message-text-loading');
-                        $messageContainer.find('.sp-message-text .sp-loading').remove();
-                    });
+                            // If a callback exists, run it.
+                            typeof successCallback === 'function' && successCallback();
+                        })
+                        .fail(function () {
+                            Swal.fire(Lang.get('messages.error'), Lang.get('messages.error_loading_message'), 'error');
+                        })
+                        .always(function () {
+                            // Unset loading icon.
+                            $messageContainer.removeClass('sp-message-text-loading');
+                            $messageContainer.find('.sp-message-text .sp-loading').remove();
+                        });
+                });
+
+                return messageDfdNext;
             } else {
                 // Message has already been loaded.
 
@@ -1163,10 +1174,11 @@
                     // Uncollapse messages first
                     $('.sp-collapsed-messages').trigger('click');
 
-                    // Fetch the list of messages from this one based on the reply order
+                    // Fetch the list of messages from this one based on the reply order, we always want latest first
+                    // like you would get in an email client.
                     var $messages;
                     if (parameters.replyOrder == 'ASC') {
-                        $messages = $(this).parents('.sp-message').prevUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack();
+                        $messages = $(this).parents('.sp-message').prevUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack().reverse();
                     } else {
                         $messages = $(this).parents('.sp-message').nextUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack();
                     }
@@ -1266,7 +1278,7 @@
         var required = ['ticketId', 'userId', 'brandId', 'notesPosition', 'replyOrder', 'ticketGridUrl'];
         for (var i = 0; i < required.length; i++) {
             if (parameters[required[i]] === null) {
-                console.warn("Parameter '" + required[i] + "' is NULL, some functions may not work as expected.");
+                void 0;
             }
         }
 

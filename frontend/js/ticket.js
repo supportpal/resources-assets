@@ -117,44 +117,38 @@ $(document).ready(function() {
     });
 
     // Update ticket custom fields
-    $('.sp-customfields-save').on('click', function () {
-        // Make sure data is valid before submitting
-        if ($(this).parents('form').valid()) {
-            // Get form data
-            var data = $(this).parents('form').serializeArray();
-            if (typeof $(this).data('token') !== 'undefined') {
-                data.push({ name: 'token', value: $(this).data('token') });
-            }
-
-            // Post updated data
-            $.ajax({
-                url: laroute.route('ticket.frontend.ticket.saveFields', {'number': $('input[name=ticket_number]').val()}),
-                type: 'POST',
-                data: data,
+    $('.sp-custom-fields').on('form:submit', function () {
+        var self = this;
+        $.ajax({
+                url: $(this).attr('action'),
+                type: $(this).attr('method'),
+                data: $(this).serializeArray(),
                 dataType: 'json'
-            }).done(function (response) {
-                if (response.status == 'success') {
-                    $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                } else {
-                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+            })
+            .then(function (response) {
+                if (response.status !== 'success') {
+                    throw new Error;
                 }
-            }).fail(function () {
+
+                $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+            })
+            .catch(function () {
                 $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+            })
+            .always(function () {
+                $(self).find('input[type="submit"]').prop('disabled', false);
             });
-        }
     });
 
     // Start polling for new replies
-    pollReplies();
+    var polling = new PollReplies(30000);
+    polling.start();
 
     /*
      * Posts message to ticket
      */
     function saveMessage(form)
     {
-        // Make sure there is a message there
-        form.find('textarea[name="text"]').valid();
-
         // Save data here before disabling fields
         var data = form.serializeArray();
 
@@ -164,8 +158,8 @@ $(document).ready(function() {
 
         // Post updated data
         $.ajax({
-            url: laroute.route('ticket.frontend.message.store'),
-            type: 'POST',
+            url: form.attr('action'),
+            type: form.attr('method'),
             data: data,
             dataType: 'json'
         }).done(function (response) {
@@ -206,74 +200,104 @@ $(document).ready(function() {
         });
     }
 
-    var lastReplyPoll;
-
-    /*
-     * Poll for new replies
-     */
-    function pollReplies()
+    function PollReplies(milliseconds)
     {
-        $.ajax({
-            url: laroute.route('ticket.frontend.message.poll'),
-            data: {
-                ticket_number: ticketNumber,
-                token: $('meta[name="token"]').prop('content'),
-                lastPoll: lastReplyPoll,
-            },
-            success: function (response) {
-                // If there are notifications, show them
-                if (typeof response.data != 'undefined') {
-                    if (response.data.messages.length) {
-                        // Add each message
-                        $.each(response.data.messages, function (index, value) {
-                            showMessage(value);
-                        });
-                    }
+        var loopTimer, lastReplyPoll, xhr,
+            startAfterTimer,
+            instance = this;
 
-                    // Update ticket details
-                    if (response.data.details.update) {
-                        // Update sidebar items
-                        $('.sp-ticket-department').text(response.data.details.department);
-                        $('.sp-ticket-status').text(response.data.details.status);
-                        $('.sp-ticket-status').css('background-color', response.data.details.status_colour);
-                        $('.sp-ticket-priority').text(response.data.details.priority);
-                        $('.sp-ticket-priority').css('background-color', response.data.details.priority_colour);
-                        $('.sp-ticket-updated').html(response.data.details.updated_at);
+        this.runNow = function () {
+            instance.stop();
 
-                        // If closed, hide mark as resolved button
-                        if (response.data.details.status_id == closedStatusId) {
-                            $('.sp-mark-resolved').hide();
-                        } else {
-                            $('.sp-mark-resolved').show();
+            void 0;
+
+            return xhr = $.ajax({
+                url: laroute.route('ticket.frontend.message.poll'),
+                data: {
+                    ticket_number: ticketNumber,
+                    token: $('meta[name="token"]').prop('content'),
+                    lastPoll: lastReplyPoll,
+                },
+                success: function (response) {
+                    // If there are notifications, show them
+                    if (typeof response.data != 'undefined') {
+                        if (response.data.messages.length) {
+                            // Add each message
+                            $.each(response.data.messages, function (index, value) {
+                                showMessage(value);
+                            });
                         }
 
-                        // If changed to locked or unlocked, refresh page
-                        if (response.data.details.locked) {
-                            if ($('form.sp-message-form').length) {
-                                location.reload();
+                        // Update ticket details
+                        if (response.data.details.update) {
+                            // Update sidebar items
+                            $('.sp-ticket-department').text(response.data.details.department);
+                            $('.sp-ticket-status')
+                                .text(response.data.details.status)
+                                .css('background-color', response.data.details.status_colour);
+                            $('.sp-ticket-priority')
+                                .text(response.data.details.priority)
+                                .css('background-color', response.data.details.priority_colour);
+                            $('.sp-ticket-updated').html(response.data.details.updated_at);
+
+                            // If closed, hide mark as resolved button
+                            if (response.data.details.status_id == closedStatusId) {
+                                $('.sp-mark-resolved').hide();
+                            } else {
+                                $('.sp-mark-resolved').show();
                             }
-                        } else {
-                            if ($('.sp-ticket-locked').length) {
-                                location.reload();
+
+                            // If changed to locked or unlocked, refresh page
+                            if (response.data.details.locked) {
+                                if ($('form.sp-message-form').length) {
+                                    location.reload();
+                                }
+                            } else {
+                                if ($('.sp-ticket-locked').length) {
+                                    location.reload();
+                                }
                             }
+                        }
+
+                        // Refresh timeago.
+                        if (typeof timeAgo !== 'undefined') {
+                            timeAgo.render($('time.timeago'));
                         }
                     }
 
-                    // Refresh timeago.
-                    if (typeof timeAgo !== 'undefined') {
-                        timeAgo.render($('time.timeago'));
-                    }
-                }
+                    // Update the last poll time
+                    lastReplyPoll = response.timestamp;
+                },
+                dataType: "json"
+            });
+        };
 
-                // Update the last poll time
-                lastReplyPoll = response.timestamp;
-            },
-            dataType: "json",
-            complete: function () {
-                // Delay the next poll by 15 seconds
-                pollTimeout = setTimeout(function () {
-                    pollReplies();
-                }, 15000);
+        this.start = function () {
+            instance.runNow().always(function () {
+                loopTimer = setTimeout(instance.start, milliseconds);
+            });
+        };
+
+        this.startAfter = function (milliseconds) {
+            void 0;
+            clearTimeout(startAfterTimer);
+            startAfterTimer = setTimeout(instance.start, milliseconds);
+        };
+
+        this.stop = function () {
+            void 0;
+            clearTimeout(loopTimer);
+            xhr && xhr.abort();
+        };
+
+        // When window is not active, stop polling.
+        $(document).on('visibilitychange', function () {
+            if (document.hidden) {
+                void 0;
+                instance.stop();
+            } else {
+                void 0;
+                instance.startAfter(2000);
             }
         });
     }

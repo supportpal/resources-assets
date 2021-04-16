@@ -29,7 +29,7 @@
 
             // Show the alert
             Swal.fire({
-                willOpen: function () {
+                didOpen: function () {
                     Swal.showLoading();
 
                     App.user.deleteAvatar($(button).data('url'))

@@ -1,22 +1,4 @@
 $(document.body).ready(function () {
-    // There's no Selectize event which runs before an item is added / an option is selected. So we're overriding the
-    // function here to allow us to intercept that event and perform an action before it adds the item to the UI etc.
-    Selectize.define('disable_options', function (options) {
-        var self = this;
-
-        this.onOptionSelect = (function (e) {
-            return function (e) {
-                var $target = $(e.currentTarget);
-                var value = $target.attr('data-value');
-                var $item = self.getOption(value);
-
-                self.trigger('item_add', value, $item);
-
-                return false;
-            }
-        })();
-    });
-
     // Show a No Results message if the server returns no data.
     Selectize.define('no_results', function (options) {
         var self = this;
@@ -78,11 +60,8 @@ $(document.body).ready(function () {
         // all the data returned from the server we're passing a 'search' property for each option which is the term
         // that we've searched for...
         searchField: ['search'],
-        plugins: ['disable_options', 'no_results'],
+        plugins: ['no_results'],
         create: false,
-        onItemAdd: function (value, $item) {
-            window.location.href = this.options[value].link;
-        },
         onFocus: function () {
             // Set search box to be half page width in desktop mode.
             $('#header .search-form').parent('.sp-flex-grow').addClass('lg:sp-w-1/2');
@@ -94,6 +73,20 @@ $(document.body).ready(function () {
             // Make dropdown bigger than normal selectize dropdown.
             $dropdown.css('max-height', $(window).height() * 0.75);
             $dropdown.css('overflow-y', 'auto');
+
+            // Remove Selectize onOptionSelected event handler so that you can click
+            // on a[href] inside dropdown options and it opens a new window.
+            $dropdown.off('mousedown click');
+            $dropdown.on('mousedown click', 'a', function (e) {
+                // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/which#Return_value
+                // https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/button#Return_value
+                if (e.button === 0 || e.which === 1) {
+                    window.location.href = $(this).attr('href');
+                }
+
+                // Keep the dropdown open.
+                return false;
+            });
         },
         render: {
             optgroup_header: function (item, escape) {

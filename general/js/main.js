@@ -231,6 +231,12 @@ if (!Array.prototype.find) {
     });
 }
 
+// Reverse items in selector.
+// https://www.mail-archive.com/discuss@jquery.com/msg04272.html
+$.fn.reverse = function () {
+    return this.pushStack(this.get().reverse(), arguments);
+};
+
 // Wait for DOM to load before running the below.
 $(function () {
     // IE 11 css --var support.
@@ -387,6 +393,44 @@ $(function () {
         // Initialise global timeAgo variable (used in several other files).
         window.timeAgo = new timeago();
         timeAgo.setLocale("supportpal");
+
+        // Hide/Show Password library defaults.
+        $.extend(true, $.fn.hideShowPassword.defaults, {
+            show: false,
+            innerToggle: 'focus',
+            states: {
+                shown: {
+                    toggle: {
+                        attr: {
+                            content: Lang.get('general.hide'),
+                            attr: { title: '' }
+                        }
+                    }
+                },
+                hidden: {
+                    toggle: {
+                        attr: {
+                            content: Lang.get('general.show'),
+                            attr: { title: '' }
+                        }
+                    }
+                }
+            },
+            toggle: {
+                className: 'sp-button-sm'
+            }
+        });
+
+        // Selectize defaults.
+        $.extend(true, $.fn.selectize.defaults, {
+            render: {
+                option_create: function (data, escape) {
+                    var item = Lang.get('core.add_selectize', {item: escape(data.input)});
+
+                    return '<div class="create">' + item + '</div>';
+                }
+            }
+        });
     }
 
     /**
@@ -408,6 +452,10 @@ $(function () {
      */
     function getErrorElementWrapper(element)
     {
+        if ($(element).parents('.sp-validation-container').length) {
+            return $(element).parents('.sp-validation-container');
+        }
+
         var $row = getErrorElementRow(element);
 
         return $row.find(':input:not(:button)').length > 1 &&
@@ -491,6 +539,12 @@ $(function () {
 
         // Custom submit handler.
         submitHandler: function (form) {
+            // CodeMirror saves when form submit events are fired. We need to manually trigger a save
+            // so that jquery-validation has the correct form data.
+            $(form).find('.CodeMirror').each(function(i, el){
+                el.CodeMirror.save();
+            });
+
             $(form).find('input[type="submit"], button[type="submit"]').prop('disabled', true);
 
             // Validate the form.
@@ -542,6 +596,22 @@ $(function () {
                     }
                 }
 
+                // If the error is in a translatable model, open it.
+                if ($elm.parent().hasClass('sp-translation')) {
+                    var $translatableInput = $elm.parents('.sp-input-translatable');
+
+                    $translatableInput.find('.fa-language').click();
+
+                    // If the translation is not visible, select it from the dropdown.
+                    if (! $elm.parent().is(':visible')) {
+                        var $selectize = $translatableInput.find('select[name=sp-translation-add]')[0].selectize;
+
+                        if (typeof $selectize !== 'undefined') {
+                            $selectize.addItem($elm.parent().data('locale'), false);
+                        }
+                    }
+                }
+
                 // Make sure the element is visible otherwise it will scroll to the top of the page.
                 if ($elm.is(':visible')) {
                     $('html, body, #content').animate({scrollTop: $elm.position().top - 44}, 1000);
@@ -550,31 +620,6 @@ $(function () {
                     return false;
                 }
             });
-        }
-    });
-
-    // Hide/Show Password library defaults.
-    $.extend(true, $.fn.hideShowPassword.defaults, {
-        show: false,
-        innerToggle: 'focus',
-        states: {
-            shown: {
-                toggle: {
-                    attr: {
-                        title: null
-                    }
-                }
-            },
-            hidden: {
-                toggle: {
-                    attr: {
-                        title: null
-                    }
-                }
-            }
-        },
-        toggle: {
-            className: 'sp-button-sm'
         }
     });
 });

@@ -71,7 +71,7 @@
 
             // Pre select the oldest ticket.
             if (typeof selectedTicket !== 'undefined' && ticket.id === selectedTicket.id) {
-                $option.prop('selected', 'selected');
+                $option.attr('selected', 'selected');
             }
 
             $list.append($option);
@@ -200,7 +200,7 @@
             var oldest = null;
 
             $.each(tickets, function (index, ticket) {
-                if (oldest === null || ticket.created_at < oldest) {
+                if (oldest === null || ticket.created_at < oldest.created_at) {
                     oldest = ticket;
                 }
             });
@@ -243,10 +243,9 @@
             html: '',
             confirmButtonText: Lang.get('ticket.merge'),
             showCancelButton: false,
-            willOpen: function () {
-                Swal.showLoading();
-            },
             didOpen: function () {
+                Swal.showLoading();
+
                 // Fetch details of the selected tickets and also recent tickets.
                 return $.get(laroute.route('ticket.operator.action.search'), {include_ids: tickets.concat(recentTicketIds)})
                     .then(function (response) {
@@ -286,9 +285,7 @@
                     Swal.showValidationMessage(Lang.get('messages.error_updated', { 'item': Lang.choice('ticket.ticket', 1) }));
                 });
             },
-            allowOutsideClick: function () {
-                return ! Swal.isLoading();
-            }
+            allowOutsideClick: false,
         });
     };
 
@@ -320,10 +317,9 @@
             html: '',
             confirmButtonText: Lang.get('general.link'),
             showCancelButton: false,
-            willOpen: function () {
-                Swal.showLoading();
-            },
             didOpen: function () {
+                Swal.showLoading();
+
                 // Don't include already linked tickets.
                 var linkedTickets = $('ul.linked-tickets')
                         .find('a.unlink')

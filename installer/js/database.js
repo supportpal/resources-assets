@@ -49,22 +49,33 @@ var installer = function (parameters) {
     };
 
     /**
+     * Append message to textarea.
+     *
+     * @param message
+     * @returns {*}
+     */
+    var appendToTextarea = function (message) {
+        var $textarea = $migration.find('textarea');
+        $textarea.val($textarea.val() + message + "\n");
+
+        return $textarea;
+    }
+
+    /**
      * AJAX error handler.
      *
      * @param string
      * @return void
      */
     var errorHandler = function (string) {
-        alert('Something went wrong while contacting the server.');
+        void 0;
 
         // Add the error message to the log.
         if (isValidJson(string)) {
-            var json = JSON.parse(string);
-
-            $migration.find('textarea').append($('<div>' + json.message + '</div>').text());
-        } else {
-            $migration.find('textarea').append($('<div>' + string + '</div>').text());
+            string = JSON.parse(string).message;
         }
+
+        appendToTextarea(string);
     };
 
     /**
@@ -84,16 +95,16 @@ var installer = function (parameters) {
             .done(function (json, textStatus, jqXHR) {
                 // Make sure we have valid json
                 if (isValidJson(jqXHR.responseText) == false) {
-                    return errorHandler('<span>' + jqXHR.responseText + '</span>');
+                    return errorHandler(jqXHR.responseText);
                 }
 
                 // Update the log.
-                $textarea.append(json.data.verbose).scrollTop($textarea[0].scrollHeight);
+                appendToTextarea(json.data.verbose).scrollTop($textarea[0].scrollHeight);
 
                 // Fire the next request after 0.5 seconds
                 if (json.data.complete == true) {
                     $textarea.scrollTop($textarea[0].scrollHeight);
-                    $migration.find('.sp-form-button.sp-hidden').show().find('input[type=submit]').removeAttr('disabled');
+                    $migration.find('.sp-form-button.sp-hidden').show().find('input[type=submit]').prop('disabled', false);
 
                     // Remove alert when clicking continue.
                     window.onbeforeunload = null;

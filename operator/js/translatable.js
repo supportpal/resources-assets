@@ -141,7 +141,7 @@ $(function () {
 
                 // Find template in missing list.
                 var $translation = $modal.find('.missing-translations .sp-translation[data-locale="' + value + '"]');
-                $translation.find(':input').removeAttr('disabled');
+                $translation.find(':input').prop('disabled', false);
                 $translation.show();
 
                 // Hide "No Existing Translations" if it's currently visible.

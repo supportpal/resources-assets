@@ -21,23 +21,16 @@
      */
     function embed_image_callback(json)
     {
-        var message = json.error;
-        if (typeof message !== 'string' || message.length === 0 || !message.trim()) {
+        var message = json.message;
+        if (typeof message !== 'string' || message.length === 0 || ! message.trim()) {
             message = Lang.get('messages.error_embed_image');
-        } else {
-            message = Lang.get('messages.please_correct') + '<br /><br />' + message;
         }
 
-        // Make sure swal is loaded (just in case?)
-        if (typeof Swal === 'function') {
-            Swal.fire({
-                title: Lang.get('messages.error'),
-                html: message,
-                icon: 'error'
-            });
-        } else {
-            alert(message.replace(/<br \/>/g, "\n"));
-        }
+        Swal.fire({
+            title: Lang.get('messages.error'),
+            html: message,
+            icon: 'error'
+        });
     }
 
     /**
@@ -120,8 +113,10 @@
             'ctrl+q, meta+q': { api: 'module.block.format', args: {tag: 'blockquote'} },
             'ctrl+., meta+.': { api: 'module.list.toggle', args: 'ol' },
             'ctrl+/, meta+/': { api: 'module.list.toggle', args: 'ul' },
-            'ctrl+[, meta+[': { api: 'module.list.outdent' },
-            'ctrl+], meta+]': { api: 'module.list.indent' },
+            // Redactor has META+[ and META+] shortcuts hardcoded. Presence of them here results
+            // in a bug where pressing META (CMD) triggers module.list.outdent
+            'ctrl+[': { api: 'module.list.outdent' },
+            'ctrl+]': { api: 'module.list.indent' },
             'ctrl+k, meta+k': { api: 'module.link.open' },
             'ctrl+\\, meta+\\': { api: 'plugin.sp-fontformat.clearformat' },
             'ctrl+alt+0, meta+alt+0': { api: 'plugin.sp-fontsize.set', args: {tag: 'p'} },

@@ -11,9 +11,7 @@ function AllowedMethods(parameters) {
     "use strict";
 
     // Validate parameters.
-    var sameStepRoute = parameters.sameStepRoute,
-        nextStepRoute = parameters.nextStepRoute,
-        methodRoute = parameters.route,
+    var methodRoute = parameters.route,
         LANG = parameters.LANG;
 
     // Base DOM element.
@@ -132,6 +130,8 @@ function AllowedMethods(parameters) {
      */
     this.validate = function ()
     {
+        var $form = $('form');
+
         $.when(
             isAllowed('GET', $.Deferred()),
             isAllowed('POST', $.Deferred()),
@@ -153,19 +153,16 @@ function AllowedMethods(parameters) {
             if (requiredValid()) {
                 $elem.find('.sp-requirement-status').find(optionalValid() ? '.sp-text-green-600' : '.sp-text-orange-600').show();
             } else {
+                $form.find('input[name="_valid"]').val("0");
                 $elem.find('.sp-requirement-status').find('.sp-text-red-600').show();
             }
 
             // Determine where the form should submit to.
-            var $form = $('form');
-            if (requiredValid() && $form.find('input[type=hidden][name="_valid"]').val() === "1") {
-                $form.prop('action', nextStepRoute);
-            } else {
-                $form.prop('action', sameStepRoute);
+            if (! requiredValid() || $form.find('input[type=hidden][name="_valid"]').val() !== "1") {
                 $form.find('input[type=submit]').val(LANG.retry);
             }
 
-            $form.find('input[type=submit]').removeAttr('disabled');
+            $form.find('input[type=submit]').prop('disabled', false);
         });
     }
 }

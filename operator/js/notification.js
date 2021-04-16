@@ -1,4 +1,61 @@
-;(function (global) {
+;(function (global, document, window)
+{
+    'use strict';
+
+    var uuid = function () {
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+            var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+            return v.toString(16);
+        });
+    };
+
+    function WindowManager()
+    {
+        var instance = this,
+            windowId = uuid(),
+            storageKey = 'SP_WINDOW_MANAGER';
+
+        this.get = function () {
+            var defaultData = {lastActive: null},
+                data = localStorage.getItem(storageKey);
+            if (data === null) {
+                return defaultData;
+            }
+
+            try {
+                data = JSON.parse(data);
+                if (typeof data !== 'object' || ! data.hasOwnProperty('lastActive')) {
+                    return defaultData;
+                }
+
+                return data;
+            } catch (err) {
+                return defaultData;
+            }
+        }
+
+        this.set = function (key, value) {
+            var data = instance.get();
+            data[key] = value;
+
+            localStorage.setItem(storageKey, JSON.stringify(data));
+        };
+
+        this.setActive = function () {
+            instance.set('lastActive', windowId);
+        };
+
+        this.isActive = function () {
+            return instance.get().lastActive === windowId;
+        };
+
+        instance.setActive();
+        window.addEventListener('visibilitychange', function () {
+            if (! document.hidden) {
+                instance.setActive();
+            }
+        });
+    }
 
     /**
      * Init wrapper for the core module.
@@ -12,6 +69,9 @@
 
         // PRIVATE CONSTANTS
 
+        var xhr,
+            windowManager = new WindowManager();
+
         // Notification types.
         var DISABLED = 0,
             IN_BROWSER = 1,
@@ -20,13 +80,24 @@
         // PRIVATE UTILITY HELPERS
         //
 
+        var pollAgain = function (instance) {
+            return setTimeout(function () {
+                poll(instance);
+            }, instance._timeout);
+        };
+
         /**
          * Poll for new notifications.
          *
          * @param instance SupportPalNotifications instance.
          */
         var poll = function (instance) {
-            $.ajax({
+            if (! windowManager.isActive()) {
+                return pollAgain(instance);
+            }
+
+            xhr && xhr.abort();
+            xhr = $.ajax({
                 url: laroute.route('core.operator.notification'),
                 data: {
                     lastPoll: instance._lastPoll,
@@ -54,10 +125,7 @@
                     instance._lastMessage = response.lastMessage;
                 },
                 complete: function() {
-                    // In 'timeout' seconds, poll again.
-                    setTimeout(function () {
-                        poll(instance);
-                    }, instance._timeout);
+                    pollAgain(instance);
                 },
                 timeout: instance._timeout,
                 dataType: "json"
@@ -98,12 +166,10 @@
 
         /**
          * Start polling for notifications.
-         *
-         * @param timeout How often to poll for notifications in milliseconds.
          */
         SupportPalNotifications.prototype.poll = function () {
             if (this._notificationType == DISABLED) {
-                console.log("Polling for notifications disabled in operator settings.");
+                void 0;
                 return;
             }
 
@@ -197,6 +263,6 @@
     };
 
     // Load Library
-    init(this);
+    init(global);
 
-})(this);
+})(this, document, window);

@@ -120,8 +120,8 @@ if (! App.userAgent.isIe()) {
                 },
                 {
                     id: 'step-5',
-                    title: Lang.get('core.company_name'),
-                    text: Lang.get('core.company_name_desc'),
+                    title: Lang.get('core.brand_name'),
+                    text: Lang.get('core.brand_name_desc'),
                     attachTo: {
                         element: '#name',
                         on: 'right'

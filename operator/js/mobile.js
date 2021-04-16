@@ -6,7 +6,7 @@ $(document).ready(function () {
 
     // Clicking navigation menu in mobile
     $('a.sp-nav-item, a.sp-nav-sub-menu').on('click', function () {
-        if ($(window).width() <= 1024) {
+        if ($(window).width() < 1024) {
             $(this).find('.fas').toggleClass('sp-chevron fa-chevron-down');
             $(this).next().slideToggle(500);
         }
