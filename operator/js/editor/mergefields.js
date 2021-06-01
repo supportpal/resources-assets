@@ -178,7 +178,7 @@
          * @private
          */
         var createContainer = function () {
-            return '<div class="merge-field_container"></div>';
+            return '<div class="sp-editor-container"></div>';
         };
 
         /**
@@ -205,7 +205,7 @@
          * @private
          */
         var createPreview = function () {
-            return '<div class="merge-field_preview"></div>';
+            return '<div class="sp-editor-preview"></div>';
         };
 
         /**

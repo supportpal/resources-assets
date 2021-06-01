@@ -163,20 +163,6 @@
         };
 
         /**
-         * Convert HTML line breaks to new line characters (LF).
-         *
-         * @param html
-         * @returns {*}
-         */
-        var htmlDecodeWithLineBreaks = function (html) {
-            var breakToken = '_______break_______',
-                lineBreakedHtml = html.replace(/(\r\n|\n|\r)/gm, "").replace(/<br\s?\/?>/gi, breakToken).replace(/<p\.*?>(.*?)<\/p>/gi, breakToken + '$1' + breakToken);
-
-            // Encode the return text for redactor, so it doesn't try to parse any of it
-            return he.encode($('<div>').html(lineBreakedHtml).text().replace(new RegExp(breakToken, 'g'), '\n'));
-        };
-
-        /**
          * Insert a message into the DOM.
          *
          * @param {string} html
@@ -482,45 +468,13 @@
             // Remove any currently quoted section in that message
             $currentHtml.find('.expandable, .supportpal_quote').remove();
 
-            // Trim and convert break lines
-            message = htmlDecodeWithLineBreaks($currentHtml.html()).trim();
-
-            var length = 100;
-            var finalText = '';
-
-            // Split into lines
-            for (var i = 0; i < message.length; i++) {
-                // Trim the string to the maximum length
-                var trimmedString = message.substr(i, length);
-
-                // Check for a line break first
-                var x = Math.min(trimmedString.length, trimmedString.indexOf("\n"));
-
-                if (x >= 0) {
-                    // Trim up to the \n
-                    trimmedString = trimmedString.substr(0, x);
-                } else if (trimmedString.length === length) {
-                    // Re-trim if we are in the middle of a word
-                    x = Math.min(trimmedString.length, trimmedString.lastIndexOf(" "));
-                    if (x >= 0) {
-                        trimmedString = trimmedString.substr(0, x);
-                    }
-                }
-
-                // Progress pointer
-                i += (x >= 0 ? x : length - 1);
-
-                // Add string
-                finalText += '> ' + trimmedString + '<br />';
-            }
-
             // Insert into the textarea where the cursor/caret currently is, sets to start if not in focus
             var $textarea = instance.visibleTextarea();
-            if (!$textarea.redactor('editor.isFocus')) {
+            if (! $textarea.redactor('editor.isFocus')) {
                 $textarea.redactor('editor.startFocus');
             }
 
-            $textarea.redactor('insertion.insertHtml', finalText + '<br />');
+            $textarea.redactor('insertion.insertHtml', '<blockquote>' + $currentHtml.html() + '</blockquote>');
         };
 
         /**
@@ -829,6 +783,9 @@
                     attachments = [],
                     failed_attachments = [];
 
+                var departmentEmail = $('select[name="department_email"] option:selected').text();
+                departmentEmail = departmentEmail.slice(departmentEmail.lastIndexOf('<') + 1, -1);
+
                 $messages.each(function (index, message) {
                     var $message = $(message),
                         message_attachments = [];
@@ -856,7 +813,7 @@
                     });
 
                     messages.push(
-                        '<strong>' + Lang.get('ticket.from') + ':</strong> ' + he.encode($message.find('.sp-name').html().trim()) + '&nbsp;&lt;' + he.encode($message.find('.sp-name').data('email')) + '&gt;<br />'
+                        '<strong>' + Lang.get('ticket.from') + ':</strong> ' + he.encode($message.find('.sp-name').html().trim()) + '&nbsp;&lt;' + he.encode($message.find('.sp-name').data('email') || departmentEmail) + '&gt;<br />'
                         + '<strong>' + Lang.get('customfield.date') + ':</strong> ' + he.encode($message.find('time').data('date')) + '<br />'
                         + '<strong>' + Lang.get('ticket.subject') + ':</strong> ' + he.encode(subject) + '<br />'
                         + (message_attachments.length > 0

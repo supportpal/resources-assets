@@ -132,67 +132,6 @@ $(document).ready(function () {
 
 });
 
-/**
- * Add a new item to DOM container. This function expects a classname:input[name$="[id]"] to be present
- * for every unique DOM item within the container.
- *
- * @param className
- * @param container
- * @returns {number}
- */
-function addNewItem(className, container) {
-    // Clone the element
-    var newElem = $(className + ':first').clone();
-
-    // Clear the input values from the cloned DOM
-    newElem.removeClass('first');
-
-    // Update the index.. god damn you Laravel
-    // Longwinded but ensures a unique key
-    // Find the highest index first and add one
-    var re = /^\w+\[(\d+)?]\[\w+]?$/;
-    var m, index = 0;
-    $(className + ' :input[name$="[id]"]').each(function () {
-        if ((m = re.exec($(this).attr('name'))) !== null) {
-            if (typeof m[1] != 'undefined') {
-                if ((m = parseInt(m[1])) >= index) {
-                    index = m + 1;
-                }
-            }
-        }
-    });
-
-    // Update all the indexes in the new element
-    newElem.find(':input, label').each(function () {
-        var elem = $(this);
-        elem.prop('disabled', false);
-        [ 'name', 'for', 'id' ].map(function (attribute) {
-            var attr = elem.attr(attribute);
-            if (/^\w+\[(\d+)?](\[[\w:-]+])*(\[\])?$/g.test(attr))
-                elem.attr(attribute, attr.replace(/\[(\d+)?]/, '[' + index + ']'));
-        });
-    });
-
-    // Where do we want to put it?
-    if (typeof container !== 'undefined') {
-        // Append cloned DOM to the end of the parent container
-        $(container).append(newElem);
-    } else {
-        // Append cloned DOM to the end of the list
-        $(className + ':last').after(newElem);
-    }
-
-    // Make it visible
-    newElem.removeClass('sp-hidden');
-
-    // Auto select first option of dropdowns - fix for firefox
-    newElem.find('select').each(function () {
-        $(this).find('option:first').prop('selected', 'selected');
-    });
-
-    return index;
-}
-
 function array_map (callback) { // eslint-disable-line camelcase
                                 //  discuss at: http://locutus.io/php/array_map/
                                 // original by: Andrea Giammarchi (http://webreflection.blogspot.com)

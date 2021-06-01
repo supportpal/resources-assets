@@ -18,17 +18,21 @@ $(document).ready(function() {
 
     // Reply type
     $('.sp-reply-type .sp-action').on('click', function() {
+        // Hide all forms.
+        $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
+        $('.message-form:not(.edit), .notes-form, .forward-form').hide();
+
         // Determine whether to show the reply, notes or forward form.
         var $form;
         switch ($(this).data('type')) {
             case 1:
+                $form = $('.notes-form').toggle();
                 form.initNotesForm();
-                $form = $('.notes-form');
                 break;
 
             case 2:
+                $form = $('.forward-form').toggle();
                 form.initForwardForm();
-                $form = $('.forward-form');
 
                 // If it's not been used before, forward the whole ticket.
                 if ($(this).hasClass('sp-fresh')) {
@@ -47,7 +51,7 @@ $(document).ready(function() {
                 break;
 
             default:
-                $form = $('.message-form:not(.edit)');
+                $form = $('.message-form:not(.edit)').toggle();
         }
 
         // If a form is visible but out of view, just scroll to it.
@@ -63,13 +67,6 @@ $(document).ready(function() {
                 return;
             }
         }
-
-        // See if we want to hide existing form if one is open.
-        $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
-        if (! $form.is(':visible')) {
-            $('.message-form:not(.edit), .notes-form, .forward-form').hide();
-        }
-        $form.toggle();
 
         // If form is now visible, focus in editor and scroll to it.
         if ($form.is(':visible')) {
@@ -1878,7 +1875,7 @@ $(document).ready(function() {
          */
         var editors = {};
 
-        var initEditor = function(selector) {
+        var initEditor = function(selector, $form) {
             if (editors.hasOwnProperty(selector) && editors[selector] === true) {
                 return;
             }
@@ -1887,6 +1884,9 @@ $(document).ready(function() {
 
             $(selector).redactor($.extend({}, ticket.defaultRedactorConfig(), {
                 callbacks: {
+                    started: function() {
+                        loadEditorContent(selector, $form, this);
+                    },
                     changed: function (html) {
                         var id = this.element.getElement().attr('id');
 
@@ -1912,14 +1912,41 @@ $(document).ready(function() {
             ticket.setParameter(name, new FileUpload($.extend(true, {}, defaults, params)));
         };
 
+        var loadEditorContent = function (selector, $form, editor) {
+            var route = $(selector).data('route');
+            if (typeof route !== 'string' || route === '' ) {
+                return;
+            }
+
+            var $container = $form.find('.reply-form'),
+                $preview = $('<div class="sp-editor-preview"></div>').hide();
+            $container.append($preview);
+
+            var height = $container.outerHeight(true);
+            $preview.html('').css('height', height).addClass('loadinggif').show();
+
+            editor.container.app.enableReadOnly();
+
+            $.get(route)
+                .done(function (json) {
+                    editor.insertion.insertHtml(json.data.purified_text);
+                })
+                .always(function () {
+                    $preview.hide();
+                    editor.container.app.disableReadOnly();
+                });
+        };
+
         this.initReplyForm = function () {
-            initFileUploads($('.message-form'), 'replyFileUpload');
-            initEditor('#newMessage');
+            var $form = $('.message-form');
+            initFileUploads($form, 'replyFileUpload');
+            initEditor('#newMessage', $form);
         };
 
         this.initNotesForm = function () {
-            initFileUploads($('.notes-form'), 'notesFileUpload');
-            initEditor('#newNote');
+            var $form = $('.notes-form');
+            initFileUploads($form, 'notesFileUpload');
+            initEditor('#newNote', $form);
         };
 
         this.initForwardForm = function () {
@@ -1929,7 +1956,7 @@ $(document).ready(function() {
                     cumulativeMaxFileSize: $form.data('cumulative-max-file-size'),
                 }
             });
-            initEditor('#newForward');
+            initEditor('#newForward', $form);
         };
     }
 });

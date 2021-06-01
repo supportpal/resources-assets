@@ -61,6 +61,11 @@ Filtering.showCondition = function (context) {
         $(context).parents('tr').find('.datepicker').datepicker();
     }
 
+    // Special case: If a phone input, initialise intl-tel-input
+    if (item === 71) {
+        $(context).parents('tr').find('.sp-phone-number').phoneinput();
+    }
+
     // Special case: need to enable the custom field ID value for custom fields (hide and disable it otherwise)
     var ids = [ 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58 ];
     $(context).parents('tr')

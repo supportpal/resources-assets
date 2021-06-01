@@ -237,6 +237,69 @@ $.fn.reverse = function () {
     return this.pushStack(this.get().reverse(), arguments);
 };
 
+/**
+ * Add a new item to DOM container. This function expects a classname:input[name$="[id]"] to be present
+ * for every unique DOM item within the container.
+ *
+ * @param className
+ * @param container
+ * @returns {number}
+ */
+function addNewItem(className, container)
+{
+    // Clone the element
+    var newElem = $(className + ':first').clone();
+
+    // Clear the input values from the cloned DOM
+    newElem.removeClass('first');
+
+    // Update the index.. god damn you Laravel
+    // Longwinded but ensures a unique key
+    // Find the highest index first and add one
+    var re = /^\w+\[(\d+)?]\[\w+]?$/;
+    var m, index = 0;
+    $(className + ' :input[name$="[id]"]').each(function () {
+        if ((m = re.exec($(this).attr('name'))) !== null) {
+            if (typeof m[1] != 'undefined') {
+                if ((m = parseInt(m[1])) >= index) {
+                    index = m + 1;
+                }
+            }
+        }
+    });
+
+    // Update all the indexes in the new element
+    newElem.find(':input, label').each(function () {
+        var elem = $(this);
+        elem.prop('disabled', false);
+        [ 'name', 'for', 'id' ].map(function (attribute) {
+            var attr = elem.attr(attribute);
+            if (/^\w+\[(\d+)?](\[[\w:-]+])*(\[\])?$/g.test(attr)) {
+                elem.attr(attribute, attr.replace(/\[(\d+)?]/, '[' + index + ']'));
+            }
+        });
+    });
+
+    // Where do we want to put it?
+    if (typeof container !== 'undefined') {
+        // Append cloned DOM to the end of the parent container
+        $(container).append(newElem);
+    } else {
+        // Append cloned DOM to the end of the list
+        $(className + ':last').after(newElem);
+    }
+
+    // Make it visible
+    newElem.removeClass('sp-hidden');
+
+    // Auto select first option of dropdowns - fix for firefox
+    newElem.find('select').each(function () {
+        $(this).find('option:first').prop('selected', 'selected');
+    });
+
+    return index;
+}
+
 // Wait for DOM to load before running the below.
 $(function () {
     // IE 11 css --var support.
@@ -456,11 +519,15 @@ $(function () {
             return $(element).parents('.sp-validation-container');
         }
 
+        if ($(element).parents('.sp-phone-number').length) {
+            return $(element).parents('.sp-phone-number');
+        }
+
         var $row = getErrorElementRow(element);
 
         return $row.find(':input:not(:button)').length > 1 &&
             (! $(element).parent('.redactor-box').length
-                && ! $(element).parent('.merge-field_container').length
+                && ! $(element).parent('.sp-editor-container').length
                 && ! $(element).parent('.hideShowPassword-wrapper').length
                 && ! $(element).parent('.sp-input-translatable-container').length
                 && ! $(element).parent('.sp-input-group').length
@@ -480,11 +547,11 @@ $(function () {
     {
         var position = element;
 
-        // If it's redactor, codemirror, show/hide button, recaptcha, a checkbox or radio, add after parent
-        if (element.parent('.redactor-box').length || element.parent('.merge-field_container').length
-            || element.parent('.hideShowPassword-wrapper').length || element.parent('.sp-input-group').length
-            || element.parent().parent('.g-recaptcha').length || element.prop('type') === 'checkbox'
-            || element.prop('type') === 'radio'
+        // If it's redactor, codemirror, show/hide button, phone input, recaptcha, a checkbox or radio, add after parent
+        if (element.parent('.redactor-box').length || element.parent('.sp-editor-container').length
+            || element.parent('.hideShowPassword-wrapper').length || element.parent('.iti').length
+            || element.parent('.sp-input-group').length || element.parent().parent('.g-recaptcha').length
+            || element.prop('type') === 'checkbox' || element.prop('type') === 'radio'
         ) {
             position = element.parent();
         }
@@ -497,6 +564,11 @@ $(function () {
         // If it's got a translatable model, add afterwards.
         if (element.next().hasClass('fa-language')) {
             position = element.next().next();
+        }
+
+        // If it's phone input, add after sibling (remove button).
+        if (element.parent('.iti').length) {
+            position = position.next();
         }
 
         // If it's a checkbox or radio, make sure we put the error after the last element.
@@ -525,6 +597,11 @@ $(function () {
 
         unhighlight: function(element, errorClass, validClass) {
             getErrorElementWrapper(element).removeClass('sp-input-has-error');
+
+            // If phone input, it's the next element which is the hidden input.
+            if ($(element).parent('.iti').length) {
+                element = $(element).next();
+            }
 
             // Hide error if it's "pending" (remote validation).
             var describer = $(element).attr("aria-describedby");

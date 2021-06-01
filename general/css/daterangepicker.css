@@ -1,0 +1,96 @@
+.daterangepicker * {
+    font-family: var(--font-icon-with-body) !important;
+    font-size: 0.875rem !important;
+}
+
+.daterangepicker {
+    background-color: var(--color-background-primary);
+    border-color: var(--color-background-tertiary);
+}
+
+.daterangepicker:before {
+    border-bottom-color: var(--color-background-tertiary);
+}
+.daterangepicker:after {
+    border-bottom-color: var(--color-background-primary);
+}
+
+.daterangepicker.opensright:before {
+    left: 15px;
+}
+.daterangepicker.opensright:after {
+    left: 16px;
+}
+
+.daterangepicker.show-ranges.ltr .drp-calendar.left {
+    border-left-color: var(--color-background-tertiary);
+}
+
+.daterangepicker .drp-buttons {
+    border-top-color: var(--color-background-tertiary);
+}
+
+.daterangepicker .ranges li:hover {
+    background-color: var(--color-background-secondary);
+}
+
+.daterangepicker .calendar-table {
+    border: 0;
+    background-color: var(--color-background-primary);
+}
+
+.daterangepicker .calendar-table .next span,
+.daterangepicker .calendar-table .prev span {
+    border-color: var(--color-text-primary);
+}
+
+.daterangepicker .calendar-table .next span {
+    margin-right: 3px;
+}
+
+.daterangepicker .calendar-table .prev span {
+    margin-left: 2px;
+}
+
+.daterangepicker select.monthselect,
+.daterangepicker select.yearselect {
+    min-height: auto;
+    padding: 0.25rem 1.75rem 0.25rem 0.5rem;
+    width: auto;
+}
+
+.daterangepicker td.active,
+.daterangepicker td.active:hover,
+.daterangepicker .ranges li.active,
+.daterangepicker td.active.in-range,
+.daterangepicker td.active.available:hover,
+.daterangepicker td.active.in-range.available:hover {
+    background-color: var(--color-primary-900);
+    color: #fff;
+    font-weight: bold;
+}
+
+.daterangepicker td.in-range,
+.daterangepicker td.in-range.available:hover {
+    background-color: var(--color-background-tertiary);
+    color: var(--text-color-primary);
+}
+
+.daterangepicker td.available:hover,
+.daterangepicker th.available:hover {
+    background-color: var(--color-background-secondary);
+}
+
+.daterangepicker td:not(.available),
+.daterangepicker th:not(.available) {
+    cursor: auto;
+}
+
+.daterangepicker td.off,
+.daterangepicker td.off.in-range,
+.daterangepicker td.off.start-date,
+.daterangepicker td.off.end-date,
+.daterangepicker td.off.available:hover {
+    background: transparent;
+    color: var(--color-text-tertiary);
+}

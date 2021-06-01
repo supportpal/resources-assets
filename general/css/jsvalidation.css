@@ -17,6 +17,7 @@ select.sp-input-has-error {
 }
 
 .sp-input-has-error .sp-input-error:not(:empty),
+div.sp-input-has-error ~ div > .sp-input-error:not(:empty),
 input.sp-input-has-error ~ div > .sp-input-error:not(:empty),
 select.sp-input-has-error ~ div > .sp-input-error:not(:empty),
 textarea.sp-input-has-error ~ div > .sp-input-error:not(:empty) {
