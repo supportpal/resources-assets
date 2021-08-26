@@ -361,7 +361,14 @@ $(function () {
         })
         // For dropdowns
         .on('click', '.sp-dropdown-container .sp-button, .sp-dropdown-container .sp-action, .sp-dropdown-container .sp-dropdown li', function () {
-            $(this).parents('.sp-dropdown-container').find('.sp-dropdown').toggle();
+            var $dropdown = $(this).parents('.sp-dropdown-container').find('.sp-dropdown');
+            if ($dropdown.is(':visible')) {
+                $dropdown.hide();
+                $dropdown.trigger('sp.dropdown.hide');
+            } else {
+                $dropdown.show();
+                $dropdown.trigger('sp.dropdown.show');
+            }
         })
         // Hide dropdown if clicking outside the dropdown div
         .on('click', function (event) {

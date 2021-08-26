@@ -6,6 +6,8 @@
 .daterangepicker {
     background-color: var(--color-background-primary);
     border-color: var(--color-background-tertiary);
+    overflow: auto;
+    max-height: calc(100% - 7rem);
 }
 
 .daterangepicker:before {

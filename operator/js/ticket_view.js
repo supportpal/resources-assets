@@ -548,7 +548,7 @@ $(document).ready(function() {
     /*
      * Saving drafts automatically
      */
-    function saveDraft($form, type) {
+    function saveDraft($form, type, useBeacon) {
         var message = $form.find('textarea:not(.CodeMirror textarea):eq(0)').redactor('source.getCode');
 
         // Update draft message variable
@@ -562,6 +562,7 @@ $(document).ready(function() {
 
         // Make AJAX data.
         var data = {
+            _token: $('meta[name=csrf_token]').prop('content'),
             ticket: [ ticket.parameters().ticketId ],
             reply_type: type,
             is_draft: 1,
@@ -579,94 +580,101 @@ $(document).ready(function() {
             data[obj.name] = obj.value;
         });
 
-        // Call the ajax to save draft
-        $.ajax({
-            method: 'POST',
-            url: laroute.route('ticket.operator.message.store'),
-            data: data,
-            success: function(response) {
-                if (typeof response.status !== 'undefined' && response.status == 'success') {
-                    // Show saved message
-                    $form.find('.draft-success').text(response.message).show();
-                    // Show discard button
-                    $form.find('.discard-draft').show();
-                    // Show draft icon in quick action
-                    $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-draft-icon').removeClass('sp-hidden');
-                    // Add attachment-id data to each attachment.
-                    var attachments = response.data.attachments;
-                    for (var upload_hash in attachments) {
-                        if (! attachments.hasOwnProperty(upload_hash)) {
-                            continue;
-                        }
-
-                        var id = attachments[upload_hash];
-                        $form.find('.sp-delete-attachment').each(function () {
-                            if ($(this).data('hash') === upload_hash || $(this).prop('data-hash') === upload_hash) {
-                                $(this).data('attachment-id', id);
+        if (useBeacon && "sendBeacon" in navigator) {
+            navigator.sendBeacon(laroute.route('ticket.operator.message.store'), new URLSearchParams($.param(data)));
+        } else {
+            // Call the ajax to save draft
+            $.ajax({
+                method: 'POST',
+                url: laroute.route('ticket.operator.message.store'),
+                data: data,
+                success: function (response) {
+                    if (typeof response.status !== 'undefined' && response.status == 'success') {
+                        // Show saved message
+                        $form.find('.draft-success').text(response.message).show();
+                        // Show discard button
+                        $form.find('.discard-draft').show();
+                        // Show draft icon in quick action
+                        $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-draft-icon').removeClass('sp-hidden');
+                        // Add attachment-id data to each attachment.
+                        var attachments = response.data.attachments;
+                        for (var upload_hash in attachments) {
+                            if (!attachments.hasOwnProperty(upload_hash)) {
+                                continue;
                             }
-                        });
+
+                            var id = attachments[upload_hash];
+                            $form.find('.sp-delete-attachment').each(function () {
+                                if ($(this).data('hash') === upload_hash || $(this).prop('data-hash') === upload_hash) {
+                                    $(this).data('attachment-id', id);
+                                }
+                            });
+                        }
                     }
-                }
-            },
-            dataType: "json"
-        });
+                },
+                dataType: "json"
+            });
+        }
     }
 
-    (function autoSaveDraft(pass) {
+    function autoSaveDraft(useBeacon) {
         // Only if draft button is available on either reply or note form
         if ($('.save-draft').length) {
-            // Skip first time - redactor changes HTML after page load
-            if (pass) {
-                var drafts = ticket.getDrafts();
+            var drafts = ticket.getDrafts();
 
-                // Check both message drafts and note drafts.
-                for (var redactor_id in drafts) {
-                    var $textarea = $('#'+redactor_id),
-                        $form = $textarea.parents('form');
+            // Check both message drafts and note drafts.
+            for (var redactor_id in drafts) {
+                var $textarea = $('#'+redactor_id),
+                    $form = $textarea.parents('form');
 
-                    // Only if it's a redactor editor (e.g. not for Twitter replies)
-                    if ($($textarea).siblings('.redactor-in').length) {
-                        // skip loop if the property is from prototype
-                        if (!drafts.hasOwnProperty(redactor_id) || $form.find('input[type="submit"]').prop('disabled')) {
-                            continue;
-                        }
+                // Only if it's a redactor editor (e.g. not for Twitter replies)
+                if ($($textarea).siblings('.redactor-in').length) {
+                    // skip loop if the property is from prototype
+                    if (!drafts.hasOwnProperty(redactor_id) || $form.find('input[type="submit"]').prop('disabled')) {
+                        continue;
+                    }
 
-                        // Get the draft message.
-                        var draftMessage = drafts[redactor_id];
+                    // Get the draft message.
+                    var draftMessage = drafts[redactor_id];
 
-                        if (draftMessage == null) {
-                            // Save current message
-                            ticket.setDraft(redactor_id, $textarea.redactor('source.getCode'));
-                        } else {
-                            var currentMessage = $textarea.redactor('source.getCode');
+                    // Save current message
+                    if (draftMessage == null) {
+                        ticket.setDraft(redactor_id, $textarea.redactor('source.getCode'));
+                    }
 
-                            // Check if message has changed
-                            if (ticket.draftHasChanged(redactor_id, currentMessage)) {
-                                // Disable button while saving
-                                $form.find('.save-draft').prop('disabled', true);
+                    // Check if message has changed
+                    var currentMessage = $textarea.redactor('source.getCode');
+                    if (ticket.draftHasChanged(redactor_id, currentMessage)) {
+                        // Disable button while saving
+                        $form.find('.save-draft').prop('disabled', true);
 
-                                // Save draft
-                                saveDraft($form, $form.find('input[name="reply_type"]').val());
+                        // Save draft
+                        saveDraft($form, $form.find('input[name="reply_type"]').val(), useBeacon);
 
-                                // Re-enable button
-                                $form.find('.save-draft').prop('disabled', false);
-                            }
-                        }
+                        // Re-enable button
+                        $form.find('.save-draft').prop('disabled', false);
                     }
                 }
-
-                // Delay the next poll by 30 seconds
-                setTimeout(function() {
-                    autoSaveDraft(true);
-                }, 30000);
-            } else {
-                // Wait 2 seconds to start, due to redactor changing HTML
-                setTimeout(function() {
-                    autoSaveDraft(true);
-                }, 2000);
             }
+
+            // Delay the next poll by 30 seconds
+            setTimeout(function() {
+                autoSaveDraft();
+            }, 30000);
         }
-    })();
+    }
+
+    // Wait 2 seconds to start, due to redactor changing HTML
+    setTimeout(function() {
+        autoSaveDraft();
+    }, 2000);
+
+    // Before closing/redirecting away, check if there's a draft that needs to be saved.
+    window.addEventListener('visibilitychange', function () {
+        if (document.visibilityState === 'hidden') {
+            autoSaveDraft(true);
+        }
+    });
     /*
      * END Saving drafts automatically
      */
@@ -723,8 +731,8 @@ $(document).ready(function() {
     });
 
     // Show a draft message.
-    $('#tabMessages').on('click', '.sp-draft-message', function () {
-        var $draft = $(this);
+    $('#tabMessages').on('click', '.sp-draft-message-title', function () {
+        var $draft = $(this).parent();
 
         // Toggle the content area.
         $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
@@ -736,7 +744,7 @@ $(document).ready(function() {
         }
 
         // Otherwise, load the message and show it.
-        return $.get(laroute.route('ticket.operator.message.showJson', {id: $(this).data('message-id')}))
+        return $.get(laroute.route('ticket.operator.message.showJson', {id: $draft.data('message-id')}))
             .done(function (ajax) {
                 // Load draft message.
                 $draft.find('.sp-draft-message-content-body').html(ajax.data.purified_text);
@@ -1914,7 +1922,7 @@ $(document).ready(function() {
 
         var loadEditorContent = function (selector, $form, editor) {
             var route = $(selector).data('route');
-            if (typeof route !== 'string' || route === '' ) {
+            if (typeof route !== 'string' || route === '') {
                 return;
             }
 
@@ -1922,18 +1930,14 @@ $(document).ready(function() {
                 $preview = $('<div class="sp-editor-preview"></div>').hide();
             $container.append($preview);
 
-            var height = $container.outerHeight(true);
-            $preview.html('').css('height', height).addClass('loadinggif').show();
-
-            editor.container.app.enableReadOnly();
+            $preview.html('').css('height', '100%').addClass('loadinggif').show();
 
             $.get(route)
                 .done(function (json) {
-                    editor.insertion.insertHtml(json.data.purified_text);
+                    editor.insertion.set(json.data.purified_text);
                 })
                 .always(function () {
                     $preview.hide();
-                    editor.container.app.disableReadOnly();
                 });
         };
 

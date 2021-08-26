@@ -1,0 +1,48 @@
+.noUi-horizontal {
+    background: var(--color-background-tertiary);
+    border: 0;
+    border-radius: 0.25rem;
+    box-shadow: none;
+    height: 0.75rem;
+}
+
+.noUi-handle {
+    background: #38a169;
+    border-radius: 9999px;
+    border: 0;
+    box-shadow: none;
+}
+
+.noUi-horizontal .noUi-handle {
+    height: 1.5rem;
+    right: -0.75rem;
+    width: 1.5rem;
+}
+
+.noUi-handle:before,
+.noUi-handle:after {
+    content: none;
+}
+
+.noUi-connect {
+    background: #38a169;
+    opacity: 0.75;
+}
+
+.noUi-touch-area {
+    cursor: pointer;
+}
+
+.noUi-pips-horizontal {
+    padding: 0.5rem 0;
+}
+
+.noUi-value {
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    cursor: pointer;
+}
+
+.noUi-marker-horizontal.noUi-marker-large {
+    height: 0.75rem;
+}

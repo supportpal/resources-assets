@@ -79,6 +79,17 @@ var installer = function (parameters) {
     };
 
     /**
+     * Window beforeunload event handler.
+     *
+     * @param {Event} event
+     * @return {string}
+     */
+    var handleUnload = function (event) {
+        event.preventDefault();
+        return event.returnValue = "Are you sure you want to close the browser window?";
+    }
+
+    /**
      * Make new AJAX request. This will continuously process all migrations until complete.
      */
     var makeRequest = function () {
@@ -107,7 +118,7 @@ var installer = function (parameters) {
                     $migration.find('.sp-form-button.sp-hidden').show().find('input[type=submit]').prop('disabled', false);
 
                     // Remove alert when clicking continue.
-                    window.onbeforeunload = null;
+                    window.removeEventListener('beforeunload', handleUnload);
                 } else {
                     window.setTimeout(function () {
                         makeRequest();
@@ -127,9 +138,7 @@ var installer = function (parameters) {
         $migration = $('#migration');
 
         // Prevent closing of the browser window.
-        window.onbeforeunload = function (e) {
-            return "Are you sure you want to close the browser window?";
-        };
+        window.addEventListener('beforeunload', handleUnload);
 
         // Register click event handler, we need page interaction in order for the onbeforeunload event to fire.
         $preMigration.on('click', '#beginMigration', function (e) {

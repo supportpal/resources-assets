@@ -34,7 +34,7 @@ $(document).ready(function () {
     };
 
     // Search - Don't submit if it's empty
-    $('form[name=search_form]').on('submit', function(e) {
+    $('form[name=search_form]').on('submit', function (e) {
         if ($(this).find('input[name=query]').val() == '') {
             e.preventDefault();
         }
@@ -58,13 +58,23 @@ $(document).ready(function () {
         $(this).find('.sp-hidden').not('.sp-translatable-modal').not('.sp-translatable-modal .sp-hidden').removeClass('sp-hidden');
     });
 
-    // Toggle show/hide of the filters area
-    $(document.body).on('click', 'button.sp-filter-results', function () {
+    // Toggle show/hide of the filter results area
+    $(document.body).on('mousedown', 'button.sp-filter-results', function () {
         $('div.sp-filter-results').show();
 
         $('#content').animate({
             scrollTop: $('div.sp-filter-results').position().top - 24
         }, 1000);
+    });
+
+    // Toggle show/hide of the filter grid area
+    $('.sp-quick-actions').on('click', 'button.sp-filter-grid', function () {
+        $('div.sp-filter-grid').removeClass('sp-hidden')
+            .find('input')
+            .trigger('focus');
+    });
+    $('.sp-quick-actions').on('focusout blur', 'div.sp-filter-grid input', function () {
+        $('div.sp-filter-grid').addClass('sp-hidden');
     });
 
     /**
@@ -87,7 +97,7 @@ $(document).ready(function () {
                     $('.sp-content-inner').prepend('<div class="session-error sp-alert sp-alert-error">' +
                         Lang.get("messages.session_refresh") + '</div>');
                 }
-                $('#content').animate({ scrollTop: 0 }, 1000);
+                $('#content').animate({scrollTop: 0}, 1000);
                 return false;
             }
         }
@@ -130,6 +140,51 @@ $(document).ready(function () {
             .afterprint(initOverlayScrollbars.bind(null, App.sidebarScrollbar));
     }
 
+    // Operator specific DataTable config.
+    $(document)
+        .on('preInit.dt', function () {
+            // Hide filter from loading on page load
+            $('div.dataTables_filter').addClass('sp-hidden');
+        })
+        .on('init.dt', function (e, settings) {
+            var $table = $(settings.nTable),
+                $wrapper = $table.parents('.dataTables_wrapper');
+
+            if (! $table.hasClass('sp-with-actions')) {
+                return;
+            }
+
+            var $quickActions = $('.sp-quick-actions'),
+                $ul = $quickActions.find('ul:first'),
+                $li = $('<li>');
+
+            $quickActions.prepend(
+                $('<div>').addClass('sp-filter-grid sp-absolute sp-flex sp-w-full sp-bg-primary sp-px-3 sp--mx-3 sp-z-50 sp-hidden')
+                    .append(
+                        $wrapper.find('div.dataTables_filter')
+                            .removeClass('sp-hidden')
+                            .addClass('sp-flex-grow sp-inline-block sm:sp-flex-initial')
+                    )
+                    .append(
+                        $('<button>').addClass('sp-filter-results sp-px-2 sp-rounded-l-none')
+                            .prop('title', Lang.get('general.filter_results'))
+                            .append('<i class="fas fa-fw fa-caret-down"></i>')
+                    )
+            );
+            $quickActions.find('.sp-filter-grid')
+                .find('input')
+                .addClass('sp-w-full sp-border-r-0 sp-rounded-r-none sm:sp-w-auto');
+
+            $ul.append(
+                $li.addClass('sp-action-group sp-inline-block sp-relative sp-float-right')
+                    .append(
+                        $('<div>').addClass('sp-grid-pagination sp-inline-block')
+                            .append($wrapper.find('div.dataTables_paginate'))
+                    )
+            );
+
+            $ul.trigger('dt.header.init', $li);
+        });
 });
 
 function array_map (callback) { // eslint-disable-line camelcase
