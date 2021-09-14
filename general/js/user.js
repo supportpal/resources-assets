@@ -58,7 +58,7 @@
 
                     Swal.fire(Lang.get('messages.error'), text, 'error');
                 });
-            }, 'image/jpeg');
+            }, 'image/png');
         };
 
         var readFile = function (file) {
