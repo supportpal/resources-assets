@@ -21,8 +21,12 @@ $(function () {
         toggleSidebox(this);
 
         // The sidebox must have an ID to store the cookie.
-        if (typeof Cookies !== 'undefined' && typeof $(this).prop('id') !== 'undefined') {
-            Cookies.set($(this).prop('id'), $(this).hasClass('sp-closed') ? 'sp-collapsed' : 'sp-expanded');
+        if (typeof Cookies !== 'undefined' && $(this).prop('id')) {
+            Cookies.set(
+                $(this).prop('id'),
+                $(this).hasClass('sp-closed') ? 'sp-collapsed' : 'sp-expanded',
+                {samesite: 'lax'}
+            );
         }
     });
 
@@ -31,10 +35,11 @@ $(function () {
         toggleSidebar();
 
         // The sidebar must have an ID to store the cookie.
-        if (typeof Cookies !== 'undefined' && typeof $sidebar.prop('id') !== 'undefined') {
+        if (typeof Cookies !== 'undefined' && $sidebar.prop('id')) {
             Cookies.set(
                 $sidebar.prop('id'),
-                $sidebar.hasClass(sidebarClosedState) ? sidebarClosedState : sidebarOpenState
+                $sidebar.hasClass(sidebarClosedState) ? sidebarClosedState : sidebarOpenState,
+                {samesite: 'lax'}
             );
         }
     });

@@ -133,7 +133,6 @@ $(document).ready(function () {
             labelField: 'name',
             searchField: 'name',
             create: true,
-            placeholder: Lang.choice('user.organisation', 1),
             allowEmptyOption: true,
             load: function (query, callback) {
                 if (! query.length) {

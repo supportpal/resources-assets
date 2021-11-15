@@ -471,3 +471,11 @@ ul.redactor-search li .sp-title {
 .redactor-in p {
     margin: 0; /* act like breaklines */
 }
+
+.redactor-in ol ol li {
+    list-style-type: lower-alpha;
+}
+
+.redactor-in ol ol ol li {
+    list-style-type: lower-roman;
+}

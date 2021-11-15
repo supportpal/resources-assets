@@ -730,35 +730,43 @@ $(document).ready(function() {
         });
     });
 
-    // Show a draft message.
-    $('#tabMessages').on('click', '.sp-draft-message-title', function () {
-        var $draft = $(this).parent();
+    $('#tabMessages')
+        // Download all attachments.
+        .on('click', '.sp-download-all', function () {
+            var $attachments = $(this).parents('ul.sp-attachments').find('li');
+            var filename = $('.sp-ticket-subject').text();
 
-        // Toggle the content area.
-        $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
-        $draft.find('.sp-chevron i').toggleClass('fa-chevron-down fa-chevron-up');
+            (new ZipFile).create($attachments, filename)
+        })
+        // Show a draft message.
+        .on('click', '.sp-draft-message-title', function () {
+            var $draft = $(this).parent();
 
-        // If it's now closed, we can stop here.
-        if ($draft.find('.fa-chevron-up').length) {
-            return;
-        }
+            // Toggle the content area.
+            $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
+            $draft.find('.sp-chevron i').toggleClass('fa-chevron-down fa-chevron-up');
 
-        // Otherwise, load the message and show it.
-        return $.get(laroute.route('ticket.operator.message.showJson', {id: $draft.data('message-id')}))
-            .done(function (ajax) {
-                // Load draft message.
-                $draft.find('.sp-draft-message-content-body').html(ajax.data.purified_text);
-            })
-            .catch(function (error) {
-                if (error.status === 404 || error.status === 403) {
-                    $draft.remove();
-                } else {
-                    // User should retry expanding the draft.
-                    $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
-                    $draft.find('.sp-chevron i').toggleClass('fa-chevron-down fa-chevron-up');
-                }
-            });
-    });
+            // If it's now closed, we can stop here.
+            if ($draft.find('.fa-chevron-up').length) {
+                return;
+            }
+
+            // Otherwise, load the message and show it.
+            return $.get(laroute.route('ticket.operator.message.showJson', {id: $draft.data('message-id')}))
+                .done(function (ajax) {
+                    // Load draft message.
+                    $draft.find('.sp-draft-message-content-body').html(ajax.data.purified_text);
+                })
+                .catch(function (error) {
+                    if (error.status === 404 || error.status === 403) {
+                        $draft.remove();
+                    } else {
+                        // User should retry expanding the draft.
+                        $draft.find('.sp-draft-message-content').toggleClass('sp-hidden');
+                        $draft.find('.sp-chevron i').toggleClass('fa-chevron-down fa-chevron-up');
+                    }
+                });
+        });
 
     // Apply macro
     $('.apply-macro').on('click', function() {
@@ -1679,6 +1687,15 @@ $(document).ready(function() {
                             });
 
                             $('form.message-form').trigger("supportpal.polled_messages");
+                        }
+
+                        // If the browser supports, it enable the download all attachments function.
+                        if (ZipFile.isSupported()) {
+                            $('#tabMessages').find('ul.sp-attachments').each(function () {
+                                if ($(this).find('li').length > 1) {
+                                    $(this).find('.sp-download-all').show();
+                                }
+                            });
                         }
 
                         // Show other operators viewing ticket

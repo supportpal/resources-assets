@@ -8,8 +8,9 @@ $(document).ready(function() {
     // Load attachment previews
     App.attachments.loadPreviews($('.sp-message'));
 
-    // Ajax load messages.
-    $(document).on('click', '.sp-message-text-show-more', function (e) {
+    $(document)
+      // Ajax load messages.
+      .on('click', '.sp-message-text-show-more', function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -39,13 +40,19 @@ $(document).ready(function() {
                 $this.show();
                 $message.find('.sp-loading').remove();
             });
-    });
+      })
+      // Download all attachments.
+      .on('click', '.sp-download-all', function () {
+          var $attachments = $(this).parents('.sp-message').find('.sp-attachments li');
+          var filename = $('meta[name="ticket-subject"]').prop('content');
 
-    // Open links in a new window/tab. Needs rel="noopener" due to
-    // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
-    $(document).on('click', '.sp-message-text a', function () {
+          (new ZipFile).create($attachments, filename)
+      })
+      // Open links in a new window/tab. Needs rel="noopener" due to
+      // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
+      .on('click', '.sp-message-text a', function () {
         $(this).attr('target', '_blank').attr('rel', 'noopener');
-    });
+      });
 
     // Redactor
     var instance = $('textarea[name=text]').redactor();
@@ -263,6 +270,15 @@ $(document).ready(function() {
                         if (typeof timeAgo !== 'undefined') {
                             timeAgo.render($('time.timeago'));
                         }
+                    }
+
+                    // If the browser supports, it enable the download all attachments function.
+                    if (ZipFile.isSupported()) {
+                        $('.sp-message-block').find('ul.sp-attachments').each(function () {
+                            if ($(this).find('li').length > 1) {
+                                $(this).find('.sp-download-all').show();
+                            }
+                        });
                     }
 
                     // Update the last poll time

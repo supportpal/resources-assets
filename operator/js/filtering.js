@@ -203,11 +203,11 @@ Filtering.initialise = function () {
 
 $(function () {
     // Toggle filtering
-    $('.toggle-filtering').on('click', function () {
-        $('.sp-condition-group').toggle();
-
+    $('.sp-quick-actions').on('mousedown', 'button.sp-filter-results', function () {
         // If we're toggling to show and it's currently empty, insert new condition
-        if ($('.sp-condition-group').is(':visible') && ! $('.sp-condition-group .condition:visible').length) {
+        if ($('.sp-condition-group').parent().toggle().is(':visible')
+            && ! $('.sp-condition-group .condition:visible').length
+        ) {
             $('.sp-condition-group .add-condition').trigger('click');
         }
     });

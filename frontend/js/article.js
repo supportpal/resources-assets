@@ -3,6 +3,17 @@ $(document).ready(function () {
     // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
     $(".sp-comment-text a:not([href^='#'])").attr('target', '_blank').attr('rel', 'noopener');
 
+    // Previews for attachments.
+    App.attachments.loadPreviews('.sp-content');
+
+    // Previews for inline images.
+    var $article = $(".sp-article");
+    $article.find("img").each(function () {
+        $(this).addClass("sp-lightbox");
+        $(this).attr("data-src", $(this).attr('src'));
+    });
+    $article.lightGallery({selector: ".sp-lightbox", counter: false});
+
     // Change ordering
     $('.sp-comment-ordering').on('change', function () {
         // Show loading
