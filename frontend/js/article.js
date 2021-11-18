@@ -7,12 +7,14 @@ $(document).ready(function () {
     App.attachments.loadPreviews('.sp-content');
 
     // Previews for inline images.
-    var $article = $(".sp-article");
-    $article.find("img").each(function () {
-        $(this).addClass("sp-lightbox");
-        $(this).attr("data-src", $(this).attr('src'));
+    var $article = $('.sp-article');
+    $article.find('img').each(function () {
+        if ($(this).parents('a').length === 0) {
+            $(this).addClass('sp-lightbox');
+            $(this).attr('data-src', $(this).attr('src'));
+        }
     });
-    $article.lightGallery({selector: ".sp-lightbox", counter: false});
+    $article.lightGallery({selector: '.sp-lightbox', counter: false});
 
     // Change ordering
     $('.sp-comment-ordering').on('change', function () {
