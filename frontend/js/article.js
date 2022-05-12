@@ -4,7 +4,7 @@ $(document).ready(function () {
     $(".sp-comment-text a:not([href^='#'])").attr('target', '_blank').attr('rel', 'noopener');
 
     // Previews for attachments.
-    App.attachments.loadPreviews('.sp-content');
+    App.attachments.loadPreviews($('.sp-content'));
 
     // Previews for inline images.
     var $article = $('.sp-article');
@@ -14,7 +14,7 @@ $(document).ready(function () {
             $(this).attr('data-src', $(this).attr('src'));
         }
     });
-    $article.lightGallery({selector: '.sp-lightbox', counter: false});
+    $article.gallery({selector: '.sp-lightbox'});
 
     // Change ordering
     $('.sp-comment-ordering').on('change', function () {
@@ -260,10 +260,10 @@ $(document).ready(function () {
                                     $('input[type=password]').hideShowPassword();
 
                                     // Date picker
-                                    $(Swal.getContent()).find('.datepicker').datepicker();
+                                    $(Swal.getHtmlContainer()).find('.datepicker').datepicker();
                                 },
                                 preConfirm: function () {
-                                    var data = $(Swal.getContent()).find("input, textarea, select").serializeArray();
+                                    var data = $(Swal.getHtmlContainer()).find("input, textarea, select").serializeArray();
                                     data.push({name: '_token', value: $('meta[name="csrf_token"]').prop('content') });
 
                                     $.post(laroute.route('selfservice.article.feedback.store', {'id': feedbackLog.id}), data);

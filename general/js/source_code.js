@@ -22,9 +22,9 @@
          * @return {void}
          */
         var createToolbar = function () {
-            $toolbar = $('<div>', {class: 'redactor-toolbar-wrapper sp-z-50'})
+            $toolbar = $('<div>', {class: 'toolbar-wrapper sp-z-50'})
                 .append(
-                    $('<div>', {class: 'redactor-toolbar'})
+                    $('<div>', {class: 'toolbar'})
                 );
 
             $container.prepend($toolbar);
@@ -44,7 +44,7 @@
             }
 
             var $button = $('<a/>', {
-                class: 're-button re-button-icon re-' + name,
+                class: 'button button-icon button-name-' + name,
                 href: '#',
                 title: data.title || '',
                 role: 'button',
@@ -54,7 +54,7 @@
                 $button.html(data.icon);
             }
 
-            $toolbar.find('.redactor-toolbar').append($button);
+            $toolbar.find('.toolbar').append($button);
 
             return $button;
         };
@@ -63,34 +63,36 @@
     /**
      * Add merge fields to the toolbar.
      *
-     * @param parameters
+     * @param {{codemirror: CodeMirror, syntaxEmailTemplate: boolean}} parameters
      * @constructor
      */
     function MergeFields(parameters)
     {
         "use strict";
 
+        var codemirror = parameters.codemirror;
         var mergeFields = new App.mergefields({
-            editor: parameters.editor,
-            show_tickets: parameters.show_tickets,
-            show_organisations: parameters.show_organisations,
-            show_canned_responses: parameters.show_canned_responses,
+            codemirror: codemirror,
             syntaxEmailTemplate: parameters.syntaxEmailTemplate
         });
 
-        mergeFields.init();
+        mergeFields.init(codemirror.container());
+        mergeFields.callback(codemirror.codemirror().getValue());
+        codemirror.codemirror().on('change', function (codemirror, changeObj) {
+            mergeFields.callback(codemirror.getValue());
+        });
 
         var $button = parameters.toolbar.addButton('mergefields', {
-            title: App.mergefields.translations.en.merge_fields,
+            title: App.mergefields.translations.merge_fields,
             icon: App.mergefields.icon
         });
 
         $button.on('click', function (e) {
             Swal.fire({
-                title: App.mergefields.translations.en.merge_fields,
+                title: App.mergefields.translations.merge_fields,
                 html: $('<div/>', {style: 'text-align: initial'})
                     .append(App.mergefields.modalContent),
-                showCancelButton: true,
+                width: 800,
                 showCloseButton: true,
                 showConfirmButton: false,
                 showClass: {
@@ -102,10 +104,25 @@
                     backdrop: ''
                 },
                 willOpen: function () {
-                    mergeFields.appendMergeFields($(Swal.getContent()))
-                        .on('mergefield:inserted', function () {
-                            Swal.close();
-                        });
+                    var $modal = App.mergefields.appendTo(
+                        $(Swal.getHtmlContainer()),
+                        parameters.show_tickets,
+                        parameters.show_canned_responses,
+                        parameters.show_organisations
+                    );
+
+                    $modal.on('mergefield:inserted', function (e, data) {
+                        Swal.close();
+
+                        var instance = codemirror.codemirror(),
+                          doc = instance.getDoc(),
+                          cursor = doc.getCursor(); // gets the line number in the cursor position
+
+                        doc.replaceRange(data.value, { line: cursor.line, ch: cursor.ch });
+                        setTimeout(function () {
+                            instance.focus();
+                        }, 100);
+                    });
                 }
             })
         });
@@ -165,7 +182,7 @@
                 toolbar = new Toolbar(instance.container());
                 new MergeFields({
                     toolbar: toolbar,
-                    editor: instance,
+                    codemirror: instance,
                     show_tickets: parameters.mergeFields.tickets,
                     show_organisations: parameters.mergeFields.organisations,
                     show_canned_responses: parameters.mergeFields.canned_responses,

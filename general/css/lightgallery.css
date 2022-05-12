@@ -1,5 +1,5 @@
 body.lg-on {
-    overflow: hidden;
+    @apply sp-overflow-hidden;
 }
 
 .lg-backdrop {
@@ -14,14 +14,16 @@ body.lg-on {
     z-index: 10004;
 }
 
-.lg-actions .lg-next, .lg-actions .lg-prev {
-    background: rgba(0,0,0,.45);
-    -moz-box-shadow: none;
-    -webkit-box-shadow: none;
-    box-shadow: none;
-    padding-top: 5px !important;
+.lg-actions .lg-next,
+.lg-actions .lg-prev {
+    @apply sp-shadow-none;
+    background-color: rgba(0, 0, 0, .9);
+}
+
+.lg-icon:hover {
+    background-color: rgba(0, 0, 0, .9) !important;
 }
 
 .lg-video-object {
-    background: #111;
+    @apply sp-bg-gray-900;
 }

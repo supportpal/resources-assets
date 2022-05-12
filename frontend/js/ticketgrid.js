@@ -10,7 +10,7 @@ $(document).ready(function () {
             // Change filter row to include submit ticket and filter results buttons.
             $("div.dataTables_filter")
                 .removeClass('dataTables_filter')
-                .addClass('sp-flex sp-flex-grow')
+                .addClass('sp-flex sp-grow')
                 .append(
                     $('<a>', {
                         class: 'sp-filter-results sp-button sp-rounded-l-none sp-hidden md:sp-inline-block',

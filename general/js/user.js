@@ -106,7 +106,7 @@
         };
 
         var bindControlEvents = function () {
-            var $content = $(Swal.getContent()),
+            var $content = $(Swal.getHtmlContainer()),
                 zoom = 0.1,
                 $minusButton = $content.find('.profile-crop-image-control-minus'),
                 $plusButton = $content.find('.profile-crop-image-control-plus');
@@ -120,7 +120,7 @@
         };
 
         var onShowModal = function (popup) {
-            var $content = $(Swal.getContent());
+            var $content = $(Swal.getHtmlContainer());
 
             cropper = new Cropper($content.find('img')[0], {
                 aspectRatio: 1,

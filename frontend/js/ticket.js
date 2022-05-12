@@ -54,8 +54,8 @@ $(document).ready(function() {
         $(this).attr('target', '_blank').attr('rel', 'noopener');
       });
 
-    // Redactor
-    var instance = $('textarea[name=text]').redactor();
+    // Editor
+    $('textarea[name=text]').editor();
 
     // Regex for email
     var re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
@@ -178,7 +178,7 @@ $(document).ready(function() {
 
                 // Reset the form
                 form.find('textarea[name="text"]').val('').prop('disabled', false);
-                instance.source.setCode('');
+                tinymce.activeEditor.setContent('');
                 $('.sp-attached-files').find('li:not(:first)').remove();
                 $('.sp-attachment-details').find('input[type=hidden][name^="attachment["]:not(:first)').remove();
 
@@ -216,7 +216,7 @@ $(document).ready(function() {
         this.runNow = function () {
             instance.stop();
 
-            void 0;
+            console.log('[' + new Date().toUTCString() + '][Poll replies] Sending AJAX');
 
             return xhr = $.ajax({
                 url: laroute.route('ticket.frontend.message.poll'),
@@ -295,13 +295,13 @@ $(document).ready(function() {
         };
 
         this.startAfter = function (milliseconds) {
-            void 0;
+            console.log('[' + new Date().toUTCString() + '][Poll replies] Starting after ' + milliseconds + ' milliseconds');
             clearTimeout(startAfterTimer);
             startAfterTimer = setTimeout(instance.start, milliseconds);
         };
 
         this.stop = function () {
-            void 0;
+            console.log('[' + new Date().toUTCString() + '][Poll replies] Cancelling current running requests.');
             clearTimeout(loopTimer);
             xhr && xhr.abort();
         };
@@ -309,10 +309,10 @@ $(document).ready(function() {
         // When window is not active, stop polling.
         $(document).on('visibilitychange', function () {
             if (document.hidden) {
-                void 0;
+                console.log('[' + new Date().toUTCString() + '][Poll replies] Tab is not visible.');
                 instance.stop();
             } else {
-                void 0;
+                console.log('[' + new Date().toUTCString() + '][Poll replies] Tab is visible.');
                 instance.startAfter(2000);
             }
         });

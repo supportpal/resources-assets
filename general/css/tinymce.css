@@ -1,0 +1,236 @@
+.tox-tinymce {
+    @apply sp-border-tertiary sp-rounded;
+
+    font-family: inherit;
+}
+
+.tox-tinymce--disabled {
+    @apply sp-opacity-75;
+}
+
+.tox-tinymce-aux {
+    z-index: 10051;
+}
+
+.tox .tox-toolbar-overlord {
+    @apply sp-border-b sp-border-solid sp-border-tertiary;
+
+    background: 0;
+}
+
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary {
+    @apply sp-bg-none sp-bg-secondary;
+}
+
+.tox .tox-toolbar,
+.tox .tox-toolbar__primary,
+.tox .tox-toolbar__overflow
+{
+    @apply sp-bg-none;
+}
+
+.tox:not([dir=rtl]) .tox-toolbar__group:not(:last-of-type),
+.tox[dir=rtl] .tox-toolbar__group:not(:last-of-type) {
+    @apply sp-border-tertiary;
+}
+
+.tox .tox-tbtn,
+.tox .tox-tbtn--select,
+.tox .tox-split-button {
+    @apply sp-m-0;
+}
+
+.tox .tox-tbtn,
+.tox .tox-tbtn--enabled,
+.tox .tox-split-button,
+.tox .tox-split-button .tox-tbtn {
+    @apply sp-text-primary !important;
+}
+
+.tox .tox-tbtn:hover,
+.tox .tox-tbtn:focus,
+.tox .tox-tbtn--enabled,
+.tox .tox-tbtn--enabled:hover,
+.tox .tox-split-button:hover,
+.tox .tox-split-button:focus,
+.tox .tox-split-button:hover .tox-tbtn,
+.tox .tox-split-button:focus .tox-tbtn {
+    @apply sp-text-secondary sp-cursor-pointer !important;
+
+    background: none;
+}
+
+.tox .tox-tbtn--select:hover,
+.tox .tox-tbtn__select-label {
+    @apply sp-cursor-pointer;
+}
+
+.tox .tox-tbtn svg,
+.tox .tox-split-button svg {
+    fill: var(--color-text-primary) !important;
+}
+
+.tox .tox-tbtn:hover svg,
+.tox .tox-split-button:hover svg,
+.tox .tox-split-button:focus svg {
+    fill: var(--color-text-secondary) !important;
+}
+
+.tox .tox-split-button:hover {
+    @apply sp-shadow-none;
+}
+
+.tox.tox-tinymce-aux .tox-toolbar__overflow,
+.tox .tox-menu {
+    @apply sp-mt-px sp-bg-primary sp-border-t-0 sp-border-tertiary sp-rounded-b sp-rounded-t-none sp-shadow-none;
+}
+
+.tox .tox-collection--list .tox-collection__group {
+    @apply sp-p-0;
+}
+
+.tox .tox-collection__group-heading {
+    @apply sp-text-secondary;
+}
+
+.tox .tox-collection__item,
+.tox .tox-collection--list .tox-collection__item--enabled,
+.tox .tox-collection--toolbar .tox-collection__item--enabled,
+.tox .tox-collection--grid .tox-collection__item--enabled,
+.tox .tox-collection--grid .tox-collection__item--active:not(.tox-collection__item--state-disabled),
+.tox .tox-collection--list .tox-collection__item--active:not(.tox-collection__item--state-disabled),
+.tox .tox-collection--toolbar .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+    @apply sp-text-primary;
+}
+
+.tox .tox-collection--list .tox-collection__item--enabled {
+    @apply sp-bg-tertiary;
+}
+
+.tox .tox-collection--list .tox-collection__item--active,
+.tox .tox-collection--toolbar .tox-collection__item--enabled,
+.tox .tox-collection--toolbar .tox-collection__item--active,
+.tox .tox-collection--grid .tox-collection__item--enabled,
+.tox .tox-collection--grid .tox-collection__item--active:not(.tox-collection__item--state-disabled) {
+    @apply sp-bg-secondary;
+}
+
+.tox .tox-collection__item-label {
+    @apply sp-leading-normal;
+}
+
+.tox .tox-edit-area__iframe {
+    @apply sp-bg-primary sp-text-secondary;
+}
+
+.tox .tox-statusbar {
+    @apply sp-bg-primary sp-border-t sp-border-secondary sp-text-secondary;
+}
+
+.tox .tox-statusbar a,
+.tox .tox-statusbar__path-item,
+.tox .tox-statusbar__wordcount {
+    @apply sp-text-secondary;
+}
+
+.tox .tox-dialog {
+    @apply sp-bg-primary sp-border-tertiary sp-rounded sp-text-primary;
+}
+
+.tox .tox-dialog-wrap__backdrop {
+    background-color: rgba(0, 0, 0, 0.75);
+}
+
+.tox .tox-dialog__busy-spinner {
+    @apply sp-bg-secondary;
+}
+
+.tox .tox-dialog__header,
+.tox .tox-dialog__footer {
+    @apply sp-bg-primary sp-text-primary sp-border-tertiary;
+}
+
+.tox .tox-dialog__header {
+    @apply sp-py-2 sp-border-b sp-border-solid;
+}
+
+.tox .tox-button {
+    @apply sp-border-0;
+}
+
+.tox .tox-button {
+    @apply sp-bg-primary-800;
+}
+
+.tox .tox-button:hover:not(:disabled) {
+    @apply sp-bg-primary-900;
+}
+
+.tox .tox-button--secondary {
+    @apply sp-bg-secondary sp-text-primary;
+}
+
+.tox .tox-button--secondary:hover:not(:disabled) {
+    @apply sp-bg-tertiary sp-text-primary;
+}
+
+.tox .tox-button--naked,
+.tox .tox-button--naked:hover:not(:disabled) {
+    background: transparent;
+}
+
+.tox .tox-button--naked:hover:not(:disabled) {
+    @apply sp-text-primary;
+}
+
+.tox .tox-pop__dialog {
+    @apply sp-bg-secondary sp-border sp-border-tertiary sp-rounded sp-shadow;
+}
+
+/* Custom */
+
+.tox-rounded-none .tox-tinymce {
+    @apply sp-rounded-none;
+}
+
+.tox-rounded-t-none .tox-tinymce {
+    @apply sp-rounded-t-none;
+}
+
+.tox-rounded-b-none .tox-tinymce {
+    @apply sp-rounded-b-none;
+}
+
+.tox-bg-orange .tox-edit-area__iframe,
+.tox-bg-orange .tox-statusbar {
+    @apply sp-bg-yellow-100;
+}
+
+.sp-theme-dark .tox-bg-orange .tox-edit-area__iframe,
+.sp-theme-dark .tox-bg-orange .tox-statusbar {
+    @apply sp-bg-yellow-800;
+}
+
+.tox-bg-purple .tox-edit-area__iframe,
+.tox-bg-purple .tox-statusbar {
+    @apply sp-bg-purple-100;
+}
+
+.sp-theme-dark .tox-bg-purple .tox-edit-area__iframe,
+.sp-theme-dark .tox-bg-purple .tox-statusbar {
+    @apply sp-bg-purple-800;
+}
+
+.tox-button-separator {
+    @apply sp-px-0 sp-py-2 sp-mx-3/2 sp-inline sp-border-l sp-border-tertiary sp-align-middle;
+}
+
+/* Editor Output */
+
+@screen print {
+    .sp-editor-content code,
+    .sp-editor-content pre:not(.moz-signature) {
+        @apply sp-whitespace-normal;
+    }
+}

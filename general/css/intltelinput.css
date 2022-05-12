@@ -1,34 +1,29 @@
 .sp-phone-number {
-    margin-bottom: 0.75rem;
+    @apply sp-mb-3;
 }
 
 .iti input[type="tel"] {
-    width: 100%;
+    @apply sp-w-full;
 }
 
 .iti__country-list {
-    background-color: var(--color-background-primary);
-    border-color: var(--color-background-tertiary);
-    margin: 0.25rem 0 0 0;
+    @apply sp-m-0 sp-mt-1 sp-bg-primary sp-border-tertiary;
 }
 
 .iti__country.iti__highlight {
-    background-color: var(--color-background-secondary);
+    @apply sp-bg-secondary;
 }
 
 .iti__divider {
-    border-color: var(--color-background-tertiary);
-    margin-bottom: 0.25rem;
-    padding-bottom: 0.25rem;
+    @apply sp-pb-1 sp-mb-1 sp-border-tertiary;
 }
 
 .iti__country {
-    font-size: 0.875rem;
-    padding: 0.25rem 0.5rem;
+    @apply sp-px-2 sp-py-1 sp-text-sm;
 }
 
 .iti__dial-code {
-    color: var(--color-text-tertiary);
+    @apply sp-text-tertiary;
 }
 
 .iti__arrow {
@@ -40,35 +35,32 @@
 }
 
 .iti__flag-container {
-    padding: 0;
+    @apply sp-p-0;
 }
 
 .iti__selected-flag {
-    padding: 0 0.625rem;
+    @apply sp-py-0 sp-px-5/2;
 }
 
 .iti--separate-dial-code .iti__selected-flag {
-    background-color: var(--color-background-tertiary);
-    border-radius: 0.25rem 0 0 0.25rem;
-    font-size: 0.875rem;
+    @apply sp-bg-tertiary sp-text-sm sp-rounded-l;
 }
 
 .iti--allow-dropdown .iti__flag-container:hover .iti__selected-flag {
-    background-color: var(--color-background-tertiary);
+    @apply sp-bg-tertiary;
 }
 
 .sp-input-has-error .iti__flag-container {
-    padding: 0.125rem;
+    @apply sp-p-1/2;
 }
 
 .sp-input-has-error .iti__selected-flag {
-    padding: 0 0.5rem;
+    @apply sp-px-2 sp-py-0;
 }
 
 /* Small (xs) */
 @media (min-width: 480px) {
     .iti {
-        margin-right: 0.25rem;
-        width: 16rem;
+        @apply sp-w-64;
     }
 }

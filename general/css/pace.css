@@ -1,26 +1,18 @@
 .pace {
-    -webkit-pointer-events: none;
-    pointer-events: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    user-select: none;
+    @apply sp-pointer-events-none sp-select-none;
 }
 
 .pace-inactive {
-    display: none;
+    @apply sp-hidden;
 }
 
 .pace .pace-progress {
-    background: var(--color-primary-800);
-    height: 0.125rem;
-    position: fixed;
-    right: 100%;
-    width: 100%;
+    @apply sp-fixed sp-h-0.5 sp-w-full sp-right-full sp-bg-primary-800;
     z-index: 10005;
 }
 
 @media print {
     .pace {
-        display: none;
+        @apply sp-hidden;
     }
 }

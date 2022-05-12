@@ -1,19 +1,60 @@
 .codemirror-box {
-    border: 1px solid var(--color-background-tertiary);
-    border-radius: 0.25rem;
+    @apply sp-border sp-border-tertiary sp-rounded;
 }
 
-.redactor-box .CodeMirror {
-    border-top: 1px solid var(--color-background-tertiary);
-    border-radius: 0 0 0.25rem 0.25rem;
+.codemirror-box .toolbar-wrapper + .CodeMirror {
+    border-radius: unset !important;
 }
 
-.CodeMirror {
-    border-radius: 0.25rem;
+/*
+ * toolbar
+ */
+
+.codemirror-box .toolbar-wrapper {
+    @apply sp-sticky sp-top-0;
+    z-index: 1000;
 }
 
-.codemirror-box .redactor-toolbar-wrapper + .CodeMirror {
-    border-radius: 0 0 0.25rem 0.25rem;
+.codemirror-box .toolbar {
+    @apply sp-px-1 sp-py-0 sp-bg-secondary sp-border-0 sp-border-b sp-border-solid sp-border-tertiary;
+    @apply sp-leading-normal !important;
+
+    line-height: 1.5 !important;
+    padding: 0 .25rem;
+}
+
+.codemirror-box .toolbar a {
+    @apply sp-m-0 sp-shadow-none sp-text-primary;
+    background: 0;
+    display: inline-block;
+    box-sizing: border-box;
+    text-align: center;
+    cursor: pointer;
+    outline: 0;
+    border: none;
+    vertical-align: middle;
+    text-decoration: none;
+    position: relative;
+    border-radius: 2px;
+}
+
+.codemirror-box .toolbar a.button-icon {
+    @apply sp-p-3/2 sp-text-sm;
+}
+
+.codemirror-box .toolbar a:hover,
+.codemirror-box .toolbar a.button-active,
+.codemirror-box .toolbar a.active {
+    background: 0;
+}
+
+.codemirror-box .toolbar a:hover,
+.codemirror-box .toolbar a:hover .fa,
+.codemirror-box .toolbar a.button-active,
+.codemirror-box .toolbar a.button-active .fa,
+.codemirror-box .toolbar a.active,
+.codemirror-box .toolbar a.active .fa {
+    @apply sp-text-secondary;
 }
 
 /*

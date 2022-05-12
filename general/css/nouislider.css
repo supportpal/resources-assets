@@ -1,22 +1,13 @@
 .noUi-horizontal {
-    background: var(--color-background-tertiary);
-    border: 0;
-    border-radius: 0.25rem;
-    box-shadow: none;
-    height: 0.75rem;
+    @apply sp-h-3 sp-bg-tertiary sp-border-0 sp-rounded sp-shadow-none;
 }
 
 .noUi-handle {
-    background: #38a169;
-    border-radius: 9999px;
-    border: 0;
-    box-shadow: none;
+    @apply sp-bg-green-500 sp-border-0 sp-rounded-full sp-shadow-none;
 }
 
 .noUi-horizontal .noUi-handle {
-    height: 1.5rem;
-    right: -0.75rem;
-    width: 1.5rem;
+    @apply sp-h-6 sp-w-6 sp--right-3;
 }
 
 .noUi-handle:before,
@@ -25,24 +16,21 @@
 }
 
 .noUi-connect {
-    background: #38a169;
-    opacity: 0.75;
+    @apply sp-bg-green-500 sp-opacity-75;
 }
 
 .noUi-touch-area {
-    cursor: pointer;
+    @apply sp-cursor-pointer;
 }
 
 .noUi-pips-horizontal {
-    padding: 0.5rem 0;
+    @apply sp-px-0 sp-py-2;
 }
 
 .noUi-value {
-    font-size: 0.875rem;
-    margin-top: 0.25rem;
-    cursor: pointer;
+    @apply sp-mt-1 sp-text-sm sp-cursor-pointer;
 }
 
 .noUi-marker-horizontal.noUi-marker-large {
-    height: 0.75rem;
+    @apply sp-h-3;
 }

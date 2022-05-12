@@ -1,4 +1,4 @@
-;(function (global, window, App, PNotify, $)
+;(function (global, window, App, PNotify, PNotifyDesktop, $, document)
 {
     'use strict';
 
@@ -12,7 +12,19 @@
     }
 
     // Echo instance.
-    var instance
+    var instance;
+
+    // Stack for PNotify browser notifications.
+    var pNotifyStack = new PNotify.Stack({
+        dir1: 'up', dir2: 'left',       // Position from the bottom right corner.
+        firstpos1: 16, firstpos2: 16,   // 16px from the bottom, 16px from the right.
+        spacing1: 16, spacing2: 16,     // 16px from the last one.
+        push: 'top',                    // Put new notifications above old.
+        maxOpen: 10,
+        maxStrategy: 'close',
+        modal: false,
+        context: document.body,
+    });
 
     function Notifications() {}
 
@@ -31,6 +43,15 @@
             .notification(function (data) {
                 Notifications.showNotification(data.title, data.text, data.route)
             });
+
+        document.addEventListener('pollcast:request-error', function(e) {
+            console.error('Pollcast request failed.', e.detail);
+
+            if (e.detail.status === 419) {
+                console.log('CSRF token has expired. Disconnecting from pollcast service.');
+                Notifications.connector().disconnect();
+            }
+        });
     }
 
     /**
@@ -110,29 +131,19 @@
      * @param {string} text
      */
     Notifications.showBrowserNotification = function (title, text) {
-        PNotify.defaults.icons = 'fontawesome5';
-        PNotify.notice({
+        PNotify.alert({
             title: title,
             titleTrusted: true,
             text: text,
             textTrusted: true,
-            addClass: 'stack-bottomright warning',
-            icon: "fas fa-bell",
-            modules: {
-                Buttons: {
-                    closerHover: false,
-                    labels: {close: ''},
-                    sticker: false,
-                    stickerHover: false
-                }
+            closerHover: false,
+            sticker: false,
+            styling: 'supportpal',
+            icon: 'fas fa-bell',
+            icons: {
+                closer: 'fas fa-times'
             },
-            shadow: false,
-            stack: {
-                dir1: 'up', dir2: 'left',       // Position from the bottom right corner.
-                firstpos1: 16, firstpos2: 16,   // 16px from the bottom, 16px from the right.
-                spacing1: 16, spacing2: 16,     // 16px from the last one.
-                push: 'top',                    // Put new notifications above old.
-            },
+            stack: pNotifyStack,
         });
     };
 
@@ -145,20 +156,20 @@
      */
     Notifications.showDesktopNotification = function (title, text, route) {
         // Request permission for the browser to display notifications (a popup will show up).
-        PNotify.modules.Desktop.permission();
+        PNotifyDesktop.permission();
 
-        PNotify.notice({
+        var notice = PNotify.notice({
             title: title,
             text: $('<p>' + text + '</p>').text(),
-            modules: {
-                Desktop: {
-                    desktop: true,
+            modules: new Map([
+                [PNotifyDesktop, {
                     icon: Notifications.getDesktopIcon(),
                     tag: text,
                     fallback: false
-                }
-            }
-        }).on('click', function(e) {
+                }]
+            ])
+        });
+        notice.on('click', function(e) {
             if ($('.ui-pnotify-closer, .ui-pnotify-sticker, .ui-pnotify-closer *, .ui-pnotify-sticker *').is(e.target)) {
                 return;
             }
@@ -172,4 +183,4 @@
 
     App.extend('Notifications', Notifications)
 
-})(this, window, App, PNotify, jQuery);
+})(this, window, App, PNotify, PNotifyDesktop, jQuery, document);

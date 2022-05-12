@@ -1,6 +1,5 @@
 .dataTables_wrapper {
-    margin-left: -1.5rem;
-    margin-right: -1.5rem;
+    @apply sp--mx-6;
 }
 
 .dataTables_wrapper .dataTables_length,
@@ -9,9 +8,7 @@
 .dataTables_wrapper .dataTables_processing,
 .dataTables_wrapper .dataTables_paginate,
 .dataTables_wrapper .dataTables_sort {
-    color: var(--color-text-primary);
-    margin-left: 1.5rem;
-    margin-right: 1.5rem;
+    @apply sp-mx-6 sp-text-primary;
 }
 
 @media print {
@@ -22,29 +19,22 @@
     .dataTables_wrapper .dataTables_processing,
     .dataTables_wrapper .dataTables_paginate,
     .dataTables_wrapper .dataTables_sort {
-        margin-left: 0;
-        margin-right: 0;
+        @apply sp-mx-0;
     }
 }
 
 .dataTables_wrapper .dataTables_processing {
-    background: var(--color-background-primary);
-    height: 100%;
-    left: 0;
-    margin: 0;
-    opacity: 0.75;
-    padding-top: 0.5rem;
-    top: 0;
-    z-index: 20;
+    background: 0;
+    @apply sp-h-full sp-left-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
 }
 
 .dataTables_length,
 .dataTables_filter {
-    padding: 0 0 1rem;
+    @apply sp-p-0 sp-pb-4;
 }
 
 .dataTables_wrapper .dataTables_filter input {
-    margin-left: 0;
+    @apply sp-ml-0;
 }
 
 .dataTables_wrapper .dataTables_length select,
@@ -52,78 +42,66 @@
 .dataTables_wrapper .dataTables_filter input,
 .dataTables_wrapper .dataTables_paginate .paginate_input,
 .dataTables_paginate .paginate_input {
-    background-color: var(--color-background-secondary);
-    border: 2px solid var(--color-background-secondary);
-    border-radius: 0.25rem;
+    @apply sp-px-3 sp-py-1/2 sp-bg-secondary sp-border-2 sp-border-secondary sp-rounded;
     min-height: 2rem;
-    padding: 0.125rem 0.75rem;
 }
 
 .dataTables_wrapper .dataTables_length select,
 .dataTables_wrapper .dataTables_sort select {
-    padding-right: 2rem;
+    @apply sp-pr-8;
 }
 
 .dataTables_wrapper .dataTables_length select,
 .dataTables_wrapper .dataTables_paginate .paginate_input,
 .dataTables_paginate .paginate_input {
-    margin-left: 0.25rem;
-    margin-right: 0.25rem;
+    @apply sp-ml-1;
 }
 
 .dataTables_wrapper .dataTables_sort {
-    float: right;
-    padding-bottom: 1rem;
+    @apply sp-pb-4 sp-float-right;
 }
 
 .dataTables_wrapper .dataTables_info,
 .dataTables_wrapper .dataTables_paginate {
-    padding-top: 1.5em;
+    @apply sp-pt-6;
 }
 
 .dataTables_wrapper .top .dataTables_info {
-    padding: 0.25rem 0 1.25rem;
+    @apply sp-px-0 sp-pt-1 sp-pb-5;
 }
 
 .dataTables_info {
-    line-height: 2;
+    @apply sp-leading-loose;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_input,
 .dataTables_paginate .paginate_input {
-    width: 4rem;
+    @apply sp-w-16;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button,
 .dataTables_wrapper .dataTables_paginate .paginate_page,
 .dataTables_paginate .paginate_button,
 .dataTables_paginate .paginate_page {
-    border: 0;
-    margin-left: 1rem;
+    @apply sp-p-0 sp-ml-4 sp-border-0;
     min-width: auto;
-    padding: 0;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_of,
 .dataTables_paginate .paginate_of {
-    margin-right: 1rem;
+    @apply sp-mr-4;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button,
 .dataTables_paginate .paginate_button {
-    border-radius: 0.25rem;
-    color: var(--color-text-secondary) !important;
-    margin-left: 0;
-    padding: 0.25rem 0.75rem;
+    @apply sp-px-3 sp-py-1 sp-ml-0 sp-rounded;
+    @apply sp-text-secondary !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button:hover,
 .dataTables_paginate .paginate_button:hover {
-    background: var(--color-background-tertiary);
-    border: 0;
-    box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 6%);
-    color: var(--color-text-primary) !important;
-    cursor: pointer;
+    @apply sp-bg-tertiary sp-border-0 sp-shadow-inner sp-cursor-pointer;
+    @apply sp-text-primary !important;
 }
 
 .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
@@ -132,49 +110,38 @@
 .dataTables_paginate .paginate_button.disabled,
 .dataTables_paginate .paginate_button.disabled:hover,
 .dataTables_paginate .paginate_button.disabled:active {
+    @apply sp-shadow-none sp-cursor-auto sp-opacity-25;
+    @apply sp-text-secondary !important;
     background: 0;
-    box-shadow: none;
-    color: var(--color-text-secondary) !important;
-    cursor: auto;
-    opacity: 0.25;
 }
 
 table.dataTable {
-    width: 100% !important;
+    @apply sp-w-full !important;
 }
 
 table.dataTable.no-footer {
-    border-bottom: 0;
+    @apply sp-border-b-0;
 }
 
 table.dataTable thead td,
 table.dataTable thead th {
-    background: var(--color-background-primary);
-    overflow: hidden;
-    position: -webkit-sticky;
-    position: sticky;
-    text-overflow: ellipsis;
-    top: 0;
-    white-space: nowrap;
-    z-index: 10;
+    @apply sp-sticky sp-top-0 sp-bg-primary sp-overflow-hidden sp-text-ellipsis sp-whitespace-nowrap sp-z-10;
 }
 
 table.dataTable thead th.sp-relative {
-    position: inherit; /* fix for IE11 */
-    position: -webkit-sticky;
-    position: sticky;
+    @apply sp-sticky;
 }
 
 table.dataTable.sp-with-actions thead td,
 table.dataTable.sp-with-actions thead th {
-    top: 3rem;
+    @apply sp-top-12;
 }
 
 table.dataTable thead td,
 table.dataTable thead th,
 table.dataTable tfoot th,
 table.dataTable tfoot td {
-    border-bottom: 2px solid var(--color-background-tertiary);
+    @apply sp-border-b-2 sp-border-tertiary;
 }
 
 table.dataTable thead th,
@@ -183,9 +150,33 @@ table.dataTable tbody th,
 table.dataTable tbody td,
 table.dataTable tfoot th,
 table.dataTable tfoot td {
-    padding: 0.5rem 0.75rem;
+    @apply sp-px-3 sp-py-2;
 }
 
+table.dataTable thead th:first-child,
+table.dataTable thead td:first-child,
+table.dataTable tbody th:first-child,
+table.dataTable tbody td:first-child,
+table.dataTable tfoot th:first-child,
+table.dataTable tfoot td:first-child {
+    @apply sp-pl-6;
+}
+
+table.dataTable thead th:first-child[style*="display: none"] + th:not([style*="display: none"]),
+table.dataTable thead td:first-child[style*="display: none"] + td:not([style*="display: none"]),
+table.dataTable tbody th:first-child[style*="display: none"] + th:not([style*="display: none"]),
+table.dataTable tbody td:first-child[style*="display: none"] + td:not([style*="display: none"]),
+table.dataTable tfoot th:first-child[style*="display: none"] + th:not([style*="display: none"]),
+table.dataTable tfoot td:first-child[style*="display: none"] + td:not([style*="display: none"]) {
+    @apply sp-pl-6;
+}
+
+table.dataTable thead th:last-child,
+table.dataTable thead td:last-child,
+table.dataTable tbody th:last-child,
+table.dataTable tbody td:last-child,
+table.dataTable tfoot th:last-child,
+table.dataTable tfoot td:last-child,
 table.dataTable thead th.sp-pr-6,
 table.dataTable thead td.sp-pr-6,
 table.dataTable tbody th.sp-pr-6,
@@ -195,61 +186,30 @@ table.dataTable tfoot td.sp-pr-6 {
     padding-right: 1.5rem;
 }
 
-table.dataTable thead th:first-child,
-table.dataTable thead td:first-child,
-table.dataTable tbody th:first-child,
-table.dataTable tbody td:first-child,
-table.dataTable tfoot th:first-child,
-table.dataTable tfoot td:first-child {
-    padding-left: 1.5rem;
-}
-
-table.dataTable thead th:first-child[style*="display: none"] + th:not([style*="display: none"]),
-table.dataTable thead td:first-child[style*="display: none"] + td:not([style*="display: none"]),
-table.dataTable tbody th:first-child[style*="display: none"] + th:not([style*="display: none"]),
-table.dataTable tbody td:first-child[style*="display: none"] + td:not([style*="display: none"]),
-table.dataTable tfoot th:first-child[style*="display: none"] + th:not([style*="display: none"]),
-table.dataTable tfoot td:first-child[style*="display: none"] + td:not([style*="display: none"]) {
-    padding-left: 1.5rem;
-}
-
-table.dataTable thead th:last-child,
-table.dataTable thead td:last-child,
-table.dataTable tbody th:last-child,
-table.dataTable tbody td:last-child,
-table.dataTable tfoot th:last-child,
-table.dataTable tfoot td:last-child {
-    padding-right: 1.5rem;
-}
-
 table.settings thead th:first-child {
-    border-left: 0;
+    @apply sp-border-l-0;
 }
 
 table.dataTable thead .sorting,
 table.dataTable thead .sorting_asc,
 table.dataTable thead .sorting_desc {
-    background-image: none !important;
+    @apply sp-bg-none !important;
 }
 
 table.dataTable thead .sorting:before,
 table.dataTable thead .sorting_asc:before,
 table.dataTable thead .sorting_desc:before {
-    float: right;
-    font-family: var(--font-icon);
-    font-weight: bold;
-    margin-left: 0.25rem;
-    right: 0.25rem;
+    @apply sp-right-1 sp-ml-1 sp-font-icon sp-font-bold sp-float-right;
 }
 
 table.dataTable thead .sorting:before {
-    opacity: 0.25;
+    @apply sp-opacity-25;
     content: "\f0dc";
 }
 
 table.dataTable thead .sorting_asc:before,
 table.dataTable thead .sorting_desc:before {
-    opacity: 1;
+    @apply sp-opacity-100;
 }
 
 table.dataTable thead .sorting_asc:before {
@@ -271,49 +231,46 @@ table.dataTable tbody tr {
 }
 
 table.dataTable tbody tr.selected {
-    background-color: var(--color-primary-200);
+    @apply sp-bg-primary-200;
 }
 
 .sp-theme-dark table.dataTable tbody tr.selected {
-    background-color: var(--color-primary-800);
+    @apply sp-bg-primary-800;
 }
 
 table.dataTable tfoot th,
 table.dataTable tfoot td {
-    border-top: 1px solid var(--color-background-tertiary);
+    @apply sp-border-t sp-border-tertiary;
 }
 
 table.dataTable tbody td.all a .fas {
-    color: var(--color-text-secondary);
+    @apply sp-text-secondary;
 }
 
 table.dataTable tbody td.all a:hover .fas {
-    color: var(--color-text-primary);
+    @apply sp-text-primary;
 }
 
 .sp-quick-actions .dataTables_paginate {
-    line-height: 1rem;
+    @apply sp-leading-none;
 }
 
 .sp-quick-actions .paginate_button {
-    display: inline-block;
-    padding-bottom: 0.625rem;
-    padding-top: 0.625rem;
-    vertical-align: middle;
+    @apply sp-inline-block sp-py-5/2 sp-align-middle;
 }
 
 .sp-quick-actions .paginate_input {
-    padding-bottom: 0.25rem;
-    padding-top: 0.25rem;
+    @apply sp-py-1;
 }
 
 .sp-quick-actions .paginate_page,
 .sp-quick-actions .paginate_input,
 .sp-quick-actions .paginate_of {
-    display: none;
+    @apply sp-hidden;
 }
 
 .sp-quick-actions .dataTables_filter {
+    @apply sp-p-0;
     padding: 0;
 }
 
@@ -342,19 +299,19 @@ table.dataTable tbody td.all a:hover .fas {
 
     .sp-quick-actions .paginate_page,
     .sp-quick-actions .paginate_of {
-        display: inline;
+        @apply sp-inline;
     }
 
     .sp-quick-actions .paginate_page {
-        margin-left: 0.75rem;
+        @apply sp-ml-3;
     }
 
     .sp-quick-actions .paginate_of {
-        margin-right: 0.75rem;
+        @apply sp-mr-3;
     }
 
     .sp-quick-actions .paginate_input {
-        display: inline-block;
+        @apply sp-inline-block;
     }
 }
 
@@ -362,29 +319,25 @@ table.dataTable tbody td.all a:hover .fas {
 @media screen and (max-width: 768px) {
     .dataTables_wrapper .dataTables_length,
     .dataTables_wrapper .dataTables_sort {
-        display: none;
+        @apply sp-hidden;
     }
 
     .dataTables_wrapper .dataTables_filter {
-        float: none;
+        @apply sp-float-none;
     }
 
     .dataTables_wrapper .dataTables_filter input {
+        @apply sp-w-full;
         width: 100%;
     }
 
     .dataTables_wrapper .dataTables_paginate {
-        margin-top: 0;
-        padding-top: 0.75rem;
+        @apply sp-pt-3 sp-mt-0;
     }
 
     .dataTables_wrapper .dataTables_paginate .paginate_input,
     .dataTables_paginate .paginate_input {
-        margin-left: 0;
-        margin-right: 0;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
-        width: 3.5rem;
+        @apply sp-w-14 sp-px-2 sp-mx-0;
     }
 
     table.dataTable thead th.md\:sp-pr-3,
@@ -430,28 +383,17 @@ table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child {
 
 table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
-    background-color: #38a169;
-    border: 0;
-    box-shadow: none;
+    @apply sp-left-6 sp-top-1/2 sp-p-1 sp-mt-0 sp-bg-green-500 sp-border-0 sp-shadow-none sp-font-icon sp-font-bold sp-text-xs sp-transform sp--translate-y-1/2;
     content: "\f067";
-    font-family: var(--font-icon);
-    font-size: 0.75rem;
-    font-weight: bold;
-    left: 1.5rem;
-    margin-top: 0;
-    padding: 0.25rem;
-    top: 50%;
-    transform: translateY(-50%);
 }
 
 table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before {
+    @apply sp-bg-red-500;
     content: "\f068";
-    background-color: #e53e3e;
 }
 
 table.dataTable > tbody > tr.child ul.dtr-details > li {
-    border: 0;
-    padding: 0;
+    @apply sp-p-0 sp-border-0;
 }
 
 table.dataTable > tbody > tr.child span.dtr-title {
@@ -461,35 +403,29 @@ table.dataTable > tbody > tr.child span.dtr-title {
 /* yadcf */
 
 .yadcf-filter-wrapper {
-    margin-left: 0 !important;
+    @apply sp-ml-0 !important;
     width: calc(100% - 2.25rem);
 }
 
 .yadcf-filter-wrapper input,
 .yadcf-filter-wrapper select {
+    @apply sp-max-w-full !important;
     max-width: 100% !important;
 }
 
 .yadcf-filter.inuse {
-    background: var(--color-background-primary);
+    @apply sp-bg-primary;
 }
 
 .yadcf-filter > option {
-    background: var(--color-background-secondary) !important;
+    @apply sp-bg-secondary !important;
 }
 
 .yadcf-filter-reset-button {
-    height: 2.5rem;
-    position: relative;
-    width: 2.25rem;
+    @apply sp-relative sp-h-10 sp-w-9;
 }
 
 .yadcf-filter-reset-button:before {
-    color: var(--color-text-primary);
+    @apply sp-absolute sp-left-3 sp-top-2 sp-text-primary sp-font-icon sp-font-bold;
     content: "\f00d";
-    font-family: var(--font-icon);
-    font-weight: bold;
-    left: 0.75rem;
-    position: absolute;
-    top: 0.5rem;
 }

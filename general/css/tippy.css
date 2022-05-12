@@ -1,11 +1,9 @@
 .tippy-box {
-    text-align: center;
+    @apply sp-text-center;
 }
 
 .sp-theme-dark .tippy-box {
-    background: var(--color-primary-100);
-    color: var(--color-primary-900);
-    text-align: center;
+    @apply sp-bg-primary-100 sp-text-primary-900 sp-text-center;
 }
 
 .sp-theme-dark .tippy-box[data-placement^=top] > .tippy-arrow::before {

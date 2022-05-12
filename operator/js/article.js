@@ -37,7 +37,7 @@ function Article(parameters)
                 // Get the category selectize instance.
                 var select_categories = this.$input.parents(self.getClassName()).find('select[name$="[categories][]"]');
                 if (select_categories.length == 0 || typeof select_categories[0].selectize === 'undefined') {
-                    void 0;
+                    console.log('Failed to find associated category drop-down.');
 
                     return;
                 }
@@ -158,8 +158,8 @@ $(document).ready(function() {
         }
     });
 
-    // Initialise redactor.
-    $('.section-items').find('textarea[name^="text"]').redactor(opts);
+    // Initialise wysiwyg editor.
+    $('.section-items').find('textarea[name^="text"]').editor(opts);
 
     /*
      * Initialise article tags.

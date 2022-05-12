@@ -1,12 +1,7 @@
 $(document).ready(function () {
-    // Date picker
     $('.datepicker').datepicker();
-
-    // Enable hide / show password toggle
     $('input[type=password]').hideShowPassword();
-
-    // Redactor
-    $('textarea[name="text"]').redactor();
+    $('textarea[name="text"]').editor();
 
     // Regex for email
     var re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;

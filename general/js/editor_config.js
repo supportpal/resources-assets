@@ -3,6 +3,25 @@
     'use strict';
 
     /**
+     * Convert SupportPal colour scheme to an array usable by tinymce.
+     *
+     * @return {[]}
+     */
+    function colourSchemeMap()
+    {
+        var theme = typeof spCssVarThemes === "undefined" ? {} : spCssVarThemes,
+          light = theme.light || {},
+          colours = [];
+
+        for (var color in light) {
+            colours.push(light[color]);
+            colours.push(light[color]);
+        }
+
+        return colours;
+    }
+
+    /**
      * Delay execution of callback.
      */
     var delay = (function() {
@@ -14,51 +33,32 @@
     })();
 
     /**
-     * The callback function for imageUploadErrorCallback in the imagemanager.js
-     * redactor plugin.
-     *
-     * @param json
+     * Image upload handler.
      */
-    function embed_image_callback(json)
+    function image_upload_handler (blobInfo, success, failure, progress)
     {
-        var message = json.message;
-        if (typeof message !== 'string' || message.length === 0 || ! message.trim()) {
-            message = Lang.get('messages.error_embed_image');
-        }
+        var formData = new FormData();
+        formData.append('file', blobInfo.blob(), blobInfo.filename());
 
-        Swal.fire({
-            title: Lang.get('messages.error'),
-            html: message,
-            icon: 'error'
-        });
-    }
+        var ajaxData = {
+            url: laroute.route('core.embed.image'),
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false
+        };
 
-    /**
-     * Callback function to handle changes to redactor.
-     *
-     * @param e Event object
-     */
-    function isValidCallback(e)
-    {
-        var textarea = this.element.getElement().get(),
-            $form     = $(textarea).parents('form.validate'),
-            validator = $form.data('validator');
-
-        // jquery-validation hasn't been initialised on this form.
-        if (! validator) {
-            return;
-        }
-
-        // 8  = back space
-        // 46 = forward backspace or delete
-        if (typeof e.keyCode !== 'undefined' && e.keyCode != 8 && e.keyCode != 46) {
-            // Wait 1 second for the user to stop typing before checking if the textarea contents is valid. Otherwise
-            // if jquery.validate is using remote (AJAX) rules then this can fire an AJAX for every single key press.
-            // The element function will only validate this single element rather than whole form.
-            delay(function () {
-                validator.element(textarea);
-            }, 1000);
-        }
+        $.ajax(ajaxData)
+            .done(function(json) {
+                if (json.location) {
+                    success(json.location);
+                } else {
+                    failure(json.message || Lang.get('messages.error_embed_image'));
+                }
+            })
+            .fail(function(){
+                failure(Lang.get('messages.error_embed_image'));
+          });
     }
 
     // CodeMirror global options.
@@ -77,94 +77,177 @@
         );
     });
 
-    // Redactor (WYSIWYG editor) global options.
-    $R.options = {
-        // View source settings.
-        source: {
-            // Enable codemirror
-            codemirror: CodeMirror.options
-        },
-
-        // Disable default redactor styling.
-        styles: false,
-
-        // Toolbar settings.
-        toolbarFixed: false, // This is implemented for the operator panel in CSS instead.
-
-        // Height settings.
-        minHeight: '150px',
-
-        // Formatting settings.
-        breakline: false, // Use <p> instead of <br>.
-                          // breakline mode is very buggy. We do not recommend to turn this on.
-
-        // Disable formatting shortcodes.
-        shortcodes: false,
-
-        // Shortcuts.
-        shortcuts: {
-            'ctrl+b, meta+b': { api: 'module.inline.format', args: 'b' },
-            'ctrl+i, meta+i': { api: 'module.inline.format', args: 'i' },
-            'ctrl+u, meta+u': { api: 'module.inline.format', args: 'u' },
-            'ctrl+h, meta+h': { api: 'module.inline.format', args: 'sup' },
-            'ctrl+l, meta+l': { api: 'module.inline.format', args: 'sub' },
-            'ctrl+shift+s, meta+shift+s': { api: 'module.inline.format', args: 'del' },
-            'ctrl+shift+x, meta+shift+x': { api: 'module.block.format', args: {tag: 'pre'} },
-            'ctrl+q, meta+q': { api: 'module.block.format', args: {tag: 'blockquote'} },
-            'ctrl+., meta+.': { api: 'module.list.toggle', args: 'ol' },
-            'ctrl+/, meta+/': { api: 'module.list.toggle', args: 'ul' },
-            // Redactor has META+[ and META+] shortcuts hardcoded. Presence of them here results
-            // in a bug where pressing META (CMD) triggers module.list.outdent
-            'ctrl+[': { api: 'module.list.outdent' },
-            'ctrl+]': { api: 'module.list.indent' },
-            'ctrl+k, meta+k': { api: 'module.link.open' },
-            'ctrl+\\, meta+\\': { api: 'plugin.sp-fontformat.clearformat' },
-            'ctrl+alt+0, meta+alt+0': { api: 'plugin.sp-fontsize.set', args: {tag: 'p'} },
-            'ctrl+alt+1, meta+alt+1': { api: 'plugin.sp-fontsize.set', args: {tag: 'h1'} },
-            'ctrl+alt+2, meta+alt+2': { api: 'plugin.sp-fontsize.set', args: {tag: 'h2'} },
-            'ctrl+alt+3, meta+alt+3': { api: 'plugin.sp-fontsize.set', args: {tag: 'h3'} },
-            'ctrl+alt+4, meta+alt+4': { api: 'plugin.sp-fontsize.set', args: {tag: 'h4'} },
-            'ctrl+alt+5, meta+alt+5': { api: 'plugin.sp-fontsize.set', args: {tag: 'h5'} },
-            'ctrl+alt+6, meta+alt+6': { api: 'plugin.sp-fontsize.set', args: {tag: 'h6'} },
-            'ctrl+shift+1, meta+shift+1': { api: 'plugin.sp-cannedresponses.show' },
-            'ctrl+shift+2, meta+shift+2': { api: 'plugin.sp-selfservice.show' }
-        },
-
-        // Paste settings.
-        pastePlainText: false, // Don't convert pasted HTML into plain/text.
-        pasteLinkTarget: '_blank', // Open pasted links in a new tab (consistent with link settings below).
-
-        // Link settings.
-        linkSize: 255, // Truncate link text longer than this size.
-        linkNewTab: true, // Show the 'Open Link in New Tab' checkbox in the Link modal.
-        linkTarget: '_blank', // Pre-check the 'Open Link in New Tab' checkbox.
-
-        // Image settings.
-        imageFigure: false,
-        imageResizable: true,
-        imageUpload: laroute.route('core.embed.image'),
-        imageData: {
-            "_token": $('meta[name=csrf_token]').prop('content')
-        },
-
-        // Event callbacks.
-        callbacks: {
-            image: {
-                uploadError: embed_image_callback
-            },
-            keyup: isValidCallback
-        },
-
-        // SupportPal specific plugins to alter look-and-feel.
-        buttons: ['html', 'sp-fontsize', 'bold', 'sp-fontformat', 'sp-lists', 'sp-link', 'sp-image'],
-
-        // After each defined button a group separator icon will be inserted.
-        groups: ['html', 'sp-fontformat'],
-
+    $.fn.editor.defaults = {
+        menubar: false,
+        selector: "textarea",
         plugins: [
-            'sp-fontsize', 'sp-fontformat', 'sp-lists', 'imagemanager', 'sp-link',
-            // Load these last (order matters).
-            'sp-fontawesome', 'sp-tooltips', 'sp-group',
+            "lists", "codemirror", "codesample", "link", "image", "autolink", "autoresize", "blockquotepatch",
+            "paste", "emoticons",
         ],
+        skin: false,
+        body_class: 'sp-editor-content',
+        content_style: ':root {' + cssToString(spCssVarThemes[$('body').hasClass('sp-theme-dark') ? 'dark' : 'light']) + '}',
+        content_css: laroute.url("", ['resources/assets/libs/tinymce/css/tinymce-editor' + (App.env === 'production' ? '.min.css' : '.css')]),
+        // Disable Word processing in the paste plugin.
+        // It breaks copy/paste of images from help desk messages containing p.MsoNormal
+        paste_enable_default_filters: false,
+        // HTML source view using CodeMirror plugin.
+        codemirror: CodeMirror.options,
+        // https://www.tiny.cloud/docs/plugins/opensource/autoresize/#min_height
+        resize: false,
+        min_height: 200,
+        autoresize_bottom_margin: 0,
+        // open links in a new tab
+        // https://www.tiny.cloud/docs-4x/plugins/link/?_ga=2.260037772.769829965.1642594724-447489908.1642594724#default_link_target
+        default_link_target: "_blank",
+        link_title: false,
+        link_context_toolbar: true,
+        // do not manipulate input URLs
+        // https://www.tiny.cloud/docs/configure/url-handling/#relative_urls
+        relative_urls : false,
+        convert_urls: false,
+        // empty paragraphs are padded with a non-breaking space
+        // https://www.tiny.cloud/docs/configure/content-filtering/#extended_valid_elements
+        extended_valid_elements: '#p',
+        // styleselect toolbar configuration
+        // https://www.tiny.cloud/docs-4x/configure/content-formatting/#style_formats
+        style_formats: [
+            {title: 'Paragraph', block: 'p'},
+            {title: 'Heading 1', block: 'h1'},
+            {title: 'Heading 2', block: 'h2'},
+            {title: 'Heading 3', block: 'h3'},
+            {title: 'Heading 4', block: 'h4'},
+            {title: 'Heading 5', block: 'h5'},
+            {title: 'Heading 6', block: 'h6'}
+        ],
+        toolbar: "codemirror | styleselect formatgroup | listsgroup link image",
+        toolbar_groups: {
+            formatgroup: {
+                // see https://www.tiny.cloud/docs/advanced/editor-icon-identifiers/ for icons
+                icon: 'text-color',
+                tooltip: Lang.get('core.more_formatting'),
+                items: 'bold underline italic strikethrough | forecolor backcolor | blockquote codesample | removeformat'
+            },
+            listsgroup: {
+                icon: 'unordered-list',
+                tooltip: Lang.get('core.lists'),
+                items: 'bullist numlist | indent outdent'
+            }
+        },
+        // https://www.tiny.cloud/docs/plugins/opensource/emoticons/#emoticons_database_url
+        emoticons_database_url: laroute.url("", ["resources/assets/libs/tinymce/emojis.min.js"]),
+        // https://www.tiny.cloud/docs/configure/content-appearance/#color_map
+        color_map: colourSchemeMap(),
+        color_cols: 9,
+        // https://www.tiny.cloud/docs/ui-components/contextmenu/
+        contextmenu: false,
+        // https://www.tiny.cloud/docs/general-configuration-guide/upload-images/
+        images_upload_handler: image_upload_handler,
+        image_dimensions: false,
+        language: 'supportpal',
+        setup: function (editor) {
+            // Toggle expandable quoted sections.
+            editor.on('click', function (e) {
+                if ($(e.target).is('div.expandable')) {
+                    $(e.target).next().toggle();
+                    editor.execCommand('mceAutoResize');
+                }
+            });
+
+            // https://www.tiny.cloud/docs/advanced/events/
+            editor.on('keyup', function (e) {
+                var textarea = editor.getElement(),
+                  $form     = $(textarea).parents('form.validate'),
+                  validator = $form.data('validator');
+
+                // jquery-validation hasn't been initialised on this form.
+                if (! validator) {
+                    return;
+                }
+
+                // 8  = back space
+                // 46 = forward backspace or delete
+                if (typeof e.keyCode !== 'undefined' && e.keyCode !== 8 && e.keyCode !== 46) {
+                    // Wait 1 second for the user to stop typing before checking if the textarea contents is valid. Otherwise
+                    // if jquery.validate is using remote (AJAX) rules then this can fire an AJAX for every single key press.
+                    // The element function will only validate this single element rather than whole form.
+                    delay(function () {
+                        validator.element(textarea);
+                    }, 1000);
+                }
+            });
+
+            // https://www.tiny.cloud/docs/api/tinymce.editor.ui/tinymce.editor.ui.registry/#addicon
+            editor.ui.registry.addIcon('brackets-curly', '<svg height="24" width="24"><path d="M 6.098 7.104 C 6.298 8.404 6.498 8.704 6.498 10.004 C 6.498 10.804 4.998 11.504 4.998 11.504 L 4.998 12.504 C 4.998 12.504 6.498 13.204 6.498 14.004 C 6.498 15.304 6.298 15.604 6.098 16.904 C 5.798 19.004 6.898 20.004 7.898 20.004 C 8.898 20.004 9.998 20.004 9.998 20.004 L 9.998 18.004 C 9.998 18.004 8.198 18.204 8.198 17.004 C 8.198 16.104 8.398 16.104 8.598 14.104 C 8.698 13.204 8.098 12.504 7.498 12.004 C 8.098 11.504 8.698 10.904 8.598 10.004 C 8.298 8.004 8.198 8.004 8.198 7.104 C 8.198 5.904 9.998 6.004 9.998 6.004 L 9.998 4.004 C 9.998 4.004 8.998 4.004 7.898 4.004 C 6.798 4.004 5.798 5.004 6.098 7.104 Z"></path><path d="M 17.898 7.104 C 17.698 8.404 17.498 8.704 17.498 10.004 C 17.498 10.804 18.998 11.504 18.998 11.504 L 18.998 12.504 C 18.998 12.504 17.498 13.204 17.498 14.004 C 17.498 15.304 17.698 15.604 17.898 16.904 C 18.198 19.004 17.098 20.004 16.098 20.004 C 15.098 20.004 13.998 20.004 13.998 20.004 L 13.998 18.004 C 13.998 18.004 15.798 18.204 15.798 17.004 C 15.798 16.104 15.598 16.104 15.398 14.104 C 15.298 13.204 15.898 12.504 16.498 12.004 C 15.898 11.504 15.298 10.904 15.398 10.004 C 15.598 8.004 15.798 8.004 15.798 7.104 C 15.798 5.904 13.998 6.004 13.998 6.004 L 13.998 4.004 C 13.998 4.004 14.998 4.004 16.098 4.004 C 17.198 4.004 18.198 5.004 17.898 7.104 Z"></path></svg>');
+
+            // https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/
+            editor.addShortcut('meta+h', 'Insert superscript.', function () {
+                editor.execCommand('Superscript');
+            });
+            editor.addShortcut('meta+l', 'Insert subscript.', function () {
+                editor.execCommand('Subscript');
+            });
+            editor.addShortcut('meta+shift+s', 'Strikethrough the text.', function () {
+                editor.execCommand('Strikethrough');
+            });
+            editor.addShortcut('meta+shift+s', 'Strikethrough the text.', function () {
+                editor.execCommand('Strikethrough');
+            });
+            editor.addShortcut('meta+shift+x', 'Insert code fragment.', function () {
+                editor.execCommand('CodeSample');
+            });
+            editor.addShortcut('meta+q', 'Insert block quote.', function () {
+                editor.execCommand('mceBlockQuote');
+            });
+            editor.addShortcut('meta+.', 'Insert ordered list.', function () {
+                editor.execCommand('InsertOrderedList');
+            });
+            editor.addShortcut('meta+/', 'Insert unordered list.', function () {
+                editor.execCommand('InsertUnorderedList');
+            });
+            editor.addShortcut('meta+[', 'Outdent the current selection.', function () {
+                editor.execCommand('Outdent');
+            });
+            editor.addShortcut('meta+]', 'Indent the current selection.', function () {
+                editor.execCommand('Indent');
+            });
+            editor.addShortcut('meta+\\', 'Remove formatting from the current selection.', function () {
+                editor.execCommand('RemoveFormat');
+            });
+            editor.addShortcut('meta+alt+0', 'Insert a paragraph.', function () {
+                editor.execCommand('FormatBlock', false, 'p');
+            });
+            editor.addShortcut('meta+alt+1', 'Insert header 1.', function () {
+                editor.execCommand('FormatBlock', false, 'h1');
+            });
+            editor.addShortcut('meta+alt+2', 'Insert header 2.', function () {
+                editor.execCommand('FormatBlock', false, 'h2');
+            });
+            editor.addShortcut('meta+alt+3', 'Insert header 3.', function () {
+                editor.execCommand('FormatBlock', false, 'h3');
+            });
+            editor.addShortcut('meta+alt+4', 'Insert header 4.', function () {
+                editor.execCommand('FormatBlock', false, 'h4');
+            });
+            editor.addShortcut('meta+alt+5', 'Insert header 5.', function () {
+                editor.execCommand('FormatBlock', false, 'h5');
+            });
+            editor.addShortcut('meta+alt+6', 'Insert header 6.', function () {
+                editor.execCommand('FormatBlock', false, 'h6');
+            });
+            editor.addShortcut('meta+shift+1', 'Insert a canned response.', function () {
+                editor.execCommand('mceCannedResponses');
+            });
+            editor.addShortcut('meta+shift+2', 'Insert a self-service article.', function () {
+                editor.execCommand('mceSelfService');
+            });
+        }
     };
+
+    function cssToString(obj)
+    {
+        return Object.entries(obj).reduce((str, [p, val]) => {
+            return `${str}${p}: ${val};\n`;
+        }, '');
+    }
 })(jQuery);

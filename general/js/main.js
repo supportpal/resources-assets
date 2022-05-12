@@ -5,13 +5,7 @@ var App = (function () {
 
     // Create a public methods object
     var modules = {
-        env: $('meta[name="environment"]').prop('content') || "production",
-        userAgent: {
-            isIe: function () {
-                return window.navigator.userAgent.indexOf('MSIE') !== -1
-                    || window.navigator.appVersion.indexOf('Trident/') !== -1;
-            },
-        }
+        env: $('meta[name="environment"]').prop('content') || "production"
     };
 
     /**
@@ -37,10 +31,6 @@ var App = (function () {
 if (App.env === "production") {
     $.migrateMute = true;
 }
-
-// Convert Date objects to unix time.
-// Deprecated (DEV-2500). To be removed in v4.
-Date.prototype.getUnixTime = function() { return this.getTime()/1000|0 };
 
 // flatpickr.
 if (typeof Lang !== 'undefined') {
@@ -135,7 +125,7 @@ $.fn.datepicker = function (options) {
 
     return $(this).each(function () {
         // Quick fix to stop flatpickr being loaded twice on an input
-        if (this._flatpickr === undefined) {
+        if (this.className.indexOf('flatpickr-input') === -1) {
             $(this).flatpickr(
                 $.extend(true, defaults, options)
             )
@@ -302,24 +292,24 @@ function addNewItem(className, container)
 
 // Wait for DOM to load before running the below.
 $(function () {
-    // IE 11 css --var support.
-    cssVars({
-        include: '[data-include]',
-        preserveStatic: false,
-        variables: spCssVarThemes[$('body').hasClass('sp-theme-dark') ? 'dark' : 'light'],
-        silent: App.env === "production"
-    });
-
     // Tooltip - tippy.js
     tippy.delegate(document.body, {
         content: function (reference) {
             var title = reference.getAttribute('title');
             reference.removeAttribute('title');
+
+            reference.setAttribute('data-tippy-content', title);
+
             return title;
+        },
+        onShow: function (instance) {
+            return instance.reference.hasAttribute('data-tippy-content')
+                && ! instance.reference.classList.contains('tox-edit-area__iframe')
+                && instance.reference.getAttribute('data-tippy-content').length > 0;
         },
         target: '[title]',
         touch: ['hold', 500],
-        zIndex: 10003,
+        zIndex: 10052,
     });
 
     // Logout handler.
@@ -360,6 +350,9 @@ $(function () {
             $(this).addClass('sp-active');
         })
         // For dropdowns
+        .on('click', '.sp-dropdown-container .sp-dropdown li.sp-dropdown-item-interactive', function (e) {
+            e.stopImmediatePropagation();
+        })
         .on('click', '.sp-dropdown-container .sp-button, .sp-dropdown-container .sp-action, .sp-dropdown-container .sp-dropdown li', function () {
             var $dropdown = $(this).parents('.sp-dropdown-container').find('.sp-dropdown');
             if ($dropdown.is(':visible')) {
@@ -533,8 +526,7 @@ $(function () {
         var $row = getErrorElementRow(element);
 
         return $row.find(':input:not(:button)').length > 1 &&
-            (! $(element).parent('.redactor-box').length
-                && ! $(element).parent('.sp-editor-container').length
+            (! $(element).parent('.sp-editor-container').length
                 && ! $(element).parent('.hideShowPassword-wrapper').length
                 && ! $(element).parent('.sp-input-translatable-container').length
                 && ! $(element).parent('.sp-input-group').length
@@ -554,17 +546,19 @@ $(function () {
     {
         var position = element;
 
-        // If it's redactor, codemirror, show/hide button, phone input, recaptcha, a checkbox or radio, add after parent
-        if (element.parent('.redactor-box').length || element.parent('.sp-editor-container').length
-            || element.parent('.hideShowPassword-wrapper').length || element.parent('.iti').length
-            || element.parent('.sp-input-group').length || element.parent().parent('.g-recaptcha').length
-            || element.prop('type') === 'checkbox' || element.prop('type') === 'radio'
+        // If it's codemirror, show/hide button, phone input, recaptcha, a checkbox or radio, add after parent
+        if (element.parent('.sp-editor-container').length || element.parent('.hideShowPassword-wrapper').length
+            || element.parent('.iti').length || element.parent('.sp-input-group').length
+            || element.parent().parent('.g-recaptcha').length || element.prop('type') === 'checkbox'
+            || element.prop('type') === 'radio'
         ) {
             position = element.parent();
         }
 
-        // If it's selectize or codemirror (source code), add after sibling.
-        if (element.next().hasClass('selectize-control') || element.hasClass('source-code')) {
+        // If it's editor, selectize or codemirror (source code), add after sibling.
+        if (element.next().hasClass('tox-tinymce') || element.next().hasClass('selectize-control')
+            || element.hasClass('source-code')
+        ) {
             position = element.next();
         }
 
@@ -573,9 +567,9 @@ $(function () {
             position = element.next().next();
         }
 
-        // If it's phone input, add after sibling (remove button).
+        // If it's phone input, add after row.
         if (element.parent('.iti').length) {
-            position = position.next();
+            position = position.parent().parent();
         }
 
         // If it's a checkbox or radio, make sure we put the error after the last element.
@@ -707,13 +701,3 @@ $(function () {
         }
     });
 });
-
-/**
- * Adds a button to show/hide passwords
- *
- * @deprecated To be removed in v4. Use $().hideShowPassword() instead.
- */
-function callHideShowPassword()
-{
-    $('input[type=password]').hideShowPassword();
-}

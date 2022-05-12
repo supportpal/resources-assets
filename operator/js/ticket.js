@@ -118,38 +118,41 @@
          * if the message should not be processed.
          *
          * @param $form
-         * @param $redactor
+         * @param $textarea
          * @returns {boolean}
          */
-        var handleMessageForm = function ($form, $redactor) {
-            if ($redactor.parent('.redactor-box').length) {
-                var $textarea = $($redactor.redactor('source.getElement').get()),
-                    textarea_id = $textarea.prop('id'),
-                    isEmpty = $textarea.redactor('utils.isEmptyHtml', $textarea.redactor('source.getCode'));
+        var handleMessageForm = function ($form, $textarea) {
+            var textarea_id = $textarea.prop('id');
+            if (tinymce.get(textarea_id)) {
+                var editor = $textarea.editor(),
+                    content = editor.getContent(),
+                    message = null,
+                    isEmpty = content.length === 0,
+                    isTooLong = editor.settings.character_limit && content.length >= editor.settings.character_limit;
 
                 // Validation.
                 // We're using manual validation here because jquery validate does not support multiple fields with the
                 // same name. We use the same name for replies and notes so this causes a problem.
                 if (isEmpty) {
-                    var error_id = textarea_id + '-error';
+                    message = Lang.get('validation.required', {'attribute': Lang.get('general.text').toLowerCase()});
+                } else if (isTooLong) {
+                    message = Lang.get('validation.max.string', {
+                        'attribute': Lang.get('general.text').toLowerCase(),
+                        'max': editor.settings.character_limit
+                    });
+                }
 
-                    // Make sure we don't duplicate the error message.
+                if (message !== null) {
+                    var error_id = textarea_id + '-error';
                     if ($("#" + error_id).length === 0) {
                         $textarea.parents('.sp-form-row, .sp-message-text-edit').addClass('sp-input-has-error');
-                        $($redactor.redactor('container.getElement').get()).after(
-                            '<span id="' + error_id + '" class="sp-input-error">' +
-                            Lang.get('validation.required', {'attribute': Lang.get('general.text').toLowerCase()}) +
-                            '</span>'
-                        );
-                    } else {
-                        // If it already exists, show it.
-                        $('#' + error_id).show();
+                        $(editor.getContainer()).after('<span id="' + error_id + '" class="sp-input-error"></span>');
                     }
+
+                    $('#' + error_id).text(message).show();
 
                     return false;
                 }
-            } else {
-                var textarea_id = $redactor.prop('id');
             }
 
             // Remove 'split' checkboxes from form data
@@ -220,21 +223,21 @@
             }, 10000);
 
             // Update editor for editing this new message
-            message.find('textarea').redactor(instance.defaultRedactorConfig());
+            message.find('textarea').editor(instance.defaultEditorConfig());
         };
 
         /**
          * Create a new message reply to the user or new operator note.
          *
          * @param $form
-         * @param $redactor
+         * @param $textarea
          * @returns {boolean}
          */
-        this.createMessage = function ($form, $redactor) {
+        this.createMessage = function ($form, $textarea) {
             var self = this;
 
             // Validation & remove unnecessary items from the form.
-            if (handleMessageForm($form, $redactor) === false) {
+            if (handleMessageForm($form, $textarea) === false) {
                 return false;
             }
 
@@ -258,16 +261,12 @@
                 showFeedback();
                 self.insertMessage(response.data.view);
 
-                $form.trigger(
-                    "supportpal.new_message:success",
-                    [$redactor.parent('.redactor-box').length ? $($redactor.redactor('source.getElement').get()) : $redactor]
-                );
+                $form.trigger("supportpal.new_message:success", [$textarea]);
 
-                // Only clear the editor if it's a redactor instance
-                if ($redactor.parent('.redactor-box').length) {
+                // Only clear the editor if it's a tinymce instance
+                if (tinymce.get($textarea.prop('id'))) {
                     // Clear current text
-                    $redactor.redactor('insertion.set', '');
-                    $($redactor.redactor('source.getElement').get()).val('');
+                    $textarea.editor().setContent('');
 
                     var replyType = $form.find('input[name="reply_type"]').val();
 
@@ -277,8 +276,7 @@
                     } else if (replyType == '2') {
                         self.setForwardDraft(null);
                     } else {
-                        $redactor.redactor('insertion.set', '');
-                        $redactor.redactor('insertion.insertHtml', parameters.signature, false);
+                        $textarea.editor().setContent(parameters.signature);
                         self.setMessageDraft(null);
                     }
 
@@ -316,11 +314,11 @@
          * Edit an existing message.
          *
          * @param $form
-         * @param $redactor
+         * @param $editor
          */
-        this.updateMessage = function ($form, $redactor) {
+        this.updateMessage = function ($form, $editor) {
             // Validation.
-            if (handleMessageForm($form, $redactor) === false) {
+            if (handleMessageForm($form, $editor) === false) {
                 return false;
             }
 
@@ -350,7 +348,7 @@
 
                 // Update editor for editing this updated message
                 showFeedback();
-                message.find('textarea').redactor(instance.defaultRedactorConfig());
+                message.find('textarea').editor(instance.defaultEditorConfig());
             }).fail(function () {
                 showFeedback(true);
             }).always(function () {
@@ -396,10 +394,8 @@
                             // Load attachment previews if needed.
                             instance.loadAttachmentPreviews($messageContainer);
 
-                            // Load redactor for editing message if not already loaded
-                            if (!$messageContainer.find('textarea').parents('.redactor-box').length) {
-                                $messageContainer.find('textarea').redactor(instance.defaultRedactorConfig());
-                            }
+                            // Load editor for editing message if not already loaded
+                            $messageContainer.find('textarea').editor(instance.defaultEditorConfig());
 
                             // If a callback exists, run it.
                             typeof successCallback === 'function' && successCallback();
@@ -470,11 +466,8 @@
 
             // Insert into the textarea where the cursor/caret currently is, sets to start if not in focus
             var $textarea = instance.visibleTextarea();
-            if (! $textarea.redactor('editor.isFocus')) {
-                $textarea.redactor('editor.startFocus');
-            }
-
-            $textarea.redactor('insertion.insertHtml', '<blockquote>' + $currentHtml.html() + '</blockquote>');
+            $textarea.editor().focus();
+            $textarea.editor().execCommand('mceInsertContent', false, '<blockquote>' + $currentHtml.html() + '</blockquote>');
         };
 
         /**
@@ -749,11 +742,18 @@
         };
 
         /**
-         * Populate redactor with the specified messages to forward.
+         * Populate editor with the specified messages to forward.
          *
          * @param $messages
          */
         this.forward = function ($messages) {
+            // Lock the interface and show a waiting spinner (this may take a while on a large ticket).
+            Swal.fire({
+                title: Lang.get('general.loading'),
+                allowOutsideClick: false
+            });
+            Swal.showLoading();
+
             // Switch to Forward tab.
             $('.sp-reply-type .sp-action[data-type="2"]').removeClass('sp-fresh').show().trigger('click');
 
@@ -767,13 +767,6 @@
             $messages.each(function (index, message) {
                 deferred.push(instance.loadMessage($(message)));
             });
-
-            // Lock the interface and show a waiting spinner (this may take a while on a large ticket).
-            Swal.fire({
-                title: Lang.get('general.loading'),
-                allowOutsideClick: false
-            });
-            Swal.showLoading();
 
             // Can't pass a literal array, so use apply.
             $.when.apply($, deferred).then(function () {
@@ -833,10 +826,6 @@
                     + messages.join('<br /><br />')
                     + '</div>';
 
-                $('#newForward').redactor('insertion.set', '');
-                $('#newForward').redactor('insertion.insertHtml', message, false);
-                $('#newForward').redactor('editor.startFocus');
-
                 // Set attachments.
                 for (var i = 0; i < attachments.length; i++) {
                     var filename = attachments[i].filename,
@@ -846,24 +835,24 @@
                     parameters.forwardFileUpload.registerFile($item, filename, hash);
                 }
 
+                // Set content on a delay, as for some reason sometimes tinymce wipes the content (some race condition).
+                $('#newForward').editor().setContent(message);
+                $('#newForward').editor().focus();
+
+                // Update draft message variable so it doesn't save a draft automatically
+                instance.setForwardDraft(message);
+
                 // Show an alert of which attachments we failed to attach.
                 if (failed_attachments.length > 0) {
                     Swal.fire({
                         title: Lang.get('messages.failed_attachments'),
                         html: failed_attachments.join(', ') + '<br /><br />'
-                            + Lang.get('core.attachment_limit_reached', {size: parameters.forwardFileUpload.cumulativeMaxFileSize.fileSize()}),
+                          + Lang.get('core.attachment_limit_reached', {size: parameters.forwardFileUpload.cumulativeMaxFileSize.fileSize()}),
                         icon: 'info'
                     });
                 } else {
-                    // Close the please wait modal...
                     Swal.close();
                 }
-
-                // Update draft message variable so it doesn't save a draft automatically
-                // Redactor is a bit slow to update so have to delay it slightly
-                setTimeout(function () {
-                    instance.setForwardDraft($('.forward-form textarea:not(.CodeMirror textarea):eq(0)').redactor('source.getCode'));
-                }, 1000);
             });
         };
 
@@ -877,19 +866,25 @@
         };
 
         /**
-         * Default redactor config.
+         * Default editor config.
          *
          * @returns {Object}
          */
-        this.defaultRedactorConfig = function () {
-            var plugins = ['sp-cannedresponses'];
+        this.defaultEditorConfig = function () {
+            var plugins = $.fn.editor.defaults.plugins.concat(['cannedresponses']),
+                toolbar = $.fn.editor.defaults.toolbar + ' | cannedresponses';
             if (parameters.selfservice) {
-                plugins.push('sp-selfservice');
+                plugins.push('selfservice');
+                toolbar += ' selfservice';
             }
 
             return {
-                groups: $R.options.groups.concat(['sp-image']),
-                plugins: plugins.concat($R.options.plugins)
+                plugins: plugins,
+                toolbar: toolbar,
+                // Plugin settings.
+                ticketId: this.parameters().ticketId,
+                userId: this.parameters().userId,
+                brandId: this.parameters().brandId
             };
         };
 
@@ -1064,11 +1059,11 @@
                                         // Replace the view and add a loaded class.
                                         $editView.addClass('sp-loaded').html(response.data.view);
 
-                                        // Initialise redactor.
-                                        $message.find('form.edit textarea').redactor(instance.defaultRedactorConfig());
+                                        // Initialise editor.
+                                        $message.find('form.edit textarea').editor(instance.defaultEditorConfig());
 
                                         // Focus the editor.
-                                        $message.find('textarea:not(.CodeMirror textarea):eq(0)').redactor('editor.startFocus');
+                                        $message.find('textarea:not(.CodeMirror textarea):eq(0)').editor('editor.startFocus');
                                     } else {
                                         // Switch back to the message view.
                                         $message.find('.sp-message-text, .sp-message-text-edit').toggle();
@@ -1235,7 +1230,7 @@
         var required = ['ticketId', 'userId', 'brandId', 'notesPosition', 'replyOrder', 'ticketGridUrl'];
         for (var i = 0; i < required.length; i++) {
             if (parameters[required[i]] === null) {
-                void 0;
+                console.warn("Parameter '" + required[i] + "' is NULL, some functions may not work as expected.");
             }
         }
 

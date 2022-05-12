@@ -73,12 +73,9 @@ $(function () {
             getCodeMirror = function ($element) {
                 if ($element[0].sourcecode) {
                     return $element[0].sourcecode.codemirror().getValue();
-                } else if ($element.next('.CodeMirror').length) {
-                    // Deprecated (DEV-2447). To be removed in favour of .sourcecode in v4.
-                    return $element.next('.CodeMirror')[0].CodeMirror.getValue();
-                } else {
-                    return '';
                 }
+
+                return '';
             },
             data = {
                 headers: getCodeMirror($action.find('textarea[name$="[headers]"]')),
@@ -143,30 +140,6 @@ $(function () {
         handle: '.sp-sortable-handle',
     });
 
-    function redactor(element, plugins)
-    {
-        // Back out if it's already been initialised.
-        if (element.data('init')) {
-            return;
-        }
-
-        var plugins = plugins || [],
-            opts = {
-                mergeFields: {
-                    tickets: true,
-                    organisations: organisationsEnabled
-                },
-                groups: $R.options.groups.concat(['sp-image']),
-                plugins: $R.options.plugins.concat(plugins).concat(['sp-mergefields'])
-            };
-
-        // Redactor
-        element.redactor(opts);
-
-        // Save that this element has been initialised, as redactor keeps duplicating
-        element.data('init', true);
-    }
-
     /**
      * Initialise code mirror instance.
      *
@@ -213,9 +186,16 @@ $(function () {
             $tr.find('.datepicker').datepicker();
         }
 
-        // If it's a textarea, use redactor
+        // If it's a textarea, use wysiwyg editor
         $action.find('textarea.text').each(function () {
-            redactor($(this), $(this).data('plugins'));
+            $(this).editor({
+                mergeFields: {
+                    tickets: true,
+                    organisations: organisationsEnabled
+                },
+                plugins: $.fn.editor.defaults.plugins.concat(['mergefields']),
+                toolbar: $.fn.editor.defaults.toolbar + ' | mergefields',
+            });
         });
 
         // Initialise visible codemirror instances (we don't initialise on hidden textareas because CodeMirror

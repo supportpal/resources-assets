@@ -64,10 +64,10 @@ $(document.body).ready(function () {
         create: false,
         onFocus: function () {
             // Set search box to be half page width in desktop mode.
-            $('#header .search-form').parent('.sp-flex-grow').addClass('lg:sp-w-1/2');
+            $('#header .search-form').parent('.sp-grow').addClass('lg:sp-w-1/2');
         },
         onBlur: function () {
-            $('#header .search-form').parent('.sp-flex-grow').removeClass('lg:sp-w-1/2');
+            $('#header .search-form').parent('.sp-grow').removeClass('lg:sp-w-1/2');
         },
         onDropdownOpen: function ($dropdown) {
             // Make dropdown bigger than normal selectize dropdown.

@@ -60,7 +60,7 @@ var SupportPalSlugGenerator = function (parameters)
                 $slug.removeClass('sp-hidden');
             })
             .fail(function (jqXHR, textStatus, errorThrown) {
-                void 0;
+                console.log(jqXHR.responseText);
             })
             .always(function () {
                 typeof alwaysCallback === 'function' && alwaysCallback();

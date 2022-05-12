@@ -60,11 +60,11 @@ $(document).ready(function () {
 
     // Toggle show/hide of the filter results area
     $(document.body).on('mousedown', 'button.sp-filter-results', function () {
-        $('div.sp-filter-results').show();
-
-        $('#content').animate({
-            scrollTop: $('div.sp-filter-results').position().top - 24
-        }, 1000);
+        var $div = $('div.sp-filter-results');
+        if ($div.length) {
+            $div.show();
+            $('#content').animate({scrollTop: $div.position().top - 24}, 1000);
+        }
     });
 
     // Toggle show/hide of the filter grid area
@@ -88,7 +88,7 @@ $(document).ready(function () {
                 {'intended': btoa(window.location.href)}
             ));
             return false;
-        } else if (xhr.status == 403) {
+        } else if (xhr.status == 419) {
             // Ensure this is a session expired message (VerifyCsrfToken middleware)
             var json = JSON.parse(xhr.responseText);
             if (json.message == Lang.get('messages.session_expired')) {
@@ -163,7 +163,7 @@ $(document).ready(function () {
                     .append(
                         $wrapper.find('div.dataTables_filter')
                             .removeClass('sp-hidden')
-                            .addClass('sp-flex-grow sp-inline-block sm:sp-flex-initial')
+                            .addClass('sp-grow sp-inline-block sm:sp-flex-initial')
                     )
                     .append(
                         $('<button>').addClass('sp-filter-results sp-px-2 sp-rounded-l-none')

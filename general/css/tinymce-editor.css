@@ -1,0 +1,52 @@
+:root {
+    --font-code: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
+}
+
+html {
+    @apply sp-leading-normal;
+    word-break: break-word;
+}
+
+body {
+    @apply sp-m-3 sp-text-primary;
+}
+
+* {
+    color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+}
+
+a {
+    @apply sp-text-secondary;
+}
+
+code,
+pre:not(.moz-signature) {
+    @apply sp-font-code sp-text-primary;
+    text-shadow: none;
+}
+
+.mce-content-body *[data-mce-selected="inline-boundary"] {
+    @apply sp-bg-tertiary;
+}
+
+div.expandable:before {
+    @apply sp-inline-block sp-h-4 sp-px-1 sp-my-3 sp-bg-secondary sp-border sp-border-tertiary sp-rounded;
+    content: '...';
+    line-height: 0.375rem;
+}
+
+div.expandable:hover:before {
+    @apply sp-bg-tertiary sp-cursor-pointer;
+}
+
+div.expandable + div.supportpal_quote {
+    @apply sp-hidden sp-text-tertiary;
+}
+
+/* Fix for Firefox */
+
+:focus-visible {
+    @apply sp-outline-none;
+}

@@ -255,7 +255,7 @@
                                 html: makeInterface(response.data),
                                 showCancelButton: true
                             });
-                            registerSelectize($(Swal.getContent().querySelector('#swal2-select')), tickets);
+                            registerSelectize($(Swal.getHtmlContainer().querySelector('#swal2-select')), tickets);
                         } else {
                             throw new Error(response.statusText);
                         }
@@ -338,7 +338,7 @@
                                 html: makeInterface(response.data),
                                 showCancelButton: true
                             });
-                            registerSelectize($(Swal.getContent().querySelector('#swal2-select')), [model]);
+                            registerSelectize($(Swal.getHtmlContainer().querySelector('#swal2-select')), [model]);
                         } else {
                             throw new Error(response.statusText);
                         }

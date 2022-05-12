@@ -1,12 +1,9 @@
 .daterangepicker * {
-    font-family: var(--font-icon-with-body) !important;
-    font-size: 0.875rem !important;
+    @apply sp-font-icon-with-body sp-text-sm !important;
 }
 
 .daterangepicker {
-    background-color: var(--color-background-primary);
-    border-color: var(--color-background-tertiary);
-    overflow: auto;
+    @apply sp-bg-primary sp-border-tertiary sp-overflow-auto;
     max-height: calc(100% - 7rem);
 }
 
@@ -21,7 +18,7 @@
     left: 15px;
 }
 .daterangepicker.opensright:after {
-    left: 16px;
+    @apply sp-left-4;
 }
 
 .daterangepicker.show-ranges.ltr .drp-calendar.left {
@@ -33,12 +30,11 @@
 }
 
 .daterangepicker .ranges li:hover {
-    background-color: var(--color-background-secondary);
+    @apply sp-bg-secondary;
 }
 
 .daterangepicker .calendar-table {
-    border: 0;
-    background-color: var(--color-background-primary);
+    @apply sp-bg-primary sp-border-0;
 }
 
 .daterangepicker .calendar-table .next span,
@@ -51,14 +47,13 @@
 }
 
 .daterangepicker .calendar-table .prev span {
-    margin-left: 2px;
+    @apply sp-ml-1/2;
 }
 
 .daterangepicker select.monthselect,
 .daterangepicker select.yearselect {
+    @apply sp-w-auto sp-py-1 sp-pt-7 sp-pb-2;
     min-height: auto;
-    padding: 0.25rem 1.75rem 0.25rem 0.5rem;
-    width: auto;
 }
 
 .daterangepicker td.active,
@@ -67,25 +62,22 @@
 .daterangepicker td.active.in-range,
 .daterangepicker td.active.available:hover,
 .daterangepicker td.active.in-range.available:hover {
-    background-color: var(--color-primary-900);
-    color: #fff;
-    font-weight: bold;
+    @apply sp-bg-primary-900 sp-text-white sp-font-bold;
 }
 
 .daterangepicker td.in-range,
 .daterangepicker td.in-range.available:hover {
-    background-color: var(--color-background-tertiary);
-    color: var(--text-color-primary);
+    @apply sp-bg-tertiary sp-text-primary;
 }
 
 .daterangepicker td.available:hover,
 .daterangepicker th.available:hover {
-    background-color: var(--color-background-secondary);
+    @apply sp-bg-secondary;
 }
 
 .daterangepicker td:not(.available),
 .daterangepicker th:not(.available) {
-    cursor: auto;
+    @apply sp-cursor-auto;
 }
 
 .daterangepicker td.off,
@@ -93,6 +85,5 @@
 .daterangepicker td.off.start-date,
 .daterangepicker td.off.end-date,
 .daterangepicker td.off.available:hover {
-    background: transparent;
-    color: var(--color-text-tertiary);
+    @apply sp-bg-transparent sp-text-tertiary;
 }

@@ -35,9 +35,12 @@ $(document).ready(function() {
                 [ 'name', 'for', 'id' ].map(attributeMapper.bind(null, elem, value));
             });
 
-            // Initialise redactor or source code editor on new textarea.
-            if (newElem.find('textarea.redactor').length > 0) {
-                newElem.find('textarea.redactor').redactor(opts);
+            // Append new element to the DOM and make it visible.
+            $container.append(newElem);
+
+            // Initialise editor on new textarea.
+            if (newElem.find('textarea.tox-editor').length > 0) {
+                newElem.find('textarea.tox-editor').editor(opts);
             }
             if (newElem.find('textarea.source-code').length > 0) {
                 newElem.find('textarea.source-code').sourcecode(opts);
@@ -46,12 +49,12 @@ $(document).ready(function() {
             // Initialise file upload.
             if (typeof FileUpload !== 'undefined' && newElem.find('.sp-file-upload').length > 0) {
                 var settings = {
-                        $element: newElem.find('.sp-file-upload'),
-                        $container: newElem
-                    },
-                    inputName = newElem.find('.sp-attachment-details')
-                        .find('input[type=hidden]')
-                        .prop('name').replace('[]', '');
+                      $element: newElem.find('.sp-file-upload'),
+                      $container: newElem
+                  },
+                  inputName = newElem.find('.sp-attachment-details')
+                    .find('input[type=hidden]')
+                    .prop('name').replace('[]', '');
 
                 // Fall back to default inputName, if we can't find an element...
                 if (inputName.length !== 0) {
@@ -61,8 +64,7 @@ $(document).ready(function() {
                 new FileUpload(settings);
             }
 
-            // Append new element to the DOM and make it visible.
-            $container.append(newElem);
+            // Show the element.
             newElem.show();
 
             // Clear the selected value silently (don't fire onChange event).

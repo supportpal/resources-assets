@@ -1,0 +1,76 @@
+.sp-editor-content h1,
+.sp-editor-content h2,
+.sp-editor-content h3,
+.sp-editor-content h4,
+.sp-editor-content h5,
+.sp-editor-content h6 {
+    @apply sp-mt-0 sp-mb-6 sp-font-display sp-font-bold sp-text-primary;
+}
+
+.sp-editor-content h1 {
+    @apply sp-text-3xl;
+}
+
+.sp-editor-content h2 {
+    @apply sp-text-2xl;
+}
+
+.sp-editor-content h3 {
+    @apply sp-text-xl;
+}
+
+.sp-editor-content h4 {
+    @apply sp-text-lg;
+}
+
+.sp-editor-content h5,
+.sp-editor-content h6 {
+    @apply sp-text-base;
+}
+
+.sp-editor-content h6 {
+    @apply sp-font-semibold;
+}
+
+.sp-editor-content p {
+    @apply sp-m-0;
+}
+
+.sp-editor-content ol,
+.sp-editor-content ul {
+    @apply sp-pl-6 sp-list-decimal;
+}
+
+.sp-editor-content ul {
+    @apply sp-list-disc;
+}
+
+.sp-editor-content ul ul {
+    @apply sp-list-circle;
+}
+
+.sp-editor-content blockquote {
+    @apply sp-pl-3 sp-ml-2 sp-my-4 sp-border-0 sp-border-l-4 sp-border-solid sp-border-tertiary;
+}
+
+.sp-editor-content code,
+.sp-editor-content pre:not(.moz-signature) {
+    @apply sp-p-4 sp-m-0 sp-bg-secondary sp-shadow sp-rounded sp-text-sm sp-overflow-auto sp-whitespace-pre;
+}
+
+.sp-editor-content pre:not(.moz-signature) code {
+    @apply sp-p-0 sp-bg-transparent sp-shadow-none sp-rounded-none sp-whitespace-normal;
+}
+
+.sp-editor-content code[class*=language-],
+.sp-editor-content pre[class*=language-] {
+    @apply sp-text-primary;
+    text-shadow: none;
+}
+
+@screen print {
+    .sp-editor-content code,
+    .sp-editor-content pre:not(.moz-signature) {
+        @apply sp-whitespace-normal;
+    }
+}

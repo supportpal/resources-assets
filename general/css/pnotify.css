@@ -1,29 +1,51 @@
-[ui-pnotify].ui-pnotify .brighttheme-notice {
-    background: #feebc8;
-    border-left: 2px solid #ed8936;
-    border-radius: 0.25rem;
+body>.pnotify.pnotify-positioned {
+    @apply sp-z-10002;
 }
 
-[ui-pnotify].ui-pnotify .brighttheme-notice div, [ui-pnotify].ui-pnotify .brighttheme-notice h4 {
-    color: #9c4221;
+[data-pnotify].supportpal-elem {
+    @apply sp-text-yellow-700;
 }
 
-.sp-theme-dark [ui-pnotify].ui-pnotify .brighttheme-notice {
-    background: #c05621;
-    border-left: 0;
-    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    color: #fff;
+[data-pnotify] .supportpal-container {
+    @apply sp-p-4 sp-bg-yellow-100 sp-border-l-2 sp-border-yellow-700 sp-rounded;
 }
 
-.sp-theme-dark [ui-pnotify].ui-pnotify .brighttheme-notice div,
-.sp-theme-dark [ui-pnotify].ui-pnotify .brighttheme-notice h4 {
-    color: #fff;
+[data-pnotify] .supportpal-container.pnotify-shadow {
+    @apply sp-shadow-md;
 }
 
-.sp-theme-dark .ui-pnotify-text a {
-    color: var(--color-text-primary);
+.sp-theme-dark [data-pnotify].supportpal-elem {
+    @apply sp-text-yellow-200;
 }
 
-.sp-theme-dark .ui-pnotify-text a:hover {
-    color: #fff;
+.sp-theme-dark [data-pnotify] .supportpal-container {
+    @apply sp-bg-yellow-700 sp-border-0;
+}
+
+.sp-theme-dark [data-pnotify] .supportpal-content a {
+    @apply sp-text-primary;
+}
+
+.sp-theme-dark [data-pnotify] .supportpal-content a:hover {
+    @apply sp-text-white;
+}
+
+[data-pnotify] .supportpal-icon {
+    @apply sp-mt-1;
+}
+
+[data-pnotify] .supportpal-content {
+    @apply sp-pl-1;
+}
+
+[data-pnotify] .supportpal-title {
+    @apply sp-mb-3 sp-text-xl sp-leading-tight;
+}
+
+[data-pnotify] .supportpal-closer {
+    @apply sp-float-right;
+}
+
+[data-pnotify] .supportpal-text {
+    @apply sp-leading-5;
 }

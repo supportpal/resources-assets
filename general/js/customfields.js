@@ -1,15 +1,10 @@
 $(document).ready(function () {
-    customfieldRedactor();
-
-    // Open links in locked custom fields in new tab.
-    $('.redactor-read-only a').on('click', function () {
-        this.target = "_blank";
-    });
+    customfieldEditor();
 
     // Dependent custom fields.
     var resetForm = function ($container, disabled) {
-        // Disable redactor.
-        $container.find('textarea').prop('contenteditable', disabled);
+        // Disable inputs.
+        $container.find('textarea').prop('disabled', disabled);
         $container.find(':input').not(':button, :submit, :reset').prop('disabled', disabled);
     };
     var showDependentFields = function ($field) {
@@ -44,32 +39,32 @@ $(document).ready(function () {
     });
 });
 
-function customfieldRedactor()
+function customfieldEditor()
 {
     $.each($('.sp-form-customfields textarea'), function () {
-        // Don't show link tootlip if redactor is disabled/readonly
-        var linkTooltip = $(this).prop('disabled') || $(this).prop('readonly') ? false : true;
+        if ($(this).editor()) {
+            // Destroy previous instance if it exists.
+            $(this).editor().destroy();
+        }
 
-        $(this).redactor({
-            // Height settings.
-            minHeight: false,
+        $(this).editor({
+            // Locked fields.
+            readonly: $(this).prop('disabled') || $(this).prop('readonly') ? true : false,
 
             // Paste settings.
-            pasteImages: false,
-            pasteBlockTags: ['p'],
-            pasteInlineTags: ['a', 'br'],
+            valid_elements: 'a[href|target=_blank],br,p',
 
             // Toolbar settings.
             toolbar: false,
-            toolbarContext: linkTooltip,
 
-            // Shortcut settings.
-            shortcuts: false,
+            // https://www.tiny.cloud/docs/plugins/opensource/autoresize/#min_height
+            min_height: 50,
+
+            // Statusbar settings.
+            statusbar: false,
+
+            // Disable keyboard shortcuts.
+            plugins: $.fn.editor.defaults.plugins.concat(['disable_shortcuts']),
         });
-
-        // Handle locked textareas
-        if ($(this).prop('disabled') || $(this).prop('readonly')) {
-            $(this).redactor('enableReadOnly');
-        }
     });
 }
