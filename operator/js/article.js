@@ -37,7 +37,7 @@ function Article(parameters)
                 // Get the category selectize instance.
                 var select_categories = this.$input.parents(self.getClassName()).find('select[name$="[categories][]"]');
                 if (select_categories.length == 0 || typeof select_categories[0].selectize === 'undefined') {
-                    console.log('Failed to find associated category drop-down.');
+                    void 0;
 
                     return;
                 }

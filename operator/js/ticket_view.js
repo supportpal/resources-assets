@@ -1043,6 +1043,76 @@
           $forwardBccSelectize = $('select[name="bcc_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig));
 
         /**
+         * Reply options.
+         */
+        // Check if send email checkbox should be checked on event based on relevant department email template
+        function handleEmailCheckbox(template, name)
+        {
+            if (template != -1) {
+                $checkboxes[name].checkbox.prop('disabled', false).prop('checked', $checkboxes[name].state);
+                $checkboxes[name].checkbox.parent().removeAttr('data-tippy-content');
+            } else {
+                $checkboxes[name].checkbox.prop('checked', false).prop('disabled', true);
+                $checkboxes[name].checkbox.parent().attr('data-tippy-content', Lang.get('ticket.department_template_disabled'));
+            }
+        }
+
+        var $checkboxes = {
+            'user': {'checkbox': $('.message-form .send-user-email input[type="checkbox"]') },
+            'operator_reply': {'checkbox': $('.message-form .send-operators-email input[type="checkbox"]')},
+            'operator_note': {'checkbox': $('.notes-form .send-operators-email input[type="checkbox"]') }
+        };
+
+        $.each($checkboxes, function (index, value) {
+            // Save the state of the checkbox initially and on change
+            value.state = value.checkbox.is(':checked');
+            value.checkbox.on('change', function () {
+                value.state = $(this).is(':checked');
+            });
+
+            // If the checkbox is disabled, uncheck it
+            if (value.checkbox.prop('disabled')) {
+                value.checkbox.prop('checked', false);
+            }
+        });
+
+        function changeToStatus (selected) {
+            if (selected == closedStatusId && departmentTemplates.user_ticket_operatorclose !== -1) {
+                // We fall back to normal ticket reply email if operator closed email is disabled.
+                handleEmailCheckbox(departmentTemplates.user_ticket_operatorclose, 'user');
+            } else {
+                handleEmailCheckbox(departmentTemplates.user_ticket_reply, 'user');
+            }
+        }
+
+        $(document).on('change', '.message-form select[name="to_status"]', function () { changeToStatus($(this).val()); });
+
+        // Mock a change on the status to have it run the above code
+        changeToStatus($('.message-form select[name="to_status"]').val());
+
+        // Check if 'send email to operator(s)' should show based on ticket message type
+        $('.reply-type .option').on('click', function () {
+            if ($(this).data('type') == 0) {
+                handleEmailCheckbox(departmentTemplates.operator_operator_ticket_reply, 'operator_reply');
+            } else {
+                handleEmailCheckbox(departmentTemplates.operator_ticket_note, 'operator_note');
+            }
+        });
+
+        // Handle expanding each option group
+        $(document).on('click', '.sp-reply-options-header', function () {
+            $(this).next(".sp-reply-options-content").slideToggle(500);
+            $(this).find(".fas").toggleClass("fa-chevron-down fa-chevron-up");
+        });
+
+        // Add a new canned response
+        $('input[name=add_canned]').on('change', function () {
+            var $table = $(this).parents('.sp-reply-option').find('div');
+
+            this.checked ? $table.removeClass('sp-hidden') : $table.addClass('sp-hidden');
+        });
+
+        /**
          * Edit user on ticket
          */
         $('.edit-user').on('click', function() {
@@ -1643,6 +1713,7 @@
 
                       // Update department templates.
                       departmentTemplates = response.data.templates;
+
                       // Force run that code that checks if we can send the email to user/operators, by mocking events.
                       $('.message-form select[name="to_status"]').trigger('change');
 
@@ -1818,7 +1889,7 @@
             this.runNow = function (allMessages) {
                 instance.stop();
 
-                console.log('[' + new Date().toUTCString() + '][Poll replies] Sending AJAX');
+                void 0;
 
                 return xhr = $.ajax({
                     url: laroute.route('ticket.operator.message.poll'),
@@ -2018,13 +2089,13 @@
             };
 
             this.startAfter = function (milliseconds) {
-                console.log('[' + new Date().toUTCString() + '][Poll replies] Starting after ' + milliseconds + ' milliseconds');
+                void 0;
                 clearTimeout(startAfterTimer);
                 startAfterTimer = setTimeout(instance.start, milliseconds);
             };
 
             this.stop = function () {
-                console.log('[' + new Date().toUTCString() + '][Poll replies] Cancelling current running requests.');
+                void 0;
                 clearTimeout(loopTimer);
                 xhr && xhr.abort();
             };
@@ -2032,10 +2103,10 @@
             // When window is not active, stop polling.
             $(document).on('visibilitychange', function () {
                 if (document.hidden) {
-                    console.log('[' + new Date().toUTCString() + '][Poll replies] Tab is not visible.');
+                    void 0;
                     instance.stop();
                 } else {
-                    console.log('[' + new Date().toUTCString() + '][Poll replies] Tab is visible.');
+                    void 0;
                     instance.startAfter(2000);
                 }
             });

@@ -68,7 +68,7 @@ var installer = function (parameters) {
      * @return void
      */
     var errorHandler = function (string) {
-        alert('Something went wrong while contacting the server.');
+        void 0;
 
         // Add the error message to the log.
         if (isValidJson(string)) {

@@ -45,10 +45,10 @@
             });
 
         document.addEventListener('pollcast:request-error', function(e) {
-            console.error('Pollcast request failed.', e.detail);
+            void 0;
 
             if (e.detail.status === 419) {
-                console.log('CSRF token has expired. Disconnecting from pollcast service.');
+                void 0;
                 Notifications.connector().disconnect();
             }
         });

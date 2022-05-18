@@ -23,7 +23,7 @@ body.swal2-height-auto {
 }
 
 .swal2-html-container {
-    @apply sp-text-base sp-text-primary sp-leading-normal sp-z-10;
+    @apply sp-text-base sp-text-primary sp-leading-normal sp-overflow-visible sp-z-10;
 }
 
 .swal2-modal hr {

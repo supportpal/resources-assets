@@ -216,7 +216,7 @@ $(document).ready(function() {
         this.runNow = function () {
             instance.stop();
 
-            console.log('[' + new Date().toUTCString() + '][Poll replies] Sending AJAX');
+            void 0;
 
             return xhr = $.ajax({
                 url: laroute.route('ticket.frontend.message.poll'),
@@ -295,13 +295,13 @@ $(document).ready(function() {
         };
 
         this.startAfter = function (milliseconds) {
-            console.log('[' + new Date().toUTCString() + '][Poll replies] Starting after ' + milliseconds + ' milliseconds');
+            void 0;
             clearTimeout(startAfterTimer);
             startAfterTimer = setTimeout(instance.start, milliseconds);
         };
 
         this.stop = function () {
-            console.log('[' + new Date().toUTCString() + '][Poll replies] Cancelling current running requests.');
+            void 0;
             clearTimeout(loopTimer);
             xhr && xhr.abort();
         };
@@ -309,10 +309,10 @@ $(document).ready(function() {
         // When window is not active, stop polling.
         $(document).on('visibilitychange', function () {
             if (document.hidden) {
-                console.log('[' + new Date().toUTCString() + '][Poll replies] Tab is not visible.');
+                void 0;
                 instance.stop();
             } else {
-                console.log('[' + new Date().toUTCString() + '][Poll replies] Tab is visible.');
+                void 0;
                 instance.startAfter(2000);
             }
         });

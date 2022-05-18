@@ -1230,7 +1230,7 @@
         var required = ['ticketId', 'userId', 'brandId', 'notesPosition', 'replyOrder', 'ticketGridUrl'];
         for (var i = 0; i < required.length; i++) {
             if (parameters[required[i]] === null) {
-                console.warn("Parameter '" + required[i] + "' is NULL, some functions may not work as expected.");
+                void 0;
             }
         }
 
