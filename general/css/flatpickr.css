@@ -1,5 +1,5 @@
-input.datepicker,
-input.timepicker {
+input.datepicker::placeholder,
+input.timepicker::placeholder {
     @apply sp-font-icon-with-body;
 }
 

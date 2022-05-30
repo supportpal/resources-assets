@@ -38,6 +38,11 @@
     border-radius: 2px;
 }
 
+.codemirror-box .toolbar svg {
+    @apply sp-text-primary;
+    fill: var(--color-text-primary);
+}
+
 .codemirror-box .toolbar a.button-icon {
     @apply sp-p-3/2 sp-text-sm;
 }
@@ -55,6 +60,12 @@
 .codemirror-box .toolbar a.active,
 .codemirror-box .toolbar a.active .fa {
     @apply sp-text-secondary;
+}
+
+.codemirror-box .toolbar svg:hover,
+.codemirror-box .toolbar a.active svg {
+    @apply sp-text-secondary;
+    fill: var(--color-text-secondary);
 }
 
 /*

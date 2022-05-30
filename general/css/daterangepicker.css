@@ -1,5 +1,5 @@
 .daterangepicker * {
-    @apply sp-font-icon-with-body sp-text-sm !important;
+    @apply sp-text-sm !important;
 }
 
 .daterangepicker {
@@ -52,7 +52,7 @@
 
 .daterangepicker select.monthselect,
 .daterangepicker select.yearselect {
-    @apply sp-w-auto sp-py-1 sp-pt-7 sp-pb-2;
+    @apply sp-w-auto sp-px-2 sp-py-1 sp-pr-7;
     min-height: auto;
 }
 

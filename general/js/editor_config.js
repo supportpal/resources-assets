@@ -38,6 +38,7 @@
     function image_upload_handler (blobInfo, success, failure, progress)
     {
         var formData = new FormData();
+        formData.append('_token', $('meta[name=csrf_token]').prop('content'));
         formData.append('file', blobInfo.blob(), blobInfo.filename());
 
         var ajaxData = {
@@ -91,6 +92,10 @@
         // Disable Word processing in the paste plugin.
         // It breaks copy/paste of images from help desk messages containing p.MsoNormal
         paste_enable_default_filters: false,
+        // Enable drag & drop, copy & paste, etc of locally stored images.
+        // This setting works in conjunction with automatic_uploads, and image_upload_handler to convert base64 data
+        // uri images into URLs.
+        paste_data_images: true,
         // HTML source view using CodeMirror plugin.
         codemirror: CodeMirror.options,
         // https://www.tiny.cloud/docs/plugins/opensource/autoresize/#min_height
@@ -134,12 +139,16 @@
                 items: 'bullist numlist | indent outdent'
             }
         },
+        // https://www.tiny.cloud/docs/configure/spelling/#browser_spellcheck
+        browser_spellcheck: true,
         // https://www.tiny.cloud/docs/plugins/opensource/emoticons/#emoticons_database_url
         emoticons_database_url: laroute.url("", ["resources/assets/libs/tinymce/emojis.min.js"]),
         // https://www.tiny.cloud/docs/configure/content-appearance/#color_map
         color_map: colourSchemeMap(),
         color_cols: 9,
         // https://www.tiny.cloud/docs/ui-components/contextmenu/
+        // If enabled, consider that browser_spellcheck requires use of CTRL+Right Click
+        // (https://www.tiny.cloud/blog/tinymce-spellchecker/).
         contextmenu: false,
         // https://www.tiny.cloud/docs/general-configuration-guide/upload-images/
         images_upload_handler: image_upload_handler,

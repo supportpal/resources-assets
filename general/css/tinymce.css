@@ -155,6 +155,32 @@
     @apply sp-py-2 sp-border-b sp-border-solid;
 }
 
+.tox .tox-dialog__body-nav-item,
+.tox .tox-dialog__body-nav-item--active {
+    @apply sp-text-primary;
+}
+
+.tox .tox-dialog__body-nav-item--active {
+    @apply sp-border-tertiary;
+}
+
+.tox .tox-dialog__body-nav-item:focus {
+    @apply sp-bg-transparent;
+}
+
+.tox .tox-dropzone {
+    @apply sp-bg-secondary sp-border-tertiary;
+}
+
+.tox .tox-dropzone p {
+    @apply sp-text-secondary;
+}
+
+.tox .tox-label,
+.tox .tox-toolbar-label {
+    @apply sp-text-primary;
+}
+
 .tox .tox-button {
     @apply sp-border-0;
 }
@@ -224,13 +250,4 @@
 
 .tox-button-separator {
     @apply sp-px-0 sp-py-2 sp-mx-3/2 sp-inline sp-border-l sp-border-tertiary sp-align-middle;
-}
-
-/* Editor Output */
-
-@screen print {
-    .sp-editor-content code,
-    .sp-editor-content pre:not(.moz-signature) {
-        @apply sp-whitespace-normal;
-    }
 }

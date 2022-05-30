@@ -464,18 +464,14 @@ $(function () {
             states: {
                 shown: {
                     toggle: {
-                        attr: {
-                            content: Lang.get('general.hide'),
-                            attr: { title: '' }
-                        }
+                        content: Lang.get('general.hide'),
+                        attr: { title: '' }
                     }
                 },
                 hidden: {
                     toggle: {
-                        attr: {
-                            content: Lang.get('general.show'),
-                            attr: { title: '' }
-                        }
+                        content: Lang.get('general.show'),
+                        attr: { title: '' }
                     }
                 }
             },
