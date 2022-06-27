@@ -226,7 +226,7 @@
       // data-brand set on form-row. If nothing is set then it won't be included.
       var brandId = $container.parents('form').find(':input[name="brand_id"]').length
         ? $container.parents('form').find(':input[name="brand_id"]').val()
-        : $container.parents('.form-row').data('brand');
+        : $container.parents('.sp-form-row').data('brand');
 
       // Get ticket ID.
       var ticketId = $container.parents('form').find(':input[name="ticket_id"]').length

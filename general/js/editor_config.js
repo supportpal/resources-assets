@@ -190,64 +190,80 @@
             editor.ui.registry.addIcon('brackets-curly', '<svg height="24" width="24"><path d="M 6.098 7.104 C 6.298 8.404 6.498 8.704 6.498 10.004 C 6.498 10.804 4.998 11.504 4.998 11.504 L 4.998 12.504 C 4.998 12.504 6.498 13.204 6.498 14.004 C 6.498 15.304 6.298 15.604 6.098 16.904 C 5.798 19.004 6.898 20.004 7.898 20.004 C 8.898 20.004 9.998 20.004 9.998 20.004 L 9.998 18.004 C 9.998 18.004 8.198 18.204 8.198 17.004 C 8.198 16.104 8.398 16.104 8.598 14.104 C 8.698 13.204 8.098 12.504 7.498 12.004 C 8.098 11.504 8.698 10.904 8.598 10.004 C 8.298 8.004 8.198 8.004 8.198 7.104 C 8.198 5.904 9.998 6.004 9.998 6.004 L 9.998 4.004 C 9.998 4.004 8.998 4.004 7.898 4.004 C 6.798 4.004 5.798 5.004 6.098 7.104 Z"></path><path d="M 17.898 7.104 C 17.698 8.404 17.498 8.704 17.498 10.004 C 17.498 10.804 18.998 11.504 18.998 11.504 L 18.998 12.504 C 18.998 12.504 17.498 13.204 17.498 14.004 C 17.498 15.304 17.698 15.604 17.898 16.904 C 18.198 19.004 17.098 20.004 16.098 20.004 C 15.098 20.004 13.998 20.004 13.998 20.004 L 13.998 18.004 C 13.998 18.004 15.798 18.204 15.798 17.004 C 15.798 16.104 15.598 16.104 15.398 14.104 C 15.298 13.204 15.898 12.504 16.498 12.004 C 15.898 11.504 15.298 10.904 15.398 10.004 C 15.598 8.004 15.798 8.004 15.798 7.104 C 15.798 5.904 13.998 6.004 13.998 6.004 L 13.998 4.004 C 13.998 4.004 14.998 4.004 16.098 4.004 C 17.198 4.004 18.198 5.004 17.898 7.104 Z"></path></svg>');
 
             // https://www.tiny.cloud/docs/advanced/keyboard-shortcuts/
-            editor.addShortcut('meta+h', 'Insert superscript.', function () {
+            // ctrl+h
+            editor.addShortcut('ctrl+72', 'Insert superscript.', function () {
                 editor.execCommand('Superscript');
             });
-            editor.addShortcut('meta+l', 'Insert subscript.', function () {
+            // ctrl+l
+            editor.addShortcut('ctrl+76', 'Insert subscript.', function () {
                 editor.execCommand('Subscript');
             });
-            editor.addShortcut('meta+shift+s', 'Strikethrough the text.', function () {
+            // ctrl+shift+s
+            editor.addShortcut('ctrl+shift+83', 'Strikethrough the text.', function () {
                 editor.execCommand('Strikethrough');
             });
-            editor.addShortcut('meta+shift+s', 'Strikethrough the text.', function () {
-                editor.execCommand('Strikethrough');
-            });
-            editor.addShortcut('meta+shift+x', 'Insert code fragment.', function () {
+            // ctrl+shift+x
+            editor.addShortcut('ctrl+shift+88', 'Insert code fragment.', function () {
                 editor.execCommand('CodeSample');
             });
-            editor.addShortcut('meta+q', 'Insert block quote.', function () {
+            // ctrl+q
+            editor.addShortcut('ctrl+81', 'Insert block quote.', function () {
                 editor.execCommand('mceBlockQuote');
             });
-            editor.addShortcut('meta+.', 'Insert ordered list.', function () {
+            // ctrl+.
+            editor.addShortcut('ctrl+190', 'Insert ordered list.', function () {
                 editor.execCommand('InsertOrderedList');
             });
-            editor.addShortcut('meta+/', 'Insert unordered list.', function () {
+            // ctrl+/
+            editor.addShortcut('ctrl+191', 'Insert unordered list.', function () {
                 editor.execCommand('InsertUnorderedList');
             });
-            editor.addShortcut('meta+[', 'Outdent the current selection.', function () {
+            // ctrl+[
+            editor.addShortcut('ctrl+160', 'Outdent the current selection.', function () {
                 editor.execCommand('Outdent');
             });
-            editor.addShortcut('meta+]', 'Indent the current selection.', function () {
+            // ctrl+]
+            editor.addShortcut('ctrl+221', 'Indent the current selection.', function () {
                 editor.execCommand('Indent');
             });
-            editor.addShortcut('meta+\\', 'Remove formatting from the current selection.', function () {
+            // ctrl+\
+            editor.addShortcut('ctrl+220', 'Remove formatting from the current selection.', function () {
                 editor.execCommand('RemoveFormat');
             });
-            editor.addShortcut('meta+alt+0', 'Insert a paragraph.', function () {
+            // ctrl+alt+0
+            editor.addShortcut('ctrl+alt+48', 'Insert a paragraph.', function () {
                 editor.execCommand('FormatBlock', false, 'p');
             });
-            editor.addShortcut('meta+alt+1', 'Insert header 1.', function () {
+            // ctrl+alt+1
+            editor.addShortcut('ctrl+alt+49', 'Insert header 1.', function () {
                 editor.execCommand('FormatBlock', false, 'h1');
             });
-            editor.addShortcut('meta+alt+2', 'Insert header 2.', function () {
+            // ctrl+alt+2
+            editor.addShortcut('ctrl+alt+50', 'Insert header 2.', function () {
                 editor.execCommand('FormatBlock', false, 'h2');
             });
-            editor.addShortcut('meta+alt+3', 'Insert header 3.', function () {
+            // ctrl+alt+3
+            editor.addShortcut('ctrl+alt+51', 'Insert header 3.', function () {
                 editor.execCommand('FormatBlock', false, 'h3');
             });
-            editor.addShortcut('meta+alt+4', 'Insert header 4.', function () {
+            // ctrl+alt+4
+            editor.addShortcut('ctrl+alt+52', 'Insert header 4.', function () {
                 editor.execCommand('FormatBlock', false, 'h4');
             });
-            editor.addShortcut('meta+alt+5', 'Insert header 5.', function () {
+            // ctrl+alt+5
+            editor.addShortcut('ctrl+alt+53', 'Insert header 5.', function () {
                 editor.execCommand('FormatBlock', false, 'h5');
             });
-            editor.addShortcut('meta+alt+6', 'Insert header 6.', function () {
+            // ctrl+alt+6
+            editor.addShortcut('ctrl+alt+54', 'Insert header 6.', function () {
                 editor.execCommand('FormatBlock', false, 'h6');
             });
-            editor.addShortcut('meta+shift+1', 'Insert a canned response.', function () {
+            // ctrl+shift+1
+            editor.addShortcut('ctrl+shift+49', 'Insert a canned response.', function () {
                 editor.execCommand('mceCannedResponses');
             });
-            editor.addShortcut('meta+shift+2', 'Insert a self-service article.', function () {
+            // ctrl+shift+2
+            editor.addShortcut('ctrl+shift+50', 'Insert a self-service article.', function () {
                 editor.execCommand('mceSelfService');
             });
         }
