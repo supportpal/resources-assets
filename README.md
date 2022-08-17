@@ -8,4 +8,4 @@ SupportPal is a [self-hosted, on-premise help desk software](https://www.support
 
 - [Frontend Template](https://github.com/supportpal/frontend-template)
 - [Operator Panel Template](https://github.com/supportpal/operator-template)
-- [Language Files](https://github.com/supportpal/language-files)
+- [Language Packs](https://github.com/orgs/supportpal/repositories?q=addon-language)
