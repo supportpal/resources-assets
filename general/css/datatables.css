@@ -25,7 +25,11 @@
 
 .dataTables_wrapper .dataTables_processing {
     background: 0;
-    @apply sp-h-full sp-left-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
+    @apply sp-h-full sp-w-full sp-left-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
+}
+
+div.dataTables_processing > div:last-child > div {
+    @apply sp-h-2 sp-w-2;
 }
 
 .dataTables_length,
@@ -125,7 +129,8 @@ table.dataTable.no-footer {
 
 table.dataTable thead td,
 table.dataTable thead th {
-    @apply sp-sticky sp-top-0 sp-bg-primary sp-overflow-hidden sp-text-ellipsis sp-whitespace-nowrap sp-z-10;
+    @apply sp-sticky !important;
+    @apply sp-top-0 sp-bg-primary sp-overflow-hidden sp-text-ellipsis sp-whitespace-nowrap sp-z-10;
 }
 
 table.dataTable thead th.sp-relative {
@@ -231,11 +236,15 @@ table.dataTable tbody tr {
 }
 
 table.dataTable tbody tr.selected {
-    @apply sp-bg-primary-200;
+    @apply sp-bg-primary-200 sp-shadow-none;
 }
 
 .sp-theme-dark table.dataTable tbody tr.selected {
     @apply sp-bg-primary-800;
+}
+
+table.dataTable tbody tr.selected > * {
+    @apply sp-shadow-none;
 }
 
 table.dataTable tfoot th,

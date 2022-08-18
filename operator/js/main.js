@@ -77,6 +77,18 @@ $(document).ready(function () {
         $('div.sp-filter-grid').addClass('sp-hidden');
     });
 
+    // Change language.
+    $('select[name="language"]').on('change', function (e) {
+        var valueSelected = this.value;
+
+        $.post(laroute.route('core.operator.set.language'), {language: valueSelected})
+            .always(function (data) {
+                var params = new URLSearchParams(window.location.search);
+                params.set('lang', valueSelected);
+                window.location.search = params.toString();
+            });
+    });
+
     /**
      * Global AJAX error handler to catch session timeouts.
      */

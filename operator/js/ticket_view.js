@@ -23,6 +23,8 @@
                     oninit: function () {
                         var editor = tinymce.get($(selector).prop('id'));
                         loadEditorContent(selector, $form, editor);
+
+                        editor.focus();
                     }
                 },
                 opts
@@ -107,7 +109,9 @@
 
         // Initialise reply editor.
         var form = new Form();
-        form.initReplyForm();
+        if ($('.sp-reply-type .sp-action[data-type=0]').hasClass('sp-active')) {
+            form.initReplyForm();
+        }
 
         // Enable hide/show password toggle
         $('input[type=password]').hideShowPassword();
@@ -158,26 +162,12 @@
 
                 default:
                     $form = $('.message-form:not(.edit)').toggle();
-            }
-
-            // If a form is visible but out of view, just scroll to it.
-            if ($form.is(':visible')) {
-                var elementTop = $form.position().top;
-                var elementBottom = elementTop + $form.outerHeight();
-                var screenTop = $('#content').scrollTop();
-                var screenBottom = screenTop + $('#content').innerHeight();
-
-                // Element is not visible.
-                if (screenBottom < elementTop || screenTop > elementBottom) {
-                    $('#content').animate({scrollTop: $form.position().top - 24}, 1000);
-                }
+                    form.initReplyForm();
             }
 
             // If form is now visible, focus in editor and scroll to it.
             if ($form.is(':visible')) {
                 $(this).addClass('sp-active');
-
-                $form.find('textarea').editor().focus();
 
                 // Scroll to form
                 $('#content').animate({scrollTop: $form.position().top - 24}, 1000);

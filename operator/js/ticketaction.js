@@ -241,7 +241,7 @@
         return Swal.fire({
             title: Lang.get('ticket.merge_tickets'),
             html: '',
-            confirmButtonText: Lang.get('ticket.merge'),
+            confirmButtonText: Lang.get('general.merge'),
             showCancelButton: false,
             didOpen: function () {
                 Swal.showLoading();

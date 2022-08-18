@@ -55,11 +55,11 @@ $(function () {
             $sidebar
                 .removeClass(sidebarClosedState)
                 .addClass('lg:sp-w-72')
-                .toggleClass('sp-w-72 sm:sp-w-72 ' + sidebarOpenState);
+                .toggleClass('sp-w-72 sm:sp-w-72 sm:sp-w-8 ' + sidebarOpenState);
 
             $sidebar.find('.sp-toggle-sidebar')
                 .addClass('lg:sp-ml-72')
-                .toggleClass('sp-ml-72 sm:sp-ml-72');
+                .toggleClass('sp-ml-72 sm:sp-ml-72 sm:sp-ml-8');
         } else {
             // Desktop view
             $sidebar

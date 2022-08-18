@@ -2,6 +2,8 @@
 
     var laroute = (function () {
 
+        var asset_params = {};
+
         var routes = {
 
             absolute: false,
@@ -22,7 +24,7 @@
             url: function (url, parameters) {
                 parameters = parameters || [];
 
-                var uri = url + '/' + parameters.join('/');
+                var uri = url + (parameters.length ? '/' + parameters.join('/') : '');
 
                 return this.getCorrectUrl(uri);
             },
@@ -131,11 +133,13 @@
                 return routes.route(route, parameters);
             },
 
+            asset : function (path) {
+                return this.url(path) + routes.getRouteQueryString(asset_params);
+            },
+
             // Generate a fully qualified URL to the given path.
             // laroute.route('url', [params = {}])
             url : function (route, parameters) {
-                parameters = parameters || {};
-
                 return routes.url(route, parameters);
             },
 
@@ -185,6 +189,10 @@
             // $NAMEPSACE$.set_prefix('my-prefix')
             set_prefix : function (prefix) {
                 routes.prefix = prefix;
+            },
+
+            set_asset_params : function (params) {
+                asset_params = params;
             }
 
         };

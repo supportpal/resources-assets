@@ -17,17 +17,16 @@ $(document).ready(function () {
         var returnTo = $("option:selected", this).data('return-to'),
             valueSelected = this.value;
 
-        $.post(laroute.route('core.set.language'), {
-            language: valueSelected
-        }).always(function (data) {
-            if (typeof returnTo !== 'undefined' && returnTo !== '') {
-                window.location.href = returnTo;
-            } else {
-                // Add the language in the URL and reload the page
-                var separator = (window.location.search.indexOf("?") === -1) ? "?" : "&";
-                window.location.search += separator + 'lang=' + valueSelected;
-            }
-        });
+        $.post(laroute.route('core.set.language'), {language: valueSelected})
+            .always(function (data) {
+                if (typeof returnTo !== 'undefined' && returnTo !== '') {
+                    window.location.href = returnTo;
+                } else {
+                    var params = new URLSearchParams(window.location.search);
+                    params.set('lang', valueSelected);
+                    window.location.search = params.toString();
+                }
+            });
     });
 
     // Search - open/close search bar
