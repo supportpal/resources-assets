@@ -1,5 +1,7 @@
 (function () {
     function Form() {
+        var reply_selector = '#newMessage';
+
         /**
          * Key, value pair of editors which have been initialised.
          * Key is the text editor element ID. Value is bool (initialised or not).
@@ -8,8 +10,12 @@
          */
         var editors = {};
 
+        var isInitialised = function (selector) {
+            return editors.hasOwnProperty(selector) && editors[selector] === true;
+        }
+
         var initEditor = function(selector, $form, opts) {
-            if (editors.hasOwnProperty(selector) && editors[selector] === true) {
+            if (isInitialised(selector)) {
                 return;
             }
 
@@ -77,10 +83,19 @@
               });
         };
 
+        this.destroyReplyForm = function () {
+            if (! isInitialised(reply_selector)) {
+                return;
+            }
+
+            editors[reply_selector] = false;
+            $(reply_selector).editor().remove();
+        };
+
         this.initReplyForm = function (opts) {
             var $form = $('.message-form');
             initFileUploads($form, 'replyFileUpload');
-            initEditor('#newMessage', $form, opts);
+            initEditor(reply_selector, $form, opts);
         };
 
         this.initNotesForm = function () {
@@ -100,7 +115,7 @@
         };
     }
 
-    App.extend('TicketViewForm', Form);
+    App.extend('TicketViewForm', new Form);
 
     $(document).ready(function() {
 
@@ -108,9 +123,8 @@
         polling.start();
 
         // Initialise reply editor.
-        var form = new Form();
         if ($('.sp-reply-type .sp-action[data-type=0]').hasClass('sp-active')) {
-            form.initReplyForm();
+            App.TicketViewForm.initReplyForm();
         }
 
         // Enable hide/show password toggle
@@ -133,7 +147,7 @@
             switch ($(this).data('type')) {
                 case 1:
                     $form = $('.notes-form').toggle();
-                    form.initNotesForm();
+                    App.TicketViewForm.initNotesForm();
                     break;
 
                 case 2:
@@ -153,7 +167,7 @@
                       };
 
                     $form = $('.forward-form').toggle();
-                    form.initForwardForm(isFresh ? editor_opts : {});
+                    App.TicketViewForm.initForwardForm(isFresh ? editor_opts : {});
                     if (isFresh) {
                         return;
                     }
@@ -162,7 +176,7 @@
 
                 default:
                     $form = $('.message-form:not(.edit)').toggle();
-                    form.initReplyForm();
+                    App.TicketViewForm.initReplyForm();
             }
 
             // If form is now visible, focus in editor and scroll to it.
