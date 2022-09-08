@@ -11,15 +11,26 @@
         var editors = {};
 
         var isInitialised = function (selector) {
-            return editors.hasOwnProperty(selector) && editors[selector] === true;
+            return editors.hasOwnProperty(selector) && editors[selector].hasOwnProperty('initialised')
+                && editors[selector]['initialised'] === true;
         }
 
-        var initEditor = function(selector, $form, opts) {
+        var isFocused = function (selector) {
+            return editors.hasOwnProperty(selector) && editors[selector].hasOwnProperty('focused')
+                && editors[selector]['focused'] === true;
+        }
+
+        var initEditor = function(selector, $form, opts, focus) {
+            focus = typeof focus !== 'undefined' ? focus : true;
+
             if (isInitialised(selector)) {
+                // If it's loaded but not focused once and we want to.
+                if (focus && ! isFocused(selector)) {
+                    editors[selector]['editor'].focus();
+                }
+
                 return;
             }
-
-            editors[selector] = true;
 
             $(selector).editor(
               $.extend(
@@ -30,7 +41,11 @@
                         var editor = tinymce.get($(selector).prop('id'));
                         loadEditorContent(selector, $form, editor);
 
-                        editor.focus();
+                        if (focus && ! isFocused(selector)) {
+                            editor.focus();
+                        }
+
+                        editors[selector] = {'initialised': true, 'focused': focus, 'editor': editor};
                     }
                 },
                 opts
@@ -92,10 +107,10 @@
             $(reply_selector).editor().remove();
         };
 
-        this.initReplyForm = function (opts) {
+        this.initReplyForm = function (opts, focus) {
             var $form = $('.message-form');
             initFileUploads($form, 'replyFileUpload');
-            initEditor(reply_selector, $form, opts);
+            initEditor(reply_selector, $form, opts, focus);
         };
 
         this.initNotesForm = function () {
@@ -124,7 +139,7 @@
 
         // Initialise reply editor.
         if ($('.sp-reply-type .sp-action[data-type=0]').hasClass('sp-active')) {
-            App.TicketViewForm.initReplyForm();
+            App.TicketViewForm.initReplyForm({}, false);
         }
 
         // Enable hide/show password toggle
