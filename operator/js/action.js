@@ -188,14 +188,21 @@ $(function () {
 
         // If it's a textarea, use wysiwyg editor
         $action.find('textarea.text').each(function () {
-            $(this).editor({
-                mergeFields: {
-                    tickets: true,
-                    organisations: organisationsEnabled
-                },
-                plugins: $.fn.editor.defaults.plugins.concat(['mergefields']),
-                toolbar: $.fn.editor.defaults.toolbar + ' | mergefields',
-            });
+            var opts = {};
+
+            if (typeof ticket !== 'undefined') {
+                $.extend(true, opts, ticket.defaultEditorConfig());
+            }
+
+            opts['mergeFields'] = {tickets: true, organisations: organisationsEnabled};
+
+            var plugins = typeof opts['plugins'] !== 'undefined' ? opts['plugins'] : $.fn.editor.defaults.plugins;
+            opts['plugins'] = plugins.concat(['mergefields']);
+
+            var toolbar = typeof opts['toolbar'] !== 'undefined' ? opts['toolbar'] : $.fn.editor.defaults.toolbar;
+            opts['toolbar'] = toolbar + ' | mergefields';
+
+            $(this).editor(opts);
         });
 
         // Initialise visible codemirror instances (we don't initialise on hidden textareas because CodeMirror

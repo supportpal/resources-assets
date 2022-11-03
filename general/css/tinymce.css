@@ -86,6 +86,10 @@
     @apply sp-mt-px sp-bg-primary sp-border-t-0 sp-border-tertiary sp-rounded-b sp-rounded-t-none sp-shadow-none;
 }
 
+.tox .tox-autocompleter .tox-menu {
+    @apply sp-mt-1/2 sp-border-t sp-rounded-t;
+}
+
 .tox .tox-collection--list .tox-collection__group {
     @apply sp-p-0;
 }
@@ -250,4 +254,16 @@
 
 .tox-button-separator {
     @apply sp-px-0 sp-py-2 sp-mx-3/2 sp-inline sp-border-l sp-border-tertiary sp-align-middle;
+}
+
+.tox-sp-avatar {
+    @apply sp-inline-block sp-h-6 sp-w-6 sp-rounded-full sp-mr-2 !important;
+}
+
+.tox-sp-description {
+    @apply sp-text-secondary sp-text-sm !important;
+}
+
+.tox-sp-mr-1 {
+    @apply sp-mr-1 !important;
 }

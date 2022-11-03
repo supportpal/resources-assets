@@ -158,16 +158,16 @@
     };
 
     /**
-     * Check whether the html contains {{ operator.signature }} and show a warning.
+     * Check whether the html contains {{ operator.reply_template }} and show a warning.
      *
      * @param html
      */
-    var containsSignature = function (html) {
-      // Check if the editor contains {{ operator.signature }}
-      if (/\{\{\s*operator\.signature(\|raw)?\s*}}/.test(html)) {
+    var containsReplyTemplate = function (html) {
+      // Check if the editor contains {{ operator.reply_template }}
+      if (/\{\{\s*operator\.reply_template(\|raw)?\s*}}/.test(html)) {
         if (! $container.find('.twig-sig-warning').length) {
           $container.append(
-            $('<div>', { class: "sp-alert sp-alert-warning sp-mt-3 sp-mb-0 twig-sig-warning", text: Lang.get('core.twig_operator_signature') })
+            $('<div>', { class: "sp-alert sp-alert-warning sp-mt-3 sp-mb-0 twig-sig-warning", text: Lang.get('core.twig_operator_reply_template') })
           );
         }
       } else {
@@ -184,8 +184,8 @@
       // Sync the textarea and editor.
       syncFn();
 
-      // Check if the editor contains {{ operator.signature }}.
-      containsSignature(html);
+      // Check if the editor contains {{ operator.reply_template }}.
+      containsReplyTemplate(html);
 
       // Check any twig code exists within HTML nodes or its' attributes.
       if (containsTwig(html)) {

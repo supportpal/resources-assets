@@ -1,6 +1,241 @@
 (function () {
+    var $tagSelectize, $assignSelectize;
+    var polling = new PollReplies(30000);
+    function PollReplies(milliseconds)
+    {
+        var lastReplyPoll, loopTimer, xhr,
+          startAfterTimer,
+          instance = this;
+
+        this.runNow = function (allMessages) {
+            instance.stop();
+
+            void 0;
+
+            return xhr = $.ajax({
+                url: laroute.route('ticket.operator.message.poll'),
+                data: {
+                    ticket_id: ticket.parameters().ticketId,
+                    lastPoll: lastReplyPoll,
+                    // Fetch all messages (included authed user) or just other users
+                    all: (typeof allMessages === 'undefined') ? 0 : 1
+                },
+                success: function(response) {
+                    // If there are notifications, show them
+                    if (response.status == 'success' && typeof response.data != 'undefined' && response.data !== null) {
+                        if (response.data.messages.length) {
+                            // Add each message
+                            $.each(response.data.messages, function (index, value) {
+                                ticket.insertMessage(value);
+                            });
+
+                            $('form.message-form').trigger("supportpal.polled_messages");
+                        }
+
+                        // If the browser supports, it enable the download all attachments function.
+                        if (ZipFile.isSupported()) {
+                            $('#tabMessages').find('ul.sp-attachments').each(function () {
+                                if ($(this).find('li').length > 1) {
+                                    $(this).find('.sp-download-all').show();
+                                }
+                            });
+                        }
+
+                        // Show other operators viewing ticket
+                        $('.ticket-viewing').replaceWith(response.data.viewing).show(500);
+                        // Depending on view, add margin to top or bottom of content area if visible (code in mobile.js)
+                        $(window).trigger('resize');
+
+                        // Show other operator's draft
+                        $.each(response.data.drafts, function (type, value) {
+                            var elements = { 0: $(".message-form"), 1: $(".notes-form"), 2: $(".forward-form") },
+                              $draftsElm = elements[type].find('.sp-drafts'),
+                              $draftIcon = $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-other-draft-icon');
+
+                            // Remove drafts which were not returned in the response.
+                            $draftsElm.find('.sp-draft-message').each(function () {
+                                var id = $(this).data('message-id');
+                                if (typeof value[id] === "undefined") {
+                                    $(this).remove();
+                                    $draftIcon.addClass('sp-hidden');
+                                }
+                            });
+
+                            // Show new drafts, and update existing ones.
+                            $.each(value, function (id, message) {
+                                var $message = $draftsElm.find('.sp-draft-message[data-message-id=' + id + ']');
+                                if ($message.length > 0) {
+                                    $message.find('.sp-draft-updated-at').html(message.model.updated_at);
+
+                                    // If the draft message is visible, update the content (via AJAX).
+                                    // If it's not visible, when the draft is expanded, it will automatically refresh via AJAX.
+                                    var $content = $message.find('.sp-draft-message-content');
+                                    if ($content.hasClass('sp-hidden') === false) {
+                                        $message.trigger('click').trigger('click');
+                                    }
+                                } else {
+                                    $draftsElm.append(message.template);
+                                }
+
+                                $draftIcon.removeClass('sp-hidden');
+                            });
+                        });
+
+                        // Update ticket details
+                        $('.last-action').html(response.data.details.updated_at);
+                        if (response.data.details.update) {
+                            // Update subject
+                            $('.sp-ticket-subject').text(response.data.details.subject);
+                            $('.sp-edit-subject').val(response.data.details.subject);
+
+                            // Update sidebar items
+                            $('.edit-user').html(response.data.details.user);
+                            $('select[name="department"]').val(response.data.details.department);
+                            $('select[name="priority"]').val(response.data.details.priority);
+
+                            // Update status in sidebar
+                            if ($('select[name="status"]').val() != response.data.details.status) {
+                                $('select[name="status"]').val(response.data.details.status);
+
+                                // Update the status dropdown in the notes box (only if it's changed)
+                                $('.notes-form, .forward-form').find('select[name="to_status"]').val(response.data.details.status);
+                            }
+
+                            $tagSelectize[0].selectize.clear(true);
+                            $tagSelectize[0].selectize.refreshOptions(false);
+                            $.each(response.data.details.tags, function(index, value) {
+                                $tagSelectize[0].selectize.addOption({ id: value.id, name: value.name, original_name: value.original_name, colour: value.colour, colour_text: value.colour_text });
+                                $tagSelectize[0].selectize.refreshOptions(false);
+                                $tagSelectize[0].selectize.addItem(value.original_name, true);
+                            });
+
+                            $assignSelectize[0].selectize.clear(true);
+                            $assignSelectize[0].selectize.refreshOptions(false);
+                            $.each(response.data.details.assigned, function(index, value) {
+                                $assignSelectize[0].selectize.addOption({ id: value.id, formatted_name: value.formatted_name, avatar_url: value.avatar_url });
+                                $assignSelectize[0].selectize.refreshOptions(false);
+                                $assignSelectize[0].selectize.addItem(value.id, true);
+                            });
+
+                            if (typeof ticket.ccSelectize()[0] !== 'undefined') {
+                                // We need to keep a list of the 'unremovable' options so they get added back properly.
+                                var options = [];
+                                $.each(ticket.ccSelectize()[0].selectize.options, function (index, option) {
+                                    if (typeof option.unremovable !== 'undefined' && option.unremovable) {
+                                        options.push(option);
+                                    }
+                                });
+                                $.each(response.data.details.cc, function (index, value) {
+                                    options.push({ text: value, value: value });
+                                });
+                                ticket.ccSelectize()[0].selectize.clear(true);
+                                ticket.ccSelectize()[0].selectize.refreshOptions(false);
+                                $.each(options, function (index, value) {
+                                    ticket.ccSelectize()[0].selectize.addOption(value);
+                                    ticket.ccSelectize()[0].selectize.refreshOptions(false);
+                                    ticket.ccSelectize()[0].selectize.addItem(value.value, true);
+                                });
+                            }
+
+                            $('.edit-slaplan').html(response.data.details.sla_plan_name);
+                            $('select[name="slaplan"]').val(response.data.details.sla_plan)
+                              .attr('data-id', response.data.details.sla_plan);
+                            $('.edit-duetime').html(response.data.details.due_time);
+                            // If it says 'set a due time', hide the trash can icon, else show it
+                            if (response.data.details.due_time == Lang.get('ticket.set_due_time')) {
+                                $('.update-duetime .remove-duetime').hide();
+                            } else {
+                                $('.update-duetime .remove-duetime').show();
+                            }
+
+                            // Update reply options status and if closed, hide close button
+                            if (response.data.details.status == closedStatusId) {
+                                $('.close-ticket').addClass('sp-hidden');
+                            } else {
+                                $('.close-ticket').removeClass('sp-hidden');
+                            }
+
+                            // Show/hide take button depending if self is assigned to ticket and only one assigned.
+                            var assigned = response.data.details.assigned.some(function(obj) {
+                                return obj.hasOwnProperty('id') && obj['id'] == operatorId;
+                            });
+                            if (assigned && response.data.details.assigned.length === 1) {
+                                $('.take-ticket').addClass('sp-hidden');
+                            } else {
+                                $('.take-ticket').removeClass('sp-hidden');
+                            }
+
+                            // If locked, show unlock button instead
+                            if (response.data.details.locked) {
+                                $('.lock-ticket').addClass('sp-hidden');
+                                $('h1 .fa-lock, .unlock-ticket').removeClass('sp-hidden');
+                            } else {
+                                $('.lock-ticket').removeClass('sp-hidden');
+                                $('h1 .fa-lock, .unlock-ticket').addClass('sp-hidden');
+                            }
+
+                            // Update log and escalation rules tables
+                            ticket.updateLogTable();
+                            ticket.updateEscalationsTable();
+                        }
+
+                        // Update custom fields
+                        if (typeof response.data.customfields != 'undefined') {
+                            $('#sidebar .customfields').html(response.data.customfields);
+                            // Enable hide/show password toggle, textarea editor and flatpickr if needed
+                            $('input[type=password]').hideShowPassword();
+                            customfieldEditor();
+                            $('.datepicker').datepicker();
+                        }
+
+                        $('#sidebar').trigger('refreshedSidebar');
+
+                        // Refresh timeago.
+                        if (typeof timeAgo !== 'undefined') {
+                            timeAgo.render($('time.timeago'));
+                        }
+                    }
+
+                    // Update the last poll time
+                    lastReplyPoll = response.timestamp;
+                },
+                dataType: "json"
+            });
+        };
+
+        this.start = function () {
+            instance.runNow().always(function () {
+                loopTimer = setTimeout(instance.start, milliseconds);
+            });
+        };
+
+        this.startAfter = function (milliseconds) {
+            void 0;
+            clearTimeout(startAfterTimer);
+            startAfterTimer = setTimeout(instance.start, milliseconds);
+        };
+
+        this.stop = function () {
+            void 0;
+            clearTimeout(loopTimer);
+            xhr && xhr.abort();
+        };
+
+        // When window is not active, stop polling.
+        $(document).on('visibilitychange', function () {
+            if (document.hidden) {
+                void 0;
+                instance.stop();
+            } else {
+                void 0;
+                instance.startAfter(2000);
+            }
+        });
+    }
+
     function Form() {
         var reply_selector = '#newMessage';
+        var forward_selector = '#newForward';
 
         /**
          * Key, value pair of editors which have been initialised.
@@ -9,6 +244,7 @@
          * @type {{}}
          */
         var editors = {};
+        var instance = this;
 
         var isInitialised = function (selector) {
             return editors.hasOwnProperty(selector) && editors[selector].hasOwnProperty('initialised')
@@ -19,6 +255,10 @@
             return editors.hasOwnProperty(selector) && editors[selector].hasOwnProperty('focused')
                 && editors[selector]['focused'] === true;
         }
+
+        var setEditor = function (selector, focus, editor) {
+            editors[selector] = {'initialised': true, 'focused': focus, 'editor': editor};
+        };
 
         var initEditor = function(selector, $form, opts, focus) {
             focus = typeof focus !== 'undefined' ? focus : true;
@@ -33,23 +273,22 @@
             }
 
             $(selector).editor(
-              $.extend(
-                {},
-                ticket.defaultEditorConfig(),
-                {
-                    oninit: function () {
-                        var editor = tinymce.get($(selector).prop('id'));
-                        loadEditorContent(selector, $form, editor);
+                $.extend(
+                    {},
+                    ticket.defaultEditorConfig(),
+                    {
+                        oninit: function (editor) {
+                            loadEditorContent(selector, $form, editor);
 
-                        if (focus && ! isFocused(selector)) {
-                            editor.focus();
+                            if (focus && ! isFocused(selector)) {
+                                editor.focus();
+                            }
+
+                            setEditor(selector, focus, editor);
                         }
-
-                        editors[selector] = {'initialised': true, 'focused': focus, 'editor': editor};
-                    }
-                },
-                opts
-              )
+                    },
+                    opts
+                )
             );
         };
 
@@ -98,6 +337,24 @@
               });
         };
 
+        var hideAllForms = function ()
+        {
+            $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
+            $('.message-form:not(.edit), .notes-form, .forward-form').hide();
+        };
+
+        var focusForm = function ($form, type)
+        {
+            if (! $form.is(':visible')) {
+                return;
+            }
+
+            $('.sp-reply-type .sp-action[data-type=' + type + ']').addClass('sp-active');
+
+            // Scroll to form
+            $('#content').animate({scrollTop: $form.position().top - 24}, 1000);
+        };
+
         this.destroyReplyForm = function () {
             if (! isInitialised(reply_selector)) {
                 return;
@@ -126,17 +383,299 @@
                     cumulativeMaxFileSize: $form.data('cumulative-max-file-size'),
                 }
             });
-            initEditor('#newForward', $form, editor_opts);
+            initEditor(forward_selector, $form, editor_opts);
         };
+
+        this.showReplyForm = function () {
+            hideAllForms();
+            const $form = $('.message-form:not(.edit)').toggle();
+            instance.initReplyForm();
+            focusForm($form, 0);
+        }
+
+        this.showNotesForm = function () {
+            hideAllForms();
+            const $form = $('.notes-form').toggle();
+            instance.initNotesForm();
+            focusForm($form, 1);
+        }
+
+        this.showForwardForm = function () {
+            hideAllForms();
+
+            var isFresh = $('.sp-reply-type .sp-action[data-type="2"]').hasClass('sp-fresh'),
+                editor_opts = {
+                    oninit: function (editor) {
+                        // Choose right message depending on reply order.
+                        var $message;
+                        if (ticket.parameters().replyOrder === 'ASC') {
+                            $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):last');
+                        } else {
+                            $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):first');
+                        }
+
+                        ticket.forwardFrom($message);
+                        setEditor(forward_selector, true, editor);
+                    }
+                };
+
+            const $form = $('.forward-form').toggle();
+            instance.initForwardForm(isFresh ? editor_opts : {});
+            if (isFresh) {
+                return;
+            }
+
+            focusForm($form, 2);
+        }
     }
 
+    function TicketViewAction()
+    {
+        var instance = this;
+        var run = function (route, data)
+        {
+            // Disable buttons and dropdowns
+            var selector = '.sp-quick-actions button, #sidebar button, #sidebar select',
+                $disabled = $(selector).filter(':disabled'),
+                fail = function () {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                };
+
+            $(selector).prop('disabled', true);
+
+            // Post data to perform action
+            return $.post(route, $.extend(data || {}, { ticket: ticket.parameters().ticketId }))
+                .done(function(response) {
+                    if (response.status === 'success') {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                        // Update log
+                        ticket.updateLogTable();
+
+                        polling.runNow();
+                    } else {
+                        fail();
+                    }
+                })
+                .fail(function() {
+                    fail();
+                })
+                .always(function() {
+                    // Enable buttons and dropdowns
+                    $(selector).not($disabled).prop('disabled', false);
+                });
+        }
+
+        var deleteTicket = function (block, force)
+        {
+            var type = block ? 'POST' : 'DELETE',
+                route = block ? laroute.route('ticket.operator.action.block') :
+                    (force ? laroute.route('ticket.operator.action.destroy') : laroute.route('ticket.operator.action.trash')),
+                successMessage = force ? 'messages.success_deleted' : 'messages.success_trashed',
+                errorMessage = force ? 'messages.error_deleted' : 'messages.error_trashed';
+
+            var success = function () {
+                Swal.fire(
+                    Lang.get('messages.success'),
+                    Lang.get(successMessage, { item: Lang.get('general.record') }),
+                    'success'
+                );
+
+                window.location.href = ticket.parameters().ticketGridUrl;
+            };
+
+            var ajaxParams = {
+                url: route,
+                type: type,
+                data: {ticket: ticket.parameters().ticketId}
+            };
+            if (force) {
+                (new deleteAlert({ ajax: ajaxParams }))
+                    .fireDefault(Lang.choice('ticket.ticket', 1), '', deleteRelations)
+                    .then(function (result) {
+                        if (result.value) {
+                            success();
+                        }
+                    });
+            } else {
+                $.ajax(ajaxParams)
+                    .then(function (response) {
+                        if (response.status == 'success') {
+                            return success();
+                        }
+
+                        throw new Error(response.statusText);
+                    })
+                    .catch(function () {
+                        Swal.fire(
+                            Lang.get('messages.error'),
+                            Lang.get(errorMessage, { item: Lang.get('general.record') }),
+                            'error'
+                        );
+                    });
+            }
+        }
+
+        this.take = function () {
+            run(laroute.route('ticket.operator.action.take'));
+        }
+
+        this.close = function () {
+            run(laroute.route('ticket.operator.action.close'))
+                .done(function () {
+                    window.location.href = ticket.parameters().ticketGridUrl;
+                });
+        }
+
+        this.lock = function () {
+            run(laroute.route('ticket.operator.action.lock'))
+                .done(function () {
+                    window.location.href = ticket.parameters().ticketGridUrl;
+                });
+        }
+
+        this.unlock = function () {
+            run(laroute.route('ticket.operator.action.unlock'));
+        }
+
+        this.deleteFromTrash = function () {
+            deleteTicket(false, true);
+        }
+
+        this.moveToTrash = function () {
+            deleteTicket(false, false);
+        }
+
+        this.block = function () {
+            deleteTicket(true, false);
+        }
+
+        this.watch = function () {
+            run(laroute.route('ticket.operator.action.watch'));
+            $('.watch-ticket').addClass('sp-hidden');
+            $('.unwatch-ticket').removeClass('sp-hidden');
+        }
+
+        this.unwatch = function () {
+            run(laroute.route('ticket.operator.action.unwatch'));
+            $('.watch-ticket').removeClass('sp-hidden');
+            $('.unwatch-ticket').addClass('sp-hidden');
+        }
+
+        this.merge = function () {
+            TicketAction.merge([ticket.parameters().ticketId])
+                .then(function (result) {
+                    if (result.value) {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+
+                        // We need to update a lot of details on the page. Quick fix, refresh the page.
+                        window.location.reload();
+                    }
+                });
+        }
+
+        this.unmerge = function () {
+            run(laroute.route('ticket.operator.action.unmerge'))
+                .done(function () {
+                    window.location.href = ticket.parameters().ticketGridUrl;
+                });
+        }
+
+        this.print = function () {
+            var $a = $('.sp-print-ticket a');
+            if ($a.length === 0) {
+                return;
+            }
+
+            window.open($a.attr('href'), '_blank');
+        };
+
+        this.addCollapsedMessageGroup = function () {
+            // Don't create if there's less than 2 messages, or a collapsed group already exists.
+            if ($('.sp-message.sp-message-collapsed').length <= 2 || $('.sp-collapsed-messages').length) {
+                return;
+            }
+
+            // Staff notes and ticket content regions of the screen
+            var regions = [".sp-messages-container[data-position='top']", ".sp-messages-container[data-position='inline']"];
+
+            for (var i = 0; i < regions.length; i++) {
+                // Build the basic selector
+                var basicSelector = $(regions[i] + ' > .sp-message.sp-message-collapsed');
+
+                // If this region of the screen has more than 2 collapsed messages, let's shrink it!
+                if (basicSelector.length > 2) {
+                    // Group the middle section of messages and hide them
+                    var items;
+                    if (ticket.parameters().replyOrder == 'ASC') {
+                        items = basicSelector.not(':first').not(':eq(-1)');
+                    } else {
+                        items = basicSelector.not(':last').not(':eq(0)');
+                    }
+
+                    items.wrapAll(
+                        "<div class='sp-collapsed-messages'><span>" + Lang.get('ticket.older_messages', {'count': items.length}) + "</span></div>"
+                    );
+                }
+            }
+
+            $('.sp-collapsed-messages').children().children().hide();
+        }
+
+        this.removeCollapsedMessageGroup = function () {
+            var $element = $('.sp-collapsed-messages');
+            $element.find('.sp-message').show();
+            $element.children().children().insertBefore($element);
+            $element.remove();
+        }
+
+        this.expand = function ($message) {
+            // AJAX load the message into the view.
+            ticket.loadMessage($message);
+
+            // Toggle between collapsed and collapsible mode
+            $message.find('.sp-message-text').children('.sp-message-text-original').show();
+            $message.find('.sp-message-text').children('.sp-message-text-trimmed').hide();
+            $message.removeClass('sp-message-collapsed');
+            $message.addClass('sp-message-collapsible');
+        }
+
+        this.collapse = function ($message) {
+            // If we're collapsing and the edit view is showing, hide it and show the normal message view.
+            if ($message.hasClass('sp-message-collapsible') && $message.find('.sp-message-text-edit').is(':visible')) {
+                $message.find('.sp-message-text').show();
+                $message.find('.sp-message-text-edit').hide();
+            }
+
+            // Toggle between collapsed and collapsible mode
+            $message.find('.sp-message-text').children('.sp-message-text-original').hide();
+            $message.find('.sp-message-text').children('.sp-message-text-trimmed').show();
+            $message.addClass('sp-message-collapsed');
+            $message.removeClass('sp-message-collapsible');
+        }
+
+        this.expandAll = function () {
+            instance.removeCollapsedMessageGroup();
+            $('#tabMessages .sp-message-collapsed').each(function () {
+                instance.expand($(this));
+            });
+
+            $('.expand-messages, .collapse-messages').toggle();
+        }
+
+        this.collapseAll = function () {
+            $('#tabMessages .sp-message-collapsible').each(function () {
+                instance.collapse($(this));
+            });
+
+            instance.addCollapsedMessageGroup();
+            $('.expand-messages, .collapse-messages').toggle();
+        }
+    }
+
+    App.extend('TicketViewAction', new TicketViewAction);
     App.extend('TicketViewForm', new Form);
 
-    $(document).ready(function() {
-
-        var polling = new PollReplies(30000);
-        polling.start();
-
+    $(document).ready(function() {;
         // Initialise reply editor.
         if ($('.sp-reply-type .sp-action[data-type=0]').hasClass('sp-active')) {
             App.TicketViewForm.initReplyForm({}, false);
@@ -153,131 +692,46 @@
 
         // Reply type
         $('.sp-reply-type .sp-action').on('click', function() {
-            // Hide all forms.
-            $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
-            $('.message-form:not(.edit), .notes-form, .forward-form').hide();
-
-            // Determine whether to show the reply, notes or forward form.
-            var $form;
             switch ($(this).data('type')) {
                 case 1:
-                    $form = $('.notes-form').toggle();
-                    App.TicketViewForm.initNotesForm();
+                    App.TicketViewForm.showNotesForm();
                     break;
 
                 case 2:
-                    var isFresh = $(this).hasClass('sp-fresh'),
-                      editor_opts = {
-                          oninit: function () {
-                              // Choose right message depending on reply order.
-                              var $message;
-                              if (ticket.parameters().replyOrder === 'ASC') {
-                                  $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):last');
-                              } else {
-                                  $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):first');
-                              }
-
-                              $message.find('a.forward-from-here').trigger('click');
-                          }
-                      };
-
-                    $form = $('.forward-form').toggle();
-                    App.TicketViewForm.initForwardForm(isFresh ? editor_opts : {});
-                    if (isFresh) {
-                        return;
-                    }
-
+                    App.TicketViewForm.showForwardForm();
                     break;
 
                 default:
-                    $form = $('.message-form:not(.edit)').toggle();
-                    App.TicketViewForm.initReplyForm();
-            }
-
-            // If form is now visible, focus in editor and scroll to it.
-            if ($form.is(':visible')) {
-                $(this).addClass('sp-active');
-
-                // Scroll to form
-                $('#content').animate({scrollTop: $form.position().top - 24}, 1000);
+                    App.TicketViewForm.showReplyForm();
             }
         });
 
         // Process take button
-        $('.take-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.take'));
-        });
+        $('.take-ticket').on('click', App.TicketViewAction.take);
         // Process close button
-        $('.close-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.close'));
-            $(document).ajaxStop(function () {
-                // Go back to ticket grid
-                window.location.href = ticket.parameters().ticketGridUrl;
-            });
-        });
+        $('.close-ticket').on('click', App.TicketViewAction.close);
         // Process lock button
-        $('.lock-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.lock'));
-            $(document).ajaxStop(function () {
-                // Go back to ticket grid
-                window.location.href = ticket.parameters().ticketGridUrl;
-            });
-        });
+        $('.lock-ticket').on('click', App.TicketViewAction.lock);
         // Process unlock button
-        $('.unlock-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.unlock'));
-        });
+        $('.unlock-ticket').on('click', App.TicketViewAction.unlock);
         // Process watch button
-        $('.watch-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.watch'));
-            $('.watch-ticket').hide();
-            $('.unwatch-ticket').show();
-        });
+        $('.watch-ticket').on('click', App.TicketViewAction.watch);
         // Process unwatch button
-        $('.unwatch-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.unwatch'));
-            $('.watch-ticket').show();
-            $('.unwatch-ticket').hide();
-        });
+        $('.unwatch-ticket').on('click', App.TicketViewAction.unwatch);
         // Process unmerge button
-        $('.unmerge-ticket').on('click', function() {
-            ticketAction(laroute.route('ticket.operator.action.unmerge'));
-            $(document).ajaxStop(function () {
-                // Go back to ticket grid
-                window.location.href = ticket.parameters().ticketGridUrl;
-            });
-        });
+        $('.unmerge-ticket').on('click', App.TicketViewAction.unmerge);
 
-        /**
-         * Merge Tickets
-         */
-        $(document).on('click', '.merge-ticket', function () {
-            TicketAction.merge([ticket.parameters().ticketId])
-              .then(function (result) {
-                  if (result.value) {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-
-                      // We need to update a lot of details on the page. Quick fix, refresh the page.
-                      window.location.reload();
-                  }
-              });
-        });
+        $(document).on('click', '.merge-ticket', App.TicketViewAction.merge);
 
         $('.restore-ticket').on('click', function () {
             restoreTicket();
         });
 
         // Process delete button
-        $('.delete-forever-ticket').on('click', function () {
-            deleteTicket(false, true);
-        });
-        $('.delete-ticket').on('click', function() {
-            deleteTicket(false, false);
-        });
+        $('.delete-forever-ticket').on('click', App.TicketViewAction.deleteFromTrash);
+        $('.delete-ticket').on('click', App.TicketViewAction.moveToTrash);
         // Process block button
-        $('.block-ticket').on('click', function() {
-            deleteTicket(true, false);
-        });
+        $('.block-ticket').on('click', App.TicketViewAction.block);
 
         /*
          * Handle updating the ticket side bar
@@ -294,9 +748,7 @@
         $ticketDetails.find('select[name=status]').on('change', function() {
             if (typeof closedStatusId !== 'undefined' && $(this).val() == closedStatusId) {
                 // If they closed the ticket, we want to handle this differently...
-                ticketAction(laroute.route('ticket.operator.action.close'));
-                $(document).ajaxStop(function () {
-                    // Update escalation rules table
+                TicketViewAction.close().always(function () {
                     ticket.updateEscalationsTable();
                 });
             } else {
@@ -315,74 +767,74 @@
 
             // Fetch matching SLA plans and update dropdown before displaying.
             $.get(
-              laroute.route('ticket.operator.ticket.slaPlans', {id: ticket.parameters().ticketId}),
-              function (response) {
-                  if (response.status == 'success') {
-                      $slaPlanDropdown = $ticketDetails.find('select[name="slaplan"]');
+                laroute.route('ticket.operator.ticket.slaPlans', {id: ticket.parameters().ticketId}),
+                function (response) {
+                    if (response.status == 'success') {
+                        $slaPlanDropdown = $ticketDetails.find('select[name="slaplan"]');
 
-                      // Empty dropdown.
-                      $slaPlanDropdown.empty();
+                        // Empty dropdown.
+                        $slaPlanDropdown.empty();
 
-                      // Add 'none' option.
-                      $slaPlanDropdown.append($('<option>', {
-                          value: 0,
-                          text: Lang.get('general.none')
-                      }));
+                        // Add 'none' option.
+                        $slaPlanDropdown.append($('<option>', {
+                            value: 0,
+                            text: Lang.get('general.none')
+                        }));
 
-                      // Add matching SLA plans as options.
-                      $.each(response.data, function (key, value) {
-                          $slaPlanDropdown.append($('<option>', {
-                              value: value.id,
-                              text: value.name
-                          }));
-                      });
+                        // Add matching SLA plans as options.
+                        $.each(response.data, function (key, value) {
+                            $slaPlanDropdown.append($('<option>', {
+                                value: value.id,
+                                text: value.name
+                            }));
+                        });
 
-                      // Set current SLA plan as selected value.
-                      $slaPlanDropdown.val($slaPlanDropdown.data('id'));
+                        // Set current SLA plan as selected value.
+                        $slaPlanDropdown.val($slaPlanDropdown.data('id'));
 
-                      // Display dropdown.
-                      $('.edit-slaplan, .update-slaplan').toggle();
-                  } else {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  }
-              }).fail(function () {
-                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-            });
+                        // Display dropdown.
+                        $('.edit-slaplan, .update-slaplan').toggle();
+                    } else {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    }
+                }).fail(function () {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                });
         });
         $ticketDetails.find('select[name="slaplan"]').on('change', function() {
             // Post data
             $.post(
-              laroute.route('ticket.operator.ticket.updateSlaPlan', { id: ticket.parameters().ticketId }),
-              { slaplan: $(this).val() },
-              function(response) {
-                  if (response.status == 'success') {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                      // Show escalation rules tabs if we have any
-                      if (response.data.escalationrules) {
-                          $('.sp-tabs #EscalationRules').show();
-                      } else {
-                          $('.sp-tabs #EscalationRules').hide();
-                      }
-                      // Switch back to edit link
-                      $('.edit-slaplan').addClass('sp-detail-link').html(response.data.name);
-                      $('.edit-slaplan, .update-slaplan').toggle();
-                      // Update due time
-                      $('.edit-duetime').html(response.data.time);
-                      // If it says 'set a due time', hide the trash can icon, else show it
-                      if (response.data.time == Lang.get('ticket.set_due_time')) {
-                          $('.update-duetime .remove-duetime').hide();
-                      } else {
-                          $('.update-duetime .remove-duetime').show();
-                      }
-                      // Update log and escalation rules tables
-                      ticket.updateLogTable();
-                      ticket.updateEscalationsTable();
-                  } else {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  }
-              }, "json").fail(function() {
-                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-            });
+                laroute.route('ticket.operator.ticket.updateSlaPlan', { id: ticket.parameters().ticketId }),
+                { slaplan: $(this).val() },
+                function(response) {
+                    if (response.status == 'success') {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                        // Show escalation rules tabs if we have any
+                        if (response.data.escalationrules) {
+                            $('.sp-tabs #EscalationRules').show();
+                        } else {
+                            $('.sp-tabs #EscalationRules').hide();
+                        }
+                        // Switch back to edit link
+                        $('.edit-slaplan').addClass('sp-detail-link').html(response.data.name);
+                        $('.edit-slaplan, .update-slaplan').toggle();
+                        // Update due time
+                        $('.edit-duetime').html(response.data.time);
+                        // If it says 'set a due time', hide the trash can icon, else show it
+                        if (response.data.time == Lang.get('ticket.set_due_time')) {
+                            $('.update-duetime .remove-duetime').hide();
+                        } else {
+                            $('.update-duetime .remove-duetime').show();
+                        }
+                        // Update log and escalation rules tables
+                        ticket.updateLogTable();
+                        ticket.updateEscalationsTable();
+                    } else {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    }
+                }, "json").fail(function() {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                });
         });
 
         // Update due time
@@ -400,32 +852,32 @@
 
             // Post data
             $.post(
-              laroute.route('ticket.operator.ticket.updateDueTime', { id: ticket.parameters().ticketId }),
-              {
-                  duetime_date: date,
-                  duetime_time: time
-              },
-              function(response) {
-                  if (response.status == 'success') {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                      // Update due time and hide form
-                      $('.edit-duetime').html(response.data);
-                      $('.update-duetime').hide();
-                      // If it says 'set a due time', hide the trash can icon, else show it
-                      if (response.data == Lang.get('ticket.set_due_time')) {
-                          $('.update-duetime .remove-duetime').hide();
-                      } else {
-                          $('.update-duetime .remove-duetime').show();
-                      }
-                      // Update log and escalation rules tables
-                      ticket.updateLogTable();
-                      ticket.updateEscalationsTable();
-                  } else {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  }
-              }, "json").fail(function() {
-                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-            });
+                laroute.route('ticket.operator.ticket.updateDueTime', { id: ticket.parameters().ticketId }),
+                {
+                    duetime_date: date,
+                    duetime_time: time
+                },
+                function(response) {
+                    if (response.status == 'success') {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                        // Update due time and hide form
+                        $('.edit-duetime').html(response.data);
+                        $('.update-duetime').hide();
+                        // If it says 'set a due time', hide the trash can icon, else show it
+                        if (response.data == Lang.get('ticket.set_due_time')) {
+                            $('.update-duetime .remove-duetime').hide();
+                        } else {
+                            $('.update-duetime .remove-duetime').show();
+                        }
+                        // Update log and escalation rules tables
+                        ticket.updateLogTable();
+                        ticket.updateEscalationsTable();
+                    } else {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    }
+                }, "json").fail(function() {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                });
         });
 
         // Update ticket custom fields
@@ -478,38 +930,38 @@
          * Update subject
          */
         var subject = $('.sp-edit-subject').val(),
-          updateSubject = function (context) {
-              // Only update if different
-              if (subject !== $(context).val()) {
-                  // Hide input and show new subject
-                  $(context).hide();
-                  $('.sp-ticket-subject').text($(context).val()).show();
+            updateSubject = function (context) {
+                // Only update if different
+                if (subject !== $(context).val()) {
+                    // Hide input and show new subject
+                    $(context).hide();
+                    $('.sp-ticket-subject').text($(context).val()).show();
 
-                  // Post data to perform action
-                  var url = laroute.route('ticket.operator.ticket.updateSubject', { id: ticket.parameters().ticketId });
-                  $.post(url, { subject: $(context).val() })
-                    .done(function (response) {
-                        if (response.status == 'success') {
-                            $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                            // Update subject
-                            subject = $('.edit-subject').val();
-                        } else {
+                    // Post data to perform action
+                    var url = laroute.route('ticket.operator.ticket.updateSubject', { id: ticket.parameters().ticketId });
+                    $.post(url, { subject: $(context).val() })
+                        .done(function (response) {
+                            if (response.status == 'success') {
+                                $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                                // Update subject
+                                subject = $('.edit-subject').val();
+                            } else {
+                                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                                // Show old subject
+                                $('.sp-ticket-subject').text(subject);
+                            }
+                        })
+                        .fail(function () {
                             $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
                             // Show old subject
                             $('.sp-ticket-subject').text(subject);
-                        }
-                    })
-                    .fail(function () {
-                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                        // Show old subject
-                        $('.sp-ticket-subject').text(subject);
-                    });
-              } else {
-                  // Hide input and show old subject
-                  $(context).hide();
-                  $('.sp-ticket-subject').show();
-              }
-          };
+                        });
+                } else {
+                    // Hide input and show old subject
+                    $(context).hide();
+                    $('.sp-ticket-subject').show();
+                }
+            };
 
         // Show edit input
         $('.sp-ticket-subject').on('click', function() {
@@ -532,14 +984,14 @@
         });
 
         $('.sp-edit-subject')
-          .on('keyup', function (e) {
-              if (e.keyCode === 13) {
-                  updateSubject(this);
-              }
-          })
-          .on('focusout', function () {
-              updateSubject(this);
-          });
+            .on('keyup', function (e) {
+                if (e.keyCode === 13) {
+                    updateSubject(this);
+                }
+            })
+            .on('focusout', function () {
+                updateSubject(this);
+            });
         /*
          * END update subject
          */
@@ -629,59 +1081,19 @@
             e.stopPropagation();
         });
 
-        $(document).on('click', '#tabMessages .sp-message-collapsed, #tabMessages .sp-message-collapsible .sp-message-header', function() {
-            // Get right object
-            var $this = $(this);
-            if ($this.parents('.sp-message-collapsible').length) {
-                $this = $this.parents('.sp-message-collapsible');
-            }
-
-            // AJAX load the message into the view.
-            ticket.loadMessage($this);
-
-            // If we're collapsing and the edit view is showing, hide it and show the normal message view.
-            if ($this.hasClass('sp-message-collapsible') && $this.find('.sp-message-text-edit').is(':visible')) {
-                $this.find('.sp-message-text, .sp-message-text-edit').toggle();
-            }
-
-            // Toggle between collapsed and collapsible mode
-            $this.find('.sp-message-text').children('.sp-message-text-original, .sp-message-text-trimmed').toggle();
-            $this.toggleClass('sp-message-collapsible sp-message-collapsed');
+        $(document).on('click', '#tabMessages .sp-message-collapsed', function () {
+            App.TicketViewAction.expand($(this));
+        });
+        $(document).on('click', '#tabMessages .sp-message-collapsible .sp-message-header', function() {
+            App.TicketViewAction.collapse($(this).parents('.sp-message-collapsible'));
         });
 
         // Collapse tickets with more than 2 collapsed messages
-        if ($('.sp-message.sp-message-collapsed').length > 2 && ! scrollToMessage) {
-            // Staff notes and ticket content regions of the screen
-            var regions = [".sp-messages-container[data-position='top']", ".sp-messages-container[data-position='inline']"];
-
-            for (var i = 0; i < regions.length; i++) {
-                // Build the basic selector
-                var basicSelector = $(regions[i] + ' > .sp-message.sp-message-collapsed');
-
-                // If this region of the screen has more than 2 collapsed messages, let's shrink it!
-                if (basicSelector.length > 2) {
-                    // Group the middle section of messages and hide them
-                    var items;
-                    if (ticket.parameters().replyOrder == 'ASC') {
-                        items = basicSelector.not(':first').not(':eq(-1)');
-                    } else {
-                        items = basicSelector.not(':last').not(':eq(0)');
-                    }
-
-                    items.wrapAll(
-                      "<div class='sp-collapsed-messages'><span>" + Lang.get('ticket.older_messages', {'count': items.length}) + "</span></div>"
-                    );
-                }
-            }
-
-            $('.sp-collapsed-messages').children().children().hide();
+        if (! scrollToMessage) {
+            App.TicketViewAction.addCollapsedMessageGroup();
 
             // Make the new hidden group displayable again
-            $('.sp-collapsed-messages').on('click', function(event) {
-                $(this).find('.sp-message').show();
-                $(this).children().children().insertBefore($(this));
-                $(this).remove();
-            });
+            $('.sp-collapsed-messages').on('click', App.TicketViewAction.removeCollapsedMessageGroup);
         }
         /*
          * END Toggle long tickets (>5 messages)
@@ -696,15 +1108,8 @@
         }
 
         // Expand/collapse all messages on click
-        $('.expand-messages, .collapse-messages').on('click', function() {
-            if ($(this).hasClass('expand-messages')) {
-                $('.sp-collapsed-messages').trigger('click');
-                $('#tabMessages .sp-message-collapsed').trigger('click');
-            } else {
-                $('#tabMessages .sp-message-collapsible .sp-message-header').trigger('click');
-            }
-            $('.expand-messages, .collapse-messages').toggle();
-        });
+        $('.expand-messages').on('click', App.TicketViewAction.expandAll);
+        $('.collapse-messages').on('click', App.TicketViewAction.collapseAll);
         /*
          * END Expand/collapse all messages
          */
@@ -715,6 +1120,14 @@
         ticket.loadAttachmentPreviews($('.sp-message.sp-message-collapsible'));
         /*
          * END Show ticket attachment previews
+         */
+
+        /*
+         * Check ticket mentions for current user
+         */
+        ticket.highlightUserMentions($('.sp-message'));
+        /*
+         * END Check ticket mentions for current user
          */
 
         /*
@@ -796,7 +1209,7 @@
                 // Check both message drafts and note drafts.
                 for (var editorId in drafts) {
                     var $textarea = $('#'+editorId),
-                      $form = $textarea.parents('form');
+                        $form = $textarea.parents('form');
 
                     // Only if it's an editor (e.g. not for Twitter replies)
                     if (tinymce.get(editorId)) {
@@ -882,7 +1295,7 @@
                         $('.sp-reply-type .sp-action[data-type="2"]').addClass('sp-fresh');
                         ticket.setForwardDraft(null);
                     } else {
-                        $('#newMessage').editor().setContent(ticket.parameters().signature);
+                        $('#newMessage').editor().setContent(ticket.parameters().replyTemplate);
                         $('#newMessage').editor().focus();
                         ticket.setMessageDraft(null);
                     }
@@ -1019,27 +1432,27 @@
          * Initialise Forward tab.
          */
         var userSearchSelectizeConfig = {
-              render: {
-                  item: function(item, escape) {
-                      return '<div class="item' + (item.unremovable ? ' unremovable' : '') + '">' + escape(item.value) + '</div>';
-                  },
-                  option: function(item, escape) {
-                      return '<div>' +
+            render: {
+                item: function(item, escape) {
+                    return '<div class="item' + (item.unremovable ? ' unremovable' : '') + '">' + escape(item.value) + '</div>';
+                },
+                option: function(item, escape) {
+                    return '<div>' +
                         '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" /> &nbsp;' +
                         escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') +
                         (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') +
                         '</div>';
-                  }
-              },
-              load: function(query, callback) {
-                  if (!query.length) return callback();
+                }
+            },
+            load: function(query, callback) {
+                if (!query.length) return callback();
 
-                  // Hide Add CC / Add BCC to stop spinner from overlapping.
-                  var $elements = $('.add-cc:visible, .add-bcc:visible');
-                  $elements.hide();
+                // Hide Add CC / Add BCC to stop spinner from overlapping.
+                var $elements = $('.add-cc:visible, .add-bcc:visible');
+                $elements.hide();
 
-                  // Search for users
-                  $.get(laroute.route('user.operator.search'), { brand_id: ticket.parameters().brandId, q: query })
+                // Search for users
+                $.get(laroute.route('user.operator.search'), { brand_id: ticket.parameters().brandId, q: query })
                     .done(function(res) {
                         res.data = res.data.map(function(value) {
                             // Add needed info for search and selected item to work.
@@ -1054,12 +1467,12 @@
                     .always(function () {
                         $elements.show();
                     });
-              }
-          },
-          $forwardFromSelectize = $('select[name="from_address"]').selectize(fromSelectizeConfig),
-          $forwardToSelectize = $('select[name="to_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig)),
-          $forwardCcSelectize = $('select[name="cc_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig)),
-          $forwardBccSelectize = $('select[name="bcc_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig));
+                }
+            },
+            $forwardFromSelectize = $('select[name="from_address"]').selectize(fromSelectizeConfig),
+            $forwardToSelectize = $('select[name="to_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig)),
+            $forwardCcSelectize = $('select[name="cc_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig)),
+            $forwardBccSelectize = $('select[name="bcc_address[]"]').selectize($.extend({ }, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig));
 
         /**
          * Reply options.
@@ -1165,13 +1578,13 @@
                     brand_id: ticket.parameters().brandId,
                     operators: 1
                 })
-                  .done(function(res) {
-                      self.addOptionGroup(Lang.choice('user.user', 1), { label: Lang.choice('user.user', 2) });
-                      self.addOptionGroup(Lang.choice('general.operator', 1), { label: Lang.choice('general.operator', 2) });
-                      self.refreshOptions();
-                      callback(res.data);
-                  })
-                  .fail(function() { callback(); });
+                    .done(function(res) {
+                        self.addOptionGroup(Lang.choice('user.user', 1), { label: Lang.choice('user.user', 2) });
+                        self.addOptionGroup(Lang.choice('general.operator', 1), { label: Lang.choice('general.operator', 2) });
+                        self.refreshOptions();
+                        callback(res.data);
+                    })
+                    .fail(function() { callback(); });
             },
             onChange: function(value) {
                 if (value) {
@@ -1212,9 +1625,9 @@
                     }
                 }).fail(function() {
                     Swal.fire(
-                      Lang.get('messages.error'),
-                      Lang.get('messages.error_created', { item: Lang.get('general.record') }),
-                      'error'
+                        Lang.get('messages.error'),
+                        Lang.get('messages.error_created', { item: Lang.get('general.record') }),
+                        'error'
                     );
 
                     $button.prop('disabled', false);
@@ -1277,22 +1690,22 @@
             render: {
                 item: function(item, escape) {
                     return '<div class="item" style="background-color: ' + escape(item.colour) + '; color: ' + escape(item.colour_text) + '">'
-                      + escape(item.name)
-                      + '</div>';
+                        + escape(item.name)
+                        + '</div>';
                 },
                 option: function(item, escape) {
                     return '<div>'
-                      + '<i class="fas fa-circle" style="color: ' + escape(item.colour) +'"></i>'
-                      + '&nbsp; ' + escape(item.name)
-                      + '</div>';
+                        + '<i class="fas fa-circle" style="color: ' + escape(item.colour) +'"></i>'
+                        + '&nbsp; ' + escape(item.name)
+                        + '</div>';
                 }
             },
             load: function(query, callback) {
                 if (!query.length) return callback();
 
                 $.get(laroute.route('ticket.operator.tag.search'), { q: query })
-                  .done(function(res) { callback(res.data); })
-                  .fail(function() { callback(); });
+                    .done(function(res) { callback(res.data); })
+                    .fail(function() { callback(); });
             },
             onChange: function(tags) {
                 if (!tags) {
@@ -1301,18 +1714,18 @@
                 }
                 // Detach and re-attach the list of assigned tags
                 $.post(laroute.route('ticket.operator.ticket.assignTags', { id: ticket.parameters().ticketId }), { 'tags': tags } )
-                  .done(function(data) {
-                      if (data.status == 'success') {
-                          $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                          return;
-                      }
+                    .done(function(data) {
+                        if (data.status == 'success') {
+                            $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                            return;
+                        }
 
-                      // Else, an error occurred
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  })
-                  .fail(function(data) {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  });
+                        // Else, an error occurred
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    })
+                    .fail(function(data) {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    });
             }
         });
 
@@ -1330,15 +1743,15 @@
             render: {
                 item: function(item, escape) {
                     return '<div class="item">'
-                      + '<img class="sp-avatar sp-max-w-3xs" src="' + escape(item.avatar_url) + '" />&nbsp; '
-                      + escape(item.formatted_name)
-                      + '</div>';
+                        + '<img class="sp-avatar sp-max-w-3xs" src="' + escape(item.avatar_url) + '" />&nbsp; '
+                        + escape(item.formatted_name)
+                        + '</div>';
                 },
                 option: function(item, escape) {
                     return '<div>'
-                      + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; '
-                      + escape(item.formatted_name)
-                      + '</div>';
+                        + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; '
+                        + escape(item.formatted_name)
+                        + '</div>';
                 }
             },
             load: function(query, callback) {
@@ -1348,8 +1761,8 @@
                 var route = laroute.route('ticket.operator.department.search', { id: $('select[name="department"]').val() });
 
                 $.get( route, { s: query, brand_id: ticket.parameters().brandId })
-                  .done(function(res) { callback(res.data); })
-                  .fail(function() { callback(); });
+                    .done(function(res) { callback(res.data); })
+                    .fail(function() { callback(); });
             },
             onChange: function(assigned_operators) {
                 if (!assigned_operators) {
@@ -1358,21 +1771,21 @@
                 }
                 // Detach and re-attach the list of assigned operators
                 $.post( laroute.route('ticket.operator.action.assign'), { ticket: ticket.parameters().ticketId, operator: assigned_operators, replace: true } )
-                  .done(function(data) {
-                      if (data.status == 'success') {
-                          $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                    .done(function(data) {
+                        if (data.status == 'success') {
+                            $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 
-                          polling.runNow();
+                            polling.runNow();
 
-                          return;
-                      }
+                            return;
+                        }
 
-                      // Else, an error occurred
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  })
-                  .fail(function(data) {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  });
+                        // Else, an error occurred
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    })
+                    .fail(function(data) {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    });
             }
         });
 
@@ -1381,16 +1794,16 @@
          */
         $(document).on('click', '.add-link', function () {
             TicketAction.link(ticket.parameters().ticketId)
-              .then(function (result) {
-                  if (result.value) {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                .then(function (result) {
+                    if (result.value) {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 
-                      // Update linked tickets list
-                      $('.linked-tickets-list').html(result.value.data);
+                        // Update linked tickets list
+                        $('.linked-tickets-list').html(result.value.data);
 
-                      // Update log
-                      ticket.updateLogTable();
-                  }
+                        // Update log
+                        ticket.updateLogTable();
+                    }
               });
         });
 
@@ -1481,43 +1894,43 @@
 
         $(document).on('click', '.save-followup', function() {
             var $button = $(this),
-              saveFollowUp = function ($button) {
-                  // Disable button
-                  $button.prop('disabled', true);
+                saveFollowUp = function ($button) {
+                    // Disable button
+                    $button.prop('disabled', true);
 
-                  var data = $('.followup-form').serializeArray();
-                  data.push({ name: 'ticket', value: ticket.parameters().ticketId });
+                    var data = $('.followup-form').serializeArray();
+                    data.push({ name: 'ticket', value: ticket.parameters().ticketId });
 
-                  // Post updated data
-                  return $.ajax({
-                      url: $('.followup-form').data('uri'),
-                      type: $('.followup-form').data('method'),
-                      data: data,
-                      dataType: 'json'
-                  }).done(function(response) {
-                      if (response.status == 'success') {
-                          $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                    // Post updated data
+                    return $.ajax({
+                        url: $('.followup-form').data('uri'),
+                        type: $('.followup-form').data('method'),
+                        data: data,
+                        dataType: 'json'
+                    }).done(function(response) {
+                        if (response.status == 'success') {
+                            $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 
-                          // Show warning message
-                          $('.followup-warning').show().find('span').html(response.message);
+                            // Show warning message
+                            $('.followup-warning').show().find('span').html(response.message);
 
-                          // Reload follow up tab
-                          refreshFollowUpTab();
-                      } else {
-                          $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                            // Reload follow up tab
+                            refreshFollowUpTab();
+                        } else {
+                            $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
 
-                          // Re-enable button
-                          $(this).prop('disabled', false);
-                      }
+                            // Re-enable button
+                            $(this).prop('disabled', false);
+                        }
 
-                      return response;
-                  }).fail(function() {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                        return response;
+                    }).fail(function() {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
 
-                      // Re-enable button
-                      $button.prop('disabled', false);
-                  });
-              };
+                        // Re-enable button
+                        $button.prop('disabled', false);
+                    });
+                };
 
             if ($('table.rule-table tr.rule:visible').length === 0) {
                 // Show the alert
@@ -1550,22 +1963,22 @@
                 }
             };
             (new deleteAlert(params))
-              .fireDefault(Lang.get('ticket.follow_up'))
-              .then(function (result) {
-                  if (result.value) {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                .fireDefault(Lang.get('ticket.follow_up'))
+                .then(function (result) {
+                    if (result.value) {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 
-                      // Update warning message or hide it if no more follow ups.
-                      if (result.value.message != null && result.value.message.length > 0) {
-                          $('.followup-warning').show().find('span').html(result.value.message);
-                      } else {
-                          $('.followup-warning').hide();
-                      }
+                        // Update warning message or hide it if no more follow ups.
+                        if (result.value.message != null && result.value.message.length > 0) {
+                            $('.followup-warning').show().find('span').html(result.value.message);
+                        } else {
+                            $('.followup-warning').hide();
+                        }
 
-                      // Reload table
-                      $('#tabFollowup .dataTable').dataTable().api().ajax.reload();
-                  }
-              });
+                        // Reload table
+                        $('#tabFollowup .dataTable').dataTable().api().ajax.reload();
+                    }
+                });
         });
 
         function updateTicket(data) {
@@ -1579,63 +1992,35 @@
 
             // Post updated data
             $.post(
-              laroute.route('ticket.operator.action.update'),
-              data,
-              function(response) {
-                  if (response.status == 'success') {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                      // Update log
-                      ticket.updateLogTable();
-                      // Specific case for updating user
-                      if (response.message != 'undefined' && response.message == 'ticket_user_updated') {
-                          $('.edit-user').text(response.data);
-                          $('.update-user').hide();
+                laroute.route('ticket.operator.action.update'),
+                data,
+                function(response) {
+                    if (response.status == 'success') {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                        // Update log
+                        ticket.updateLogTable();
+                        // Specific case for updating user
+                        if (response.message != 'undefined' && response.message == 'ticket_user_updated') {
+                            $('.edit-user').text(response.data);
+                            $('.update-user').hide();
 
-                          // We need to update a lot of details on the page. Quick fix, refresh the page.
-                          window.location.reload();
+                            // We need to update a lot of details on the page. Quick fix, refresh the page.
+                            window.location.reload();
 
-                          // Show success message while page loads
-                          $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                      }
+                            // Show success message while page loads
+                            $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                        }
 
-                      polling.runNow();
-                  } else {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  }
-              }, "json").fail(function() {
-                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-            }).always(function() {
-                // Enable buttons and dropdowns
-                $(selector).not($disabled).prop('disabled', false);
-            });
-        }
-
-        function ticketAction(route, data) {
-            // Disable buttons and dropdowns
-            var selector = '.sp-quick-actions button, #sidebar button, #sidebar select',
-              $disabled = $(selector).filter(':disabled');
-            $(selector).prop('disabled', true);
-
-            // Post data to perform action
-            $.post(
-              route,
-              $.extend(data || {}, { ticket: ticket.parameters().ticketId }),
-              function(response) {
-                  if (response.status == 'success') {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                      // Update log
-                      ticket.updateLogTable();
-
-                      polling.runNow();
-                  } else {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  }
-              }, "json").fail(function() {
-                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-            }).always(function() {
-                // Enable buttons and dropdowns
-                $(selector).not($disabled).prop('disabled', false);
-            });
+                        polling.runNow();
+                    } else {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    }
+                }, "json").fail(function() {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                }).always(function() {
+                    // Enable buttons and dropdowns
+                    $(selector).not($disabled).prop('disabled', false);
+                });
         }
 
         function changeDepartment(data) {
@@ -1646,107 +2031,107 @@
 
             // Post data to perform action
             $.post(
-              laroute.route('ticket.operator.action.department'),
-              $.extend(data || {}, { ticket: ticket.parameters().ticketId }),
-              function(response) {
-                  if (response.status == 'success') {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                laroute.route('ticket.operator.action.department'),
+                $.extend(data || {}, { ticket: ticket.parameters().ticketId }),
+                function(response) {
+                    if (response.status == 'success') {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 
-                      // Check we're still allowed to view ticket.
-                      if (! response.data.operator_can_view) {
-                          window.location.reload(); // Reload, this will redirect back to the grid with an error message.
-                          return;
-                      }
+                        // Check we're still allowed to view ticket.
+                        if (! response.data.operator_can_view) {
+                            window.location.reload(); // Reload, this will redirect back to the grid with an error message.
+                            return;
+                        }
 
-                      // Update log
-                      ticket.updateLogTable();
+                        // Update log
+                        ticket.updateLogTable();
 
-                      // Update assigned operators and remove operators from the dropdown that are no longer assigned.
-                      $assignSelectize[0].selectize.loadedSearches = {};
-                      $assignSelectize[0].selectize.setValue(response.data.assigned, true);
-                      $.each($assignSelectize[0].selectize.options, function (index, value) {
-                          if ($.inArray(value.id, response.data.assigned) === -1) {
-                              $assignSelectize[0].selectize.removeOption(value.id);
-                          }
-                      });
-                      $assignSelectize[0].selectize.refreshOptions(false);
+                        // Update assigned operators and remove operators from the dropdown that are no longer assigned.
+                        $assignSelectize[0].selectize.loadedSearches = {};
+                        $assignSelectize[0].selectize.setValue(response.data.assigned, true);
+                        $.each($assignSelectize[0].selectize.options, function (index, value) {
+                            if ($.inArray(value.id, response.data.assigned) === -1) {
+                                $assignSelectize[0].selectize.removeOption(value.id);
+                            }
+                        });
+                        $assignSelectize[0].selectize.refreshOptions(false);
 
-                      polling.runNow();
+                        polling.runNow();
 
-                      // If the ticket has a department email dropdown
-                      var first,
-                        $fromSelectize = $('select[name="department_email"]');
-                      if ($fromSelectize.length) {
-                          // Update department emails list
-                          first = null;
-                          $fromSelectize[0].selectize.clearOptions();
-                          $.each(response.data.emails, function (index, value) {
-                              if (first === null) first = index;
-                              $fromSelectize[0].selectize.addOption({value: index, text: value});
-                              $fromSelectize[0].selectize.refreshOptions(false);
-                          });
-                          // Select first option
-                          $fromSelectize[0].selectize.addItem(first, true);
-                      }
+                        // If the ticket has a department email dropdown
+                        var first,
+                            $fromSelectize = $('select[name="department_email"]');
+                        if ($fromSelectize.length) {
+                            // Update department emails list
+                            first = null;
+                            $fromSelectize[0].selectize.clearOptions();
+                            $.each(response.data.emails, function (index, value) {
+                                if (first === null) first = index;
+                                $fromSelectize[0].selectize.addOption({value: index, text: value});
+                                $fromSelectize[0].selectize.refreshOptions(false);
+                            });
+                            // Select first option
+                            $fromSelectize[0].selectize.addItem(first, true);
+                        }
 
-                      // Update the forward department email list.
-                      var $forwardFromSelectize = $('select[name="from_address"]');
-                      if ($forwardFromSelectize.length) {
-                          first = null;
+                        // Update the forward department email list.
+                        var $forwardFromSelectize = $('select[name="from_address"]');
+                        if ($forwardFromSelectize.length) {
+                            first = null;
 
-                          // Get the "me" option.
-                          var me = $('select[name="from_address"]')[0].selectize.options.me;
+                            // Get the "me" option.
+                            var me = $('select[name="from_address"]')[0].selectize.options.me;
 
-                          // Reset the list.
-                          $forwardFromSelectize[0].selectize.clearOptions();
-                          $.each(response.data.emails, function (index, value) {
-                              if (first === null) first = index;
-                              $forwardFromSelectize[0].selectize.addOption({value: index, text: value});
-                              $forwardFromSelectize[0].selectize.refreshOptions(false);
-                          });
+                            // Reset the list.
+                            $forwardFromSelectize[0].selectize.clearOptions();
+                            $.each(response.data.emails, function (index, value) {
+                                if (first === null) first = index;
+                                $forwardFromSelectize[0].selectize.addOption({value: index, text: value});
+                                $forwardFromSelectize[0].selectize.refreshOptions(false);
+                            });
 
-                          // Add "me" option back.
-                          $forwardFromSelectize[0].selectize.addOption({value: me.value, text: me.text});
-                          $forwardFromSelectize[0].selectize.refreshOptions(false);
+                            // Add "me" option back.
+                            $forwardFromSelectize[0].selectize.addOption({value: me.value, text: me.text});
+                            $forwardFromSelectize[0].selectize.refreshOptions(false);
 
-                          // Select first option
-                          $forwardFromSelectize[0].selectize.addItem(first, true);
-                      }
+                            // Select first option
+                            $forwardFromSelectize[0].selectize.addItem(first, true);
+                        }
 
-                      // Update custom fields
-                      if (typeof response.data.customfields != 'undefined') {
-                          $('#sidebar .customfields').html(response.data.customfields);
+                        // Update custom fields
+                        if (typeof response.data.customfields != 'undefined') {
+                            $('#sidebar .customfields').html(response.data.customfields);
 
-                          // Just check to see if we have any custom fields for this department
-                          if ($('#sidebar .customfields').html().trim() == '') {
-                              // None - hide custom fields box
-                              $('#sidebar .customfields').parents('.sidebox').hide();
-                          } else {
-                              // We do - show custom fields box
-                              $('#sidebar .customfields').parents('.sidebox').show();
-                              // Enable hide/show password toggle and textarea editor if needed
-                              $('input[type=password]').hideShowPassword();
-                              customfieldEditor();
-                          }
-                      }
+                            // Just check to see if we have any custom fields for this department
+                            if ($('#sidebar .customfields').html().trim() == '') {
+                                // None - hide custom fields box
+                                $('#sidebar .customfields').parents('.sidebox').hide();
+                            } else {
+                                // We do - show custom fields box
+                                $('#sidebar .customfields').parents('.sidebox').show();
+                                // Enable hide/show password toggle and textarea editor if needed
+                                $('input[type=password]').hideShowPassword();
+                                customfieldEditor();
+                            }
+                        }
 
-                      // Update department templates.
-                      departmentTemplates = response.data.templates;
+                        // Update department templates.
+                        departmentTemplates = response.data.templates;
 
-                      // Force run that code that checks if we can send the email to user/operators, by mocking events.
-                      $('.message-form select[name="to_status"]').trigger('change');
+                        // Force run that code that checks if we can send the email to user/operators, by mocking events.
+                        $('.message-form select[name="to_status"]').trigger('change');
 
-                      // Refresh follow up tab
-                      refreshFollowUpTab();
-                  } else {
-                      $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-                  }
-              }, "json").fail(function() {
-                $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-            }).always(function() {
-                // Enable buttons and dropdowns
-                $(selector).not($disabled).prop('disabled', false);
-            });
+                        // Refresh follow up tab
+                        refreshFollowUpTab();
+                    } else {
+                        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                    }
+                }, "json").fail(function() {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                }).always(function() {
+                    // Enable buttons and dropdowns
+                    $(selector).not($disabled).prop('disabled', false);
+                });
         }
 
         function restoreTicket() {
@@ -1770,55 +2155,6 @@
             });
         }
 
-        function deleteTicket(block, force) {
-            var type = block ? 'POST' : 'DELETE',
-              route = block ? laroute.route('ticket.operator.action.block') :
-                (force ? laroute.route('ticket.operator.action.destroy') : laroute.route('ticket.operator.action.trash')),
-              successMessage = force ? 'messages.success_deleted' : 'messages.success_trashed',
-              errorMessage = force ? 'messages.error_deleted' : 'messages.error_trashed';
-
-            var success = function () {
-                Swal.fire(
-                  Lang.get('messages.success'),
-                  Lang.get(successMessage, { item: Lang.get('general.record') }),
-                  'success'
-                );
-
-                window.location.href = ticket.parameters().ticketGridUrl;
-            };
-
-            var ajaxParams = {
-                url: route,
-                type: type,
-                data: {ticket: ticket.parameters().ticketId}
-            };
-            if (force) {
-                (new deleteAlert({ ajax: ajaxParams }))
-                  .fireDefault(Lang.choice('ticket.ticket', 1), '', deleteRelations)
-                  .then(function (result) {
-                      if (result.value) {
-                          success();
-                      }
-                  });
-            } else {
-                $.ajax(ajaxParams)
-                  .then(function (response) {
-                      if (response.status == 'success') {
-                          return success();
-                      }
-
-                      throw new Error(response.statusText);
-                  })
-                  .catch(function () {
-                      Swal.fire(
-                        Lang.get('messages.error'),
-                        Lang.get(errorMessage, { item: Lang.get('general.record') }),
-                        'error'
-                      );
-                  });
-            }
-        }
-
         function applyMacro(macroId) {
             var data = {
                 macro: macroId,
@@ -1826,29 +2162,29 @@
             };
 
             return $.post(laroute.route('ticket.operator.macro.apply'), data)
-              .then(function (response) {
-                  if (response.status == 'success') {
-                      $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-                      if (response.data.deleted) {
-                          // Deleted ticket - go back to ticket grid
-                          setTimeout(function() {
-                              window.location.href = ticket.parameters().ticketGridUrl;
-                          }, 2000);
-                      } else {
-                          // Update log
-                          ticket.updateLogTable();
+                .then(function (response) {
+                    if (response.status == 'success') {
+                        $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
+                        if (response.data.deleted) {
+                            // Deleted ticket - go back to ticket grid
+                            setTimeout(function() {
+                                window.location.href = ticket.parameters().ticketGridUrl;
+                            }, 2000);
+                        } else {
+                            // Update log
+                            ticket.updateLogTable();
 
-                          polling.runNow(true);
-                      }
+                            polling.runNow(true);
+                        }
 
-                      return response;
-                  }
+                        return response;
+                    }
 
-                  throw new Error(response.statusText);
-              })
-              .catch(function () {
-                  $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-              });
+                    throw new Error(response.statusText);
+                })
+                .catch(function () {
+                    $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
+                });
         }
 
         function refreshFollowUpTab(edit) {
@@ -1860,278 +2196,145 @@
 
             // Fetch view
             $.get(
-              laroute.route('ticket.operator.followup.render', {id: ticket.parameters().ticketId, edit: edit}), { },
-              function(response) {
-                  if (response.status == 'success') {
-                      // Update form
-                      $('#tabFollowup').html(response.data);
+                laroute.route('ticket.operator.followup.render', {id: ticket.parameters().ticketId, edit: edit}), { },
+                function(response) {
+                    if (response.status == 'success') {
+                        // Update form
+                        $('#tabFollowup').html(response.data);
 
-                      // Initialise date picker.
-                      $('.datepicker').datepicker();
+                        // Initialise date picker.
+                        $('.datepicker').datepicker();
 
-                      // Initialise sortable.
-                      $("#sortable").sortable({
-                          draggable: '.rule',
-                          ghostClass: 'sp-opacity-50',
-                          handle: '.sp-sortable-handle',
-                      });
+                        // Initialise sortable.
+                        $("#sortable").sortable({
+                            draggable: '.rule',
+                            ghostClass: 'sp-opacity-50',
+                            handle: '.sp-sortable-handle',
+                        });
 
-                      // Initialise timepicker.
-                      $('.followup-form')
-                        .find('.timepicker')
-                        .timepicker();
+                        // Initialise timepicker.
+                        $('.followup-form')
+                            .find('.timepicker')
+                            .timepicker();
 
-                      // Handle rules on refreshing tab, this will call code in escalationrule.js
-                      $(".rule:first :input").prop('disabled', true);
-                      $('.rule').filter(function() { return $(this).css("display") != "none"; }).find('.rule-action select').trigger('change');
-                  } else {
-                      // Show message to refresh
-                      $('#tabFollowup').html(Lang.get('messages.please_refresh'));
-                  }
-              }, "json").fail(function() {
-                // Show message to refresh
-                $('#tabFollowup').html(Lang.get('messages.please_refresh'));
-            });
+                        // Handle rules on refreshing tab, this will call code in escalationrule.js
+                        $(".rule:first :input").prop('disabled', true);
+                        $('.rule').filter(function() { return $(this).css("display") != "none"; }).find('.rule-action select').trigger('change');
+                    } else {
+                        // Show message to refresh
+                        $('#tabFollowup').html(Lang.get('messages.please_refresh'));
+                    }
+                }, "json").fail(function() {
+                    // Show message to refresh
+                    $('#tabFollowup').html(Lang.get('messages.please_refresh'));
+                });
         }
 
-        /*
-         * Polling for new messages & other ticket related updates
-         */
-        var $tagSelectize, $assignSelectize;
-
-        function PollReplies(milliseconds)
-        {
-            var lastReplyPoll, loopTimer, xhr,
-              startAfterTimer,
-              instance = this;
-
-            this.runNow = function (allMessages) {
-                instance.stop();
-
-                void 0;
-
-                return xhr = $.ajax({
-                    url: laroute.route('ticket.operator.message.poll'),
-                    data: {
-                        ticket_id: ticket.parameters().ticketId,
-                        lastPoll: lastReplyPoll,
-                        // Fetch all messages (included authed user) or just other users
-                        all: (typeof allMessages === 'undefined') ? 0 : 1
-                    },
-                    success: function(response) {
-                        // If there are notifications, show them
-                        if (response.status == 'success' && typeof response.data != 'undefined' && response.data !== null) {
-                            if (response.data.messages.length) {
-                                // Add each message
-                                $.each(response.data.messages, function (index, value) {
-                                    ticket.insertMessage(value);
-                                });
-
-                                $('form.message-form').trigger("supportpal.polled_messages");
-                            }
-
-                            // If the browser supports, it enable the download all attachments function.
-                            if (ZipFile.isSupported()) {
-                                $('#tabMessages').find('ul.sp-attachments').each(function () {
-                                    if ($(this).find('li').length > 1) {
-                                        $(this).find('.sp-download-all').show();
-                                    }
-                                });
-                            }
-
-                            // Show other operators viewing ticket
-                            $('.ticket-viewing').replaceWith(response.data.viewing).show(500);
-                            // Depending on view, add margin to top or bottom of content area if visible (code in mobile.js)
-                            $(window).trigger('resize');
-
-                            // Show other operator's draft
-                            $.each(response.data.drafts, function (type, value) {
-                                var elements = { 0: $(".message-form"), 1: $(".notes-form"), 2: $(".forward-form") },
-                                  $draftsElm = elements[type].find('.sp-drafts'),
-                                  $draftIcon = $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-other-draft-icon');
-
-                                // Remove drafts which were not returned in the response.
-                                $draftsElm.find('.sp-draft-message').each(function () {
-                                    var id = $(this).data('message-id');
-                                    if (typeof value[id] === "undefined") {
-                                        $(this).remove();
-                                        $draftIcon.addClass('sp-hidden');
-                                    }
-                                });
-
-                                // Show new drafts, and update existing ones.
-                                $.each(value, function (id, message) {
-                                    var $message = $draftsElm.find('.sp-draft-message[data-message-id=' + id + ']');
-                                    if ($message.length > 0) {
-                                        $message.find('.sp-draft-updated-at').html(message.model.updated_at);
-
-                                        // If the draft message is visible, update the content (via AJAX).
-                                        // If it's not visible, when the draft is expanded, it will automatically refresh via AJAX.
-                                        var $content = $message.find('.sp-draft-message-content');
-                                        if ($content.hasClass('sp-hidden') === false) {
-                                            $message.trigger('click').trigger('click');
-                                        }
-                                    } else {
-                                        $draftsElm.append(message.template);
-                                    }
-
-                                    $draftIcon.removeClass('sp-hidden');
-                                });
-                            });
-
-                            // Update ticket details
-                            $('.last-action').html(response.data.details.updated_at);
-                            if (response.data.details.update) {
-                                // Update subject
-                                $('.sp-ticket-subject').text(response.data.details.subject);
-                                $('.sp-edit-subject').val(response.data.details.subject);
-
-                                // Update sidebar items
-                                $('.edit-user').html(response.data.details.user);
-                                $('select[name="department"]').val(response.data.details.department);
-                                $('select[name="priority"]').val(response.data.details.priority);
-
-                                // Update status in sidebar
-                                if ($('select[name="status"]').val() != response.data.details.status) {
-                                    $('select[name="status"]').val(response.data.details.status);
-
-                                    // Update the status dropdown in the notes box (only if it's changed)
-                                    $('.notes-form, .forward-form').find('select[name="to_status"]').val(response.data.details.status);
-                                }
-
-                                $tagSelectize[0].selectize.clear(true);
-                                $tagSelectize[0].selectize.refreshOptions(false);
-                                $.each(response.data.details.tags, function(index, value) {
-                                    $tagSelectize[0].selectize.addOption({ id: value.id, name: value.name, original_name: value.original_name, colour: value.colour, colour_text: value.colour_text });
-                                    $tagSelectize[0].selectize.refreshOptions(false);
-                                    $tagSelectize[0].selectize.addItem(value.original_name, true);
-                                });
-
-                                $assignSelectize[0].selectize.clear(true);
-                                $assignSelectize[0].selectize.refreshOptions(false);
-                                $.each(response.data.details.assigned, function(index, value) {
-                                    $assignSelectize[0].selectize.addOption({ id: value.id, formatted_name: value.formatted_name, avatar_url: value.avatar_url });
-                                    $assignSelectize[0].selectize.refreshOptions(false);
-                                    $assignSelectize[0].selectize.addItem(value.id, true);
-                                });
-
-                                if (typeof ticket.ccSelectize()[0] !== 'undefined') {
-                                    // We need to keep a list of the 'unremovable' options so they get added back properly.
-                                    var options = [];
-                                    $.each(ticket.ccSelectize()[0].selectize.options, function (index, option) {
-                                        if (typeof option.unremovable !== 'undefined' && option.unremovable) {
-                                            options.push(option);
-                                        }
-                                    });
-                                    $.each(response.data.details.cc, function (index, value) {
-                                        options.push({ text: value, value: value });
-                                    });
-                                    ticket.ccSelectize()[0].selectize.clear(true);
-                                    ticket.ccSelectize()[0].selectize.refreshOptions(false);
-                                    $.each(options, function (index, value) {
-                                        ticket.ccSelectize()[0].selectize.addOption(value);
-                                        ticket.ccSelectize()[0].selectize.refreshOptions(false);
-                                        ticket.ccSelectize()[0].selectize.addItem(value.value, true);
-                                    });
-                                }
-
-                                $('.edit-slaplan').html(response.data.details.sla_plan_name);
-                                $('select[name="slaplan"]').val(response.data.details.sla_plan)
-                                  .attr('data-id', response.data.details.sla_plan);
-                                $('.edit-duetime').html(response.data.details.due_time);
-                                // If it says 'set a due time', hide the trash can icon, else show it
-                                if (response.data.details.due_time == Lang.get('ticket.set_due_time')) {
-                                    $('.update-duetime .remove-duetime').hide();
-                                } else {
-                                    $('.update-duetime .remove-duetime').show();
-                                }
-
-                                // Update reply options status and if closed, hide close button
-                                if (response.data.details.status == closedStatusId) {
-                                    $('.close-ticket').addClass('hide');
-                                } else {
-                                    $('.close-ticket').removeClass('hide');
-                                }
-
-                                // Show/hide take button depending if self is assigned to ticket and only one assigned.
-                                var assigned = response.data.details.assigned.some(function(obj) {
-                                    return obj.hasOwnProperty('id') && obj['id'] == operatorId;
-                                });
-                                if (assigned && response.data.details.assigned.length === 1) {
-                                    $('.take-ticket').addClass('hide');
-                                } else {
-                                    $('.take-ticket').removeClass('hide');
-                                }
-
-                                // If locked, show unlock button instead
-                                if (response.data.details.locked) {
-                                    $('.lock-ticket').addClass('hide');
-                                    $('h1 .fa-lock, .unlock-ticket').removeClass('hide');
-                                } else {
-                                    $('.lock-ticket').removeClass('hide');
-                                    $('h1 .fa-lock, .unlock-ticket').addClass('hide');
-                                }
-
-                                // Update log and escalation rules tables
-                                ticket.updateLogTable();
-                                ticket.updateEscalationsTable();
-                            }
-
-                            // Update custom fields
-                            if (typeof response.data.customfields != 'undefined') {
-                                $('#sidebar .customfields').html(response.data.customfields);
-                                // Enable hide/show password toggle, textarea editor and flatpickr if needed
-                                $('input[type=password]').hideShowPassword();
-                                customfieldEditor();
-                                $('.datepicker').datepicker();
-                            }
-
-                            $('#sidebar').trigger('refreshedSidebar');
-
-                            // Refresh timeago.
-                            if (typeof timeAgo !== 'undefined') {
-                                timeAgo.render($('time.timeago'));
-                            }
-                        }
-
-                        // Update the last poll time
-                        lastReplyPoll = response.timestamp;
-                    },
-                    dataType: "json"
-                });
-            };
-
-            this.start = function () {
-                instance.runNow().always(function () {
-                    loopTimer = setTimeout(instance.start, milliseconds);
-                });
-            };
-
-            this.startAfter = function (milliseconds) {
-                void 0;
-                clearTimeout(startAfterTimer);
-                startAfterTimer = setTimeout(instance.start, milliseconds);
-            };
-
-            this.stop = function () {
-                void 0;
-                clearTimeout(loopTimer);
-                xhr && xhr.abort();
-            };
-
-            // When window is not active, stop polling.
-            $(document).on('visibilitychange', function () {
-                if (document.hidden) {
-                    void 0;
-                    instance.stop();
-                } else {
-                    void 0;
-                    instance.startAfter(2000);
-                }
-            });
-        }
-        /*
-         * END polling of new messages
-         */
+        polling.start();
     });
+
+    /*
+     * Keyboard shortcuts.
+     */
+    App.KeyboardShortcuts.SHORTCUT_FOCUS_REPLY_FORM.bind(App.TicketViewForm.showReplyForm);
+    App.KeyboardShortcuts.SHORTCUT_FOCUS_NOTES_FORM.bind(App.TicketViewForm.showNotesForm);
+    App.KeyboardShortcuts.SHORTCUT_FOCUS_FORWARD_FORM.bind(App.TicketViewForm.showForwardForm);
+    App.KeyboardShortcuts.SHORTCUT_TOGGLE_USER_DETAILS.bind(function () {
+        if ($('#tabUser').is(':visible')) {
+            $('ul.sp-tabs li#Ticket').click();
+        } else {
+            $('ul.sp-tabs li#User').click();
+        }
+    });
+    App.KeyboardShortcuts.SHORTCUT_TAKE_TICKET.bind(function () {
+        if (! shortcutIsPermitted('take-ticket')) {
+            return;
+        }
+
+        shortcutConfirmationPopup(Lang.get('core.shortcut_take_ticket'), App.TicketViewAction.take);
+    });
+    App.KeyboardShortcuts.SHORTCUT_CLOSE_TICKET.bind(function () {
+        if (! shortcutIsPermitted('close-ticket')) {
+            return;
+        }
+
+        shortcutConfirmationPopup(Lang.get('core.shortcut_close_ticket'), App.TicketViewAction.close);
+    });
+    App.KeyboardShortcuts.SHORTCUT_LOCK_TICKET.bind(function () {
+        if (! shortcutIsPermitted('lock-ticket')) {
+            return;
+        }
+
+        shortcutConfirmationPopup(Lang.get('core.shortcut_lock_ticket'), App.TicketViewAction.lock);
+    });
+    App.KeyboardShortcuts.SHORTCUT_UNLOCK_TICKET.bind(function () {
+        if (! shortcutIsPermitted('unlock-ticket')) {
+            return;
+        }
+
+        App.TicketViewAction.unlock();
+    });
+    App.KeyboardShortcuts.SHORTCUT_TRASH_TICKET.bind(function () {
+        if (! shortcutIsPermitted('delete-ticket')) {
+            return;
+        }
+
+        shortcutConfirmationPopup(Lang.get('core.shortcut_trash_ticket'), App.TicketViewAction.moveToTrash);
+    });
+    App.KeyboardShortcuts.SHORTCUT_BLOCK_USER.bind(function () {
+        if (! shortcutIsPermitted('block-ticket')) {
+            return;
+        }
+
+        shortcutConfirmationPopup(Lang.get('core.shortcut_block_user'), App.TicketViewAction.block);
+    });
+    App.KeyboardShortcuts.SHORTCUT_WATCH_TICKET.bind(function () {
+        if (! shortcutIsPermitted('watch-ticket')) {
+            return;
+        }
+
+        App.TicketViewAction.watch();
+    });
+    App.KeyboardShortcuts.SHORTCUT_UNWATCH_TICKET.bind(function () {
+        if (! shortcutIsPermitted('unwatch-ticket')) {
+            return;
+        }
+
+        App.TicketViewAction.unwatch();
+    });
+    App.KeyboardShortcuts.SHORTCUT_MERGE_TICKET.bind(function () {
+        if (! shortcutIsPermitted('merge-ticket')) {
+            return;
+        }
+
+        App.TicketViewAction.merge();
+    });
+    App.KeyboardShortcuts.SHORTCUT_UNMERGE_TICKET.bind(function () {
+        if (! shortcutIsPermitted('unmerge-ticket')) {
+            return;
+        }
+
+        shortcutConfirmationPopup(Lang.get('core.shortcut_unmerge_ticket'), App.TicketViewAction.unmerge);
+    });
+    App.KeyboardShortcuts.SHORTCUT_EXPAND_ALL.bind(App.TicketViewAction.expandAll);
+    App.KeyboardShortcuts.SHORTCUT_COLLAPSE_ALL.bind(App.TicketViewAction.collapseAll);
+    App.KeyboardShortcuts.SHORTCUT_PRINT_TICKET.bind(App.TicketViewAction.print);
+
+    var shortcutIsPermitted = function (className) {
+        var $elm = $('.' + className);
+
+        return ! ($elm.length === 0 || $elm.hasClass('sp-hidden'));
+    };
+
+    var shortcutConfirmationPopup = function (title, action) {
+        Swal.fire({
+            title: title,
+            showCancelButton: true,
+            confirmButtonText: Lang.choice('general.submit', 1),
+            preConfirm: action
+        });
+    };
+    /*
+     * END Keyboard shortcuts.
+     */
 })();

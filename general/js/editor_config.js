@@ -113,7 +113,7 @@
         convert_urls: false,
         // empty paragraphs are padded with a non-breaking space
         // https://www.tiny.cloud/docs/configure/content-filtering/#extended_valid_elements
-        extended_valid_elements: '#p',
+        extended_valid_elements: 'data[contenteditable=false|class|value],#p',
         // styleselect toolbar configuration
         // https://www.tiny.cloud/docs-4x/configure/content-formatting/#style_formats
         style_formats: [

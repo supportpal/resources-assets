@@ -305,6 +305,7 @@ $(function () {
         onShow: function (instance) {
             return instance.reference.hasAttribute('data-tippy-content')
                 && ! instance.reference.classList.contains('tox-edit-area__iframe')
+                && ! instance.reference.classList.contains('tox-collection__item')
                 && instance.reference.getAttribute('data-tippy-content').length > 0;
         },
         target: '[title]',
@@ -336,6 +337,11 @@ $(function () {
     $(document.body)
         // Tabs toggling
         .on('click', 'ul.sp-tabs li', function () {
+            // Don't do this if it's an actual link.
+            if ($(this).find('a[href]:not([href=#])').length) {
+                return;
+            }
+
             // Get name of tab
             var name = $(this).attr('id');
 

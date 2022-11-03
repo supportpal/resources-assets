@@ -109,6 +109,12 @@ $(document).ready(function() {
             $selector.parents('.sp-form-container').show();
         }
 
+        // Remove editor.
+        var editor = tinymce.get($sectionItem.find('textarea.tox-editor').attr('id'));
+        if (editor) {
+            editor.remove();
+        }
+
         // Remove the template.
         $sectionItem.remove();
     });

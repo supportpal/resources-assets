@@ -1,0 +1,413 @@
+/* General */
+
+h1 {
+    @apply sp-text-primary-800;
+}
+
+.sp-theme-dark h1 {
+    @apply sp-text-primary;
+}
+
+h2 {
+    @apply sp-mb-6 sp-text-2xl sp-font-normal sp-leading-none;
+}
+
+h3 {
+    @apply sp-my-6 sp-text-xl sp-font-normal sp-leading-none;
+}
+
+h4 {
+    @apply sp-m-0 sp-text-lg;
+}
+
+body > .sp-alert-sticky {
+    @apply sp-sticky sp-px-6 sp-mb-0 sp-rounded-none sp-z-50;
+    top: 3rem;
+}
+
+@screen xs {
+    body > .sp-alert-sticky {
+        top: 3.5rem;
+    }
+}
+
+@screen lg {
+    body > .sp-alert-sticky {
+        @apply sp-px-8;
+        top: 4rem;
+    }
+}
+
+/* Header */
+
+header .sp-container {
+    height: 3rem;
+}
+
+.sp-logo {
+    max-height: 2rem;
+}
+
+@screen xs {
+    header .sp-container {
+        height: 3.5rem;
+    }
+
+    .sp-logo {
+        max-height: 2.5rem;
+    }
+
+    .sp-mobile-nav-button {
+        @apply sp-py-1;
+    }
+}
+
+@screen lg {
+    header .sp-container {
+        height: 4rem;
+    }
+
+    .sp-logo {
+        max-height: 3rem;
+    }
+}
+
+.sp-mobile-nav-button div {
+    @apply sp-border-primary-800 sp-text-primary-800;
+}
+
+.sp-theme-dark .sp-mobile-nav-button div {
+    @apply sp-border-white sp-text-white;
+}
+
+.sp-mobile-nav-button div:hover {
+    @apply sp-bg-primary-800 sp-text-white;
+}
+
+.sp-theme-dark .sp-mobile-nav-button div:hover {
+    @apply sp-bg-white sp-text-primary-800;
+}
+
+.sp-mobile-nav-button svg {
+    @apply sp-fill-current;
+    height: 1.375rem;
+    width: 1.375rem;
+}
+
+.sp-mobile-nav {
+    margin-top: 3rem;
+    max-height: calc(100% - 3rem);
+}
+
+body.sp-mobile-nav-open {
+    @apply sp-overflow-hidden;
+}
+
+body.sp-mobile-nav-open .sp-content {
+    @apply sp-opacity-50;
+}
+
+@screen xs {
+    .sp-mobile-nav {
+        margin-top: 3.5rem;
+        max-height: calc(100% - 3.5rem);
+    }
+}
+
+@screen lg {
+    .sp-mobile-nav {
+        @apply sp-hidden !important;
+    }
+
+    body.sp-mobile-nav-open {
+        @apply sp-overflow-auto;
+    }
+
+    body.sp-mobile-nav-open .sp-content {
+        @apply sp-opacity-100;
+    }
+}
+
+.sp-search form {
+    @apply sp-relative sp-w-full;
+}
+
+.sp-search form:before {
+    @apply sp-absolute sp-text-primary sp-font-bold;
+    content: "\f002";
+    font-family: var(--font-icon);
+    left: 0.75rem;
+    top: 0.5rem;
+}
+
+.sp-search input {
+    @apply sp-w-full sp-m-0;
+    padding-left: 2.25rem;
+}
+
+/* Navigation */
+
+ul.sp-nav,
+ul.sp-nav ul {
+    @apply sp-list-none;
+}
+
+ul.sp-nav li {
+    @apply sp-whitespace-nowrap;
+}
+
+ul.sp-nav li a {
+    @apply sp-block sp-py-3/2 sp-text-primary-200 sp-text-lg;
+}
+
+ul.sp-nav li a:hover {
+    @apply sp-text-white;
+}
+
+ul.sp-nav li a.current {
+    @apply sp-text-white sp-font-bold;
+}
+
+ul.sp-nav ul li a {
+    @apply sp-pl-5;
+}
+
+ul.sp-nav .nav-item {
+    @apply sp-truncate;
+}
+
+@screen lg {
+    ul.sp-nav li a {
+        @apply sp-text-base;
+    }
+}
+
+/* Breadcrumb */
+
+.sp-breadcrumb,
+.sp-breadcrumb a {
+    @apply sp-text-secondary;
+}
+
+/* Sidebar */
+
+.sp-sidebar .sp-sidebar-box + .sp-sidebar-box {
+    @apply sp-pt-8 sp-mt-8 sp-border-t sp-border-tertiary;
+}
+
+.sp-sidebar h2 {
+    @apply sp-text-secondary;
+}
+
+.sp-sidebar ul {
+    @apply sp-p-0 sp-m-0;
+}
+
+.sp-sidebar ul li {
+    @apply sp-py-1/2;
+}
+
+.sp-sidebar ul,
+.sp-sidebar ul.sp-nav li {
+    @apply sp-p-0;
+}
+
+.sp-sidebar ul.sp-nav li a {
+    @apply sp-px-3 sp-text-primary sp-truncate;
+}
+
+.sp-sidebar ul.sp-nav ul li a {
+    @apply sp-pl-8;
+}
+
+.sp-sidebar ul.sp-nav li a:hover {
+    @apply sp-text-secondary;
+}
+
+.sp-sidebar ul.sp-nav li a.current {
+    @apply sp-bg-primary sp-border-r-4 sp-border-primary-800 sp-rounded sp-shadow sp-text-primary;
+}
+
+.sp-sidebar ul.sp-nav li a.current:hover {
+    @apply sp-text-primary;
+}
+
+.sp-sidebar input[type="checkbox"],
+.sp-sidebar input[type="email"],
+.sp-sidebar input[type="number"],
+.sp-sidebar input[type="password"],
+.sp-sidebar input[type="radio"],
+.sp-sidebar input[type="search"],
+.sp-sidebar input[type="tel"],
+.sp-sidebar input[type="text"],
+.sp-sidebar input[type="url"],
+.sp-sidebar select,
+.sp-sidebar textarea {
+    @apply sp-bg-primary sp-border-primary;
+}
+
+.sp-sidebar input[type="email"],
+.sp-sidebar input[type="number"],
+.sp-sidebar input[type="password"],
+.sp-sidebar input[type="search"],
+.sp-sidebar input[type="tel"],
+.sp-sidebar input[type="text"],
+.sp-sidebar input[type="url"] {
+    @apply sp-w-full;
+}
+
+.sp-sidebar input[type="checkbox"],
+.sp-sidebar input[type="radio"] {
+    @apply sp-bg-primary sp-border-primary;
+}
+
+.sp-sidebar input[type="checkbox"]::before,
+.sp-sidebar input[type="radio"]:before {
+    @apply sp-border-primary;
+}
+
+.sp-sidebar input[type="checkbox"]:hover::before,
+.sp-sidebar input[type="radio"]:hover::before {
+    @apply sp-bg-primary;
+}
+.sp-sidebar input[type="radio"]:checked::before,
+.sp-sidebar input[type="radio"]:checked:hover::before {
+    @apply sp-bg-green-600;
+}
+
+.sp-sidebar select {
+    @apply sp-max-w-full;
+}
+
+.sp-sidebar .sp-form-row {
+    @apply sp-mb-4;
+}
+
+.sp-sidebar .sp-form-row:last-child {
+    @apply sp-mb-0;
+}
+
+.sp-sidebar .sp-form-row label {
+    @apply sp-text-secondary sp-text-sm;
+}
+
+.sp-sidebar .sp-form-button {
+    @apply sp-ml-0;
+}
+
+.sp-sidebar .sp-collapsible {
+    @apply sp-bg-tertiary;
+}
+
+@screen lg {
+    .sp-sidebar .sp-collapsible.lg\:sp-hidden + .sp-hidden {
+        @apply sp-block !important;
+    }
+}
+
+/* Dashboard */
+
+.sp-dashboard-section {
+    @apply sp-p-6 sp-pt-0 sp--mx-6 sp-mb-6 sp-border-b sp-border-tertiary;
+}
+
+.sp-dashboard-section:last-child {
+    @apply sp-pb-0 sp-mb-0 sp-border-0;
+}
+
+.sp-dashboard-section .sp-collapsible {
+    @apply sp-p-0 sp-bg-transparent sp-rounded-none sp-shadow-none sp-font-normal;
+}
+
+.sp-dashboard-section .sp-icon .fas {
+    @apply sp-text-primary-800;
+}
+
+.sp-theme-dark .sp-dashboard-section .sp-icon .fas {
+    @apply sp-text-primary;
+}
+
+/* Ticket View */
+
+.sp-ticket-details .sp-form-row {
+    @apply sp-mb-3;
+}
+
+.sp-ticket-details .sp-form-row label {
+    @apply sp-mb-0;
+}
+
+.sp-recipients {
+    @apply sp-border sp-border-b-0 sp-border-tertiary sp-rounded-t;
+}
+
+.sp-recipients div.sp-table-row > div.sp-table-cell {
+    @apply sp-w-full sp-px-2 sp-py-3/2 sp-align-middle;
+}
+
+.sp-recipients div.sp-table-row > div.sp-table-cell:first-child {
+    @apply sp-w-auto sp-pr-0 sp-text-secondary sp-text-right sp-whitespace-nowrap;
+}
+
+.sp-recipients .sp-recipients-text {
+    @apply sp-whitespace-normal;
+}
+
+.sp-recipients .sp-recipients-input .selectize-input {
+    @apply sp-min-w-0 sp-whitespace-normal;
+}
+
+/* Comments */
+
+.sp-comment {
+    @apply sp-p-4;
+}
+
+.sp-comment .sp-comment {
+    @apply sp-border-0 sp-p-0;
+}
+
+.sp-comment .sp-comment:first-child {
+    @apply sp-mt-3;
+}
+
+/* Social Login */
+
+a.sp-social-login {
+    @apply sp-relative sp-inline-block sp-py-1 sp-rounded-full sp-text-white sp-cursor-pointer;
+}
+
+a.sp-social-login:hover {
+    @apply sp-text-white sp-opacity-75 sp-cursor-pointer;
+}
+
+/* Pagination */
+
+.pagination,
+.pager {
+    @apply sp-list-none sp-pl-0 sp-mt-6 sp-text-center;
+}
+
+.pagination li,
+.pager li {
+    @apply sp-inline;
+}
+
+.pagination li > a,
+.pager li > a,
+.pagination li > span,
+.pager li > span {
+    @apply sp-inline-block sp-px-3 sp-py-1 sp-border sp-border-secondary sp-rounded;
+}
+
+.pagination li > a:hover,
+.pager li > a:hover,
+.pagination li.active > span,
+.pager li.active > span {
+    @apply sp-bg-secondary;
+}
+
+.pagination li.disabled > span,
+.pager li.disabled > span {
+    @apply sp-opacity-50;
+}

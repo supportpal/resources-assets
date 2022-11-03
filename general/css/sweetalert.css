@@ -19,7 +19,7 @@ body.swal2-height-auto {
 }
 
 .swal2-title {
-    @apply sp-mb-4 sp-text-primary;
+    @apply sp-p-0 sp-mb-3 sp-text-primary;
 }
 
 .swal2-html-container {

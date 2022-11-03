@@ -17,11 +17,12 @@
             ticketId: null,
             userId: null,
             brandId: null,
+            departmentId: null,
             notesPosition: null,
             replyOrder: null,
             forwardFileUpload: null,
             ticketGridUrl: null,
-            signature: '',
+            replyTemplate: '',
             selfservice: true
         };
 
@@ -215,6 +216,7 @@
 
             // Load attachment previews if needed.
             instance.loadAttachmentPreviews(message);
+            instance.highlightUserMentions(message);
 
             // Special effects, set as blue for 10 seconds.
             message.toggleClass('sp-new-message', 1000);
@@ -270,13 +272,13 @@
 
                     var replyType = $form.find('input[name="reply_type"]').val();
 
-                    // Only add the signature back to the message reply box (not notes).
+                    // Only add the reply template back to the message reply box (not notes).
                     if (replyType == '1') {
                         self.setNoteDraft(null);
                     } else if (replyType == '2') {
                         self.setForwardDraft(null);
                     } else {
-                        $textarea.editor().setContent(parameters.signature);
+                        $textarea.editor().setContent(parameters.replyTemplate);
                         self.setMessageDraft(null);
                     }
 
@@ -742,6 +744,27 @@
         };
 
         /**
+         * Forward all messages from the given one.
+         *
+         * @param $message
+         */
+        this.forwardFrom = function ($message) {
+            // Uncollapse messages first
+            App.TicketViewAction.removeCollapsedMessageGroup();
+
+            // Fetch the list of messages from this one based on the reply order, we always want latest first
+            // like you would get in an email client.
+            var $messages;
+            if (parameters.replyOrder === 'ASC') {
+                $messages = $message.prevUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack().reverse();
+            } else {
+                $messages = $message.nextUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack();
+            }
+
+            instance.forward($messages);
+        }
+
+        /**
          * Populate editor with the specified messages to forward.
          *
          * @param $messages
@@ -750,12 +773,16 @@
             // Lock the interface and show a waiting spinner (this may take a while on a large ticket).
             Swal.fire({
                 title: Lang.get('general.loading'),
-                allowOutsideClick: false
+                allowOutsideClick: false,
+                focusConfirm: false,
+                focusDeny: false,
+                focusCancel: false,
+                returnFocus: false,
             });
             Swal.showLoading();
 
             // Switch to Forward tab.
-            $('.sp-reply-type .sp-action[data-type="2"]').removeClass('sp-fresh').show().trigger('click');
+            App.TicketViewForm.showForwardForm();
 
             // Delete any attachments currently tied to the form.
             var deferred = [];
@@ -818,7 +845,7 @@
                 });
 
                 // Make forwarded message.
-                var message = parameters.signature
+                var message = parameters.replyTemplate
                     + '<br /><br />'
                     + '<div class="expandable"></div>'
                     + '<div class="supportpal_quote">'
@@ -866,12 +893,25 @@
         };
 
         /**
+         * Highlight ticket mentions.
+         *
+         * @param $message
+         */
+        this.highlightUserMentions = function ($message) {
+            $message.find('.sp-editor-content .sp-mention:not(.sp-current-user)').each(function () {
+                if ($(this).attr('value') === instance.parameters().authUserId) {
+                    $(this).addClass('sp-current-user');
+                }
+            });
+        };
+
+        /**
          * Default editor config.
          *
          * @returns {Object}
          */
         this.defaultEditorConfig = function () {
-            var plugins = $.fn.editor.defaults.plugins.concat(['cannedresponses']),
+            var plugins = $.fn.editor.defaults.plugins.concat(['mentions', 'cannedresponses', 'autosavecursor']),
                 toolbar = $.fn.editor.defaults.toolbar + ' | cannedresponses';
             if (parameters.selfservice) {
                 plugins.push('selfservice');
@@ -884,7 +924,8 @@
                 // Plugin settings.
                 ticketId: this.parameters().ticketId,
                 userId: this.parameters().userId,
-                brandId: this.parameters().brandId
+                brandId: this.parameters().brandId,
+                departmentId: this.parameters().departmentId
             };
         };
 
@@ -1123,19 +1164,7 @@
                     event.stopPropagation();
                     event.preventDefault();
 
-                    // Uncollapse messages first
-                    $('.sp-collapsed-messages').trigger('click');
-
-                    // Fetch the list of messages from this one based on the reply order, we always want latest first
-                    // like you would get in an email client.
-                    var $messages;
-                    if (parameters.replyOrder == 'ASC') {
-                        $messages = $(this).parents('.sp-message').prevUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack().reverse();
-                    } else {
-                        $messages = $(this).parents('.sp-message').nextUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack();
-                    }
-
-                    instance.forward($messages);
+                    instance.forwardFrom($(this).parents('.sp-message'));
                 })
 
                 // Create linked ticket.
@@ -1227,7 +1256,7 @@
         parameters = $.extend(true, defaults, parameters);
 
         // Validate parameters.
-        var required = ['ticketId', 'userId', 'brandId', 'notesPosition', 'replyOrder', 'ticketGridUrl'];
+        var required = ['ticketId', 'userId', 'authUserId', 'brandId', 'notesPosition', 'replyOrder', 'ticketGridUrl'];
         for (var i = 0; i < required.length; i++) {
             if (parameters[required[i]] === null) {
                 void 0;

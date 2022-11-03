@@ -1,0 +1,220 @@
+body {
+    @apply sp-bg-secondary sp-my-6 sp-text-primary;
+}
+
+@screen sm {
+    body {
+        @apply sp-m-6;
+    }
+}
+
+@screen md {
+    body {
+        @apply sp-m-12;
+    }
+}
+
+.sp-logo {
+    @apply sp-inline sp-w-16 sp-text-primary-800;
+}
+
+@screen md {
+    .sp-logo {
+        @apply sp-w-24;
+    }
+}
+
+.sp-theme-dark .sp-logo {
+    @apply sp-text-secondary;
+}
+
+.sp-logo path {
+    @apply sp-fill-current;
+}
+
+.sp-logo.sp-logo-big {
+    @apply sp-absolute sp-w-64 sp-left-50 sp-top-50 sp--ml-32 sp--mt-32;
+}
+
+.sp-container {
+    max-width: 768px;
+}
+
+.sp-content {
+    @apply sp-p-6 sp-bg-primary sp-shadow;
+}
+
+.sp-theme-dark .sp-content {
+    @apply sp-shadow-md;
+}
+
+@screen sm {
+    .sp-content {
+        @apply sp-rounded;
+    }
+}
+
+.loadinggif {
+    @apply sp-relative;
+}
+
+.loadinggif:after {
+    @apply sp-absolute sp--mt-12 sp--ml-8 sp-font-icon sp-font-bold sp-text-primary-600 sp-text-6xl;
+    animation: fa-spin 2s infinite linear;
+    content: "\f013";
+    top: 50%;
+    left: 50%;
+}
+
+.sp-theme-dark .loadinggif:after {
+    @apply sp-text-primary-200;
+}
+
+/* Headings */
+
+h1 {
+    @apply sp-mb-6 sp-leading-none sp-text-3xl;
+}
+
+h2 {
+    @apply sp-my-6 sp-text-xl;
+}
+
+h3 {
+    @apply sp-mt-4 sp-mb-1 sp-text-base;
+}
+
+/* Progress Bar */
+
+.sp-progress, .sp-progress-bg {
+    @apply sp-h-6 sp-shadow;
+}
+
+.sp-progress {
+    @apply sp-bg-gray-300 sp-shadow;
+}
+
+.sp-theme-dark .sp-progress {
+    @apply sp-bg-primary sp-shadow-md;
+}
+
+.sp-progress-bg {
+    @apply sp-overflow-hidden;
+
+    animation: sp-move 1.5s linear infinite;
+    background-image: linear-gradient(-45deg, #68d391 33%, #48bb78 33%, #48bb78 66%, #68d391 66%);
+    background-size: 3rem 1.5rem;
+}
+
+.sp-theme-dark .sp-progress-bg {
+    background-image: linear-gradient(-45deg, #38a169 33%, #48bb78 33%, #48bb78 66%, #38a169 66%);
+}
+
+@screen sm {
+    .sp-progress, .sp-progress-bg {
+        @apply sp-rounded;
+    }
+
+    .sp-progress {
+        @apply sp-mb-6;
+    }
+}
+
+/* Animate the stripes */
+
+@-webkit-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 48px 0;
+    }
+}
+@-moz-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 48px 0;
+    }
+}
+@-ms-keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 48px 0;
+    }
+}
+@keyframes move {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 48px 0;
+    }
+}
+
+/* Tables */
+
+table {
+    @apply sp-mt-6 sp-border sp-border-tertiary sp-border-b-0 sp-text-sm;
+}
+
+table td,
+table th {
+    @apply sp-block sp-p-2 sp-border-b sp-border-tertiary;
+}
+
+table th {
+    @apply sp-w-full sp-bg-secondary sp-font-bold sp-text-left;
+}
+
+@screen sm {
+    table td,
+    table th {
+        @apply sp-table-cell;
+    }
+
+    table th {
+        @apply sp-w-64 sp-text-right;
+    }
+}
+
+/* Requirements */
+
+.sp-requirement {
+    @apply sp-w-full sp-mb-6;
+}
+
+.sp-requirement:last-of-type {
+    @apply sp-mb-0;
+}
+
+.sp-requirement .sp-requirement-status {
+    @apply sp-w-12;
+}
+
+.sp-requirement .sp-requirement-status .fas {
+    @apply sp-text-4xl;
+}
+
+.sp-requirement .sp-is-valid {
+    @apply sp-text-secondary;
+}
+
+.sp-requirement .sp-requirement-details {
+    @apply sp-pl-2;
+}
+
+.sp-requirement .sp-requirement-details h2 {
+    @apply sp-mt-0 sp-mb-1;
+}
+
+.sp-requirement h3 {
+    @apply sp-text-secondary;
+}
+
+.sp-requirement h3 + table {
+    @apply sp-mt-0;
+}

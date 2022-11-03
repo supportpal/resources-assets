@@ -69,6 +69,13 @@ $(document.body).ready(function () {
         onBlur: function () {
             $('#header .search-form').parent('.sp-grow').removeClass('lg:sp-w-1/2');
         },
+        onChange: function (value) {
+            // Clear set value.
+            this.setValue(null, true);
+            this.refreshOptions(false);
+
+            window.location.href = $('.search-form .selectize-dropdown-content div[data-value="' + value + '"] a').attr('href');
+        },
         onDropdownOpen: function ($dropdown) {
             // Make dropdown bigger than normal selectize dropdown.
             $dropdown.css('max-height', $(window).height() * 0.75);
@@ -148,8 +155,18 @@ $(document.body).ready(function () {
         },
     });
 
-    // Focus on search input if click anywhere in wrapper (mainly to handle clicking on the search icon).
-    $('.search-form .selectize-control').on('click', function () {
+    function showSearchBar() {
         $selectize[0].selectize.focus();
+    }
+
+    // Focus on search input if click anywhere in wrapper (mainly to handle clicking on the search icon).
+    $('.search-form .selectize-control').on('click', showSearchBar);
+
+    // Register keyboard shortcut.
+    App.KeyboardShortcuts.SHORTCUT_SEARCH.bind(function () {
+        showSearchBar();
+
+        // Disable browsers built-in shortcut.
+        return false;
     });
 });
