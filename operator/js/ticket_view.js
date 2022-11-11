@@ -748,9 +748,7 @@
         $ticketDetails.find('select[name=status]').on('change', function() {
             if (typeof closedStatusId !== 'undefined' && $(this).val() == closedStatusId) {
                 // If they closed the ticket, we want to handle this differently...
-                TicketViewAction.close().always(function () {
-                    ticket.updateEscalationsTable();
-                });
+                App.TicketViewAction.close();
             } else {
                 updateTicket($(this).serializeArray());
             }
