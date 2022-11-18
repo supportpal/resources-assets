@@ -1,6 +1,6 @@
 input.datepicker::placeholder,
 input.timepicker::placeholder {
-    @apply sp-font-icon-with-body;
+    @apply sp-font-icon;
 }
 
 .flatpickr-input[readonly] {
