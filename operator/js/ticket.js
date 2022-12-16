@@ -125,9 +125,7 @@
       var textarea_id = $textarea.prop('id');
       if (tinymce.get(textarea_id)) {
         var editor = $textarea.editor(),
-          content = editor.getContent({
-            withoutCursorMarker: true
-          }),
+          content = editor.getContent(),
           message = null,
           isEmpty = content.length === 0,
           isTooLong = editor.settings.character_limit && content.length >= editor.settings.character_limit;
@@ -246,12 +244,6 @@
       // Now that we've modified the form, add the ticket id to the POST data.
       var data = $form.serializeArray();
       data.push({
-        name: 'text',
-        value: $textarea.editor().getContent({
-          withoutCursorMarker: true
-        })
-      });
-      data.push({
         name: 'ticket[0]',
         value: $form.find(':input[name=ticket_id]').val()
       });
@@ -328,17 +320,10 @@
         return false;
       }
       var self = this;
-      var data = $form.serializeArray();
-      data.push({
-        name: 'text',
-        value: $editor.getContent({
-          withoutCursorMarker: true
-        })
-      });
       $.ajax({
         url: $form.data('route'),
         type: 'PUT',
-        data: data,
+        data: $form.serializeArray(),
         dataType: 'json'
       }).done(function (response) {
         if (response.status != 'success') {
@@ -510,8 +495,8 @@
     /**
      * Check whether a draft is different to a given value.
      *
-     * @param {string} key
-     * @param {string} new_value
+     * @param key
+     * @param new_value
      * @returns {boolean}
      */
     this.draftHasChanged = function (key, new_value) {
@@ -837,9 +822,7 @@
         $('#newForward').editor().focus();
 
         // Update draft message variable so it doesn't save a draft automatically
-        instance.setForwardDraft($('#newForward').editor().getContent({
-          withoutCursorMarker: true
-        }));
+        instance.setForwardDraft(message);
 
         // Show an alert of which attachments we failed to attach.
         if (failed_attachments.length > 0) {

@@ -295,12 +295,9 @@
       ticket.setParameter(name, new FileUpload($.extend(true, {}, defaults, params)));
     };
     var loadEditorContent = function (selector, $form, editor) {
-      var triggerEvent = function () {
-        $(selector).trigger('loaded-editor-content', [selector, $form, editor]);
-      };
       var route = $(selector).data('route');
       if (typeof route !== 'string' || route === '') {
-        return triggerEvent();
+        return;
       }
       $form = $form.find('.reply-form');
       $form.after('<div class="sp-editor-container"></div>');
@@ -310,7 +307,6 @@
       $preview.html('').css($form.position()).css('width', $form.outerWidth()).css('height', $form.outerHeight(true)).addClass('loadinggif').show();
       $.get(route).done(function (json) {
         editor.setContent(json.data.purified_text);
-        triggerEvent();
       }).always(function () {
         $preview.hide();
       });
@@ -1040,19 +1036,15 @@
      * Saving drafts automatically
      */
     function saveDraft($form, type, useBeacon) {
-      var editor = $form.find('textarea:not(.CodeMirror textarea):eq(0)').editor(),
-        message = editor.getContent(),
-        messageWithoutCursorMarker = editor.getContent({
-          withoutCursorMarker: true
-        });
+      var message = $form.find('textarea:not(.CodeMirror textarea):eq(0)').editor().getContent();
 
       // Update draft message variable
       if (type == '1') {
-        ticket.setNoteDraft(messageWithoutCursorMarker);
+        ticket.setNoteDraft(message);
       } else if (type == '2') {
-        ticket.setForwardDraft(messageWithoutCursorMarker);
+        ticket.setForwardDraft(message);
       } else {
-        ticket.setMessageDraft(messageWithoutCursorMarker);
+        ticket.setMessageDraft(message);
       }
 
       // Make AJAX data.
@@ -1108,55 +1100,57 @@
         });
       }
     }
-    var autoSaveDraftTimer,
-      autoSaveDraftTime = 30000;
     function autoSaveDraft(useBeacon) {
-      if (autoSaveDraftTimer) {
-        clearTimeout(autoSaveDraftTimer);
-      }
-      var drafts = ticket.getDrafts();
-      for (var editorId in drafts) {
-        var $textarea = $('#' + editorId),
-          $form = $textarea.parents('form');
+      // Only if draft button is available on either reply or note form
+      if ($('.save-draft').length) {
+        var drafts = ticket.getDrafts();
 
-        // Only if it's an editor (e.g. not for Twitter replies)
-        if ($form.find('.save-draft').length === 0 || !tinymce.get(editorId) || !drafts.hasOwnProperty(editorId) || $form.find('input[type="submit"]').prop('disabled')) {
-          continue;
+        // Check both message drafts and note drafts.
+        for (var editorId in drafts) {
+          var $textarea = $('#' + editorId),
+            $form = $textarea.parents('form');
+
+          // Only if it's an editor (e.g. not for Twitter replies)
+          if (tinymce.get(editorId)) {
+            // skip loop if the property is from prototype
+            if (!drafts.hasOwnProperty(editorId) || $form.find('input[type="submit"]').prop('disabled')) {
+              continue;
+            }
+
+            // Get the draft message.
+            var draftMessage = drafts[editorId];
+
+            // Save current message
+            if (draftMessage == null) {
+              ticket.setDraft(editorId, $textarea.editor().getContent());
+            }
+
+            // Check if message has changed
+            var currentMessage = $textarea.editor().getContent();
+            if (ticket.draftHasChanged(editorId, currentMessage)) {
+              // Disable button while saving
+              $form.find('.save-draft').prop('disabled', true);
+
+              // Save draft
+              saveDraft($form, $form.find('input[name="reply_type"]').val(), useBeacon);
+
+              // Re-enable button
+              $form.find('.save-draft').prop('disabled', false);
+            }
+          }
         }
 
-        // Get the draft message.
-        var draftMessage = drafts[editorId];
-
-        // Check if message has changed
-        var currentMessage = $textarea.editor().getContent({
-          withoutCursorMarker: true
-        });
-        if (draftMessage === null || !ticket.draftHasChanged(editorId, currentMessage)) {
-          continue;
-        }
-
-        // Disable button while saving
-        $form.find('.save-draft').prop('disabled', true);
-
-        // Save draft
-        saveDraft($form, $form.find('input[name="reply_type"]').val(), useBeacon);
-
-        // Re-enable button
-        $form.find('.save-draft').prop('disabled', false);
+        // Delay the next poll by 30 seconds
+        setTimeout(function () {
+          autoSaveDraft();
+        }, 30000);
       }
-
-      // Delay the next poll by 30 seconds
-      autoSaveDraftTimer = setTimeout(() => autoSaveDraft(), autoSaveDraftTime);
     }
 
-    // Save the initial message.
-    autoSaveDraft();
-    $('#newMessage, #newNote').on('loaded-editor-content', function (e, selector, $form, editor) {
-      var editorId = $(selector).attr('id');
-      ticket.setDraft(editorId, editor.getContent({
-        withoutCursorMarker: true
-      }));
-    });
+    // Wait 2 seconds to start, due to editor manipulating HTML
+    setTimeout(function () {
+      autoSaveDraft();
+    }, 2000);
 
     // Before closing/redirecting away, check if there's a draft that needs to be saved.
     window.addEventListener('visibilitychange', function () {
@@ -1195,15 +1189,15 @@
           // Clear editor
           if (replyType == 1) {
             $('#newNote').editor().setContent('');
-            ticket.setNoteDraft('');
+            ticket.setNoteDraft(null);
           } else if (replyType == 2) {
             $('#newForward').editor().setContent('');
             $('.sp-reply-type .sp-action[data-type="2"]').addClass('sp-fresh');
-            ticket.setForwardDraft('');
+            ticket.setForwardDraft(null);
           } else {
             $('#newMessage').editor().setContent(ticket.parameters().replyTemplate);
             $('#newMessage').editor().focus();
-            ticket.setMessageDraft($('#newMessage').editor().getContent());
+            ticket.setMessageDraft(null);
           }
 
           // Remove draft icon in quick action
