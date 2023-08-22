@@ -7,11 +7,8 @@ body.swal2-height-auto {
 }
 
 .swal2-modal {
+    @apply dark:sp-bg-primary dark:sp-shadow-md;
     font-family: inherit;
-}
-
-.sp-theme-dark .swal2-modal {
-    @apply sp-bg-primary sp-shadow-md;
 }
 
 .swal2-popup {
@@ -85,12 +82,7 @@ body.swal2-height-auto {
 
 .swal2-actions:not(.swal2-loading) .swal2-styled:active,
 .swal2-actions:not(.swal2-loading) .swal2-styled:hover {
-    @apply sp-bg-none;
-}
-
-.sp-theme-dark .swal2-actions:not(.swal2-loading) .swal2-styled:active,
-.sp-theme-dark .swal2-actions:not(.swal2-loading) .swal2-styled:hover {
-    @apply sp-text-white;
+    @apply sp-bg-none dark:sp-text-white;
 }
 
 .swal2-actions:not(.swal2-loading) .swal2-styled[style*="background-color"]:not(.swal2-cancel):hover {

@@ -12,11 +12,7 @@ input.timepicker::placeholder {
 }
 
 .flatpickr-calendar {
-    @apply sp-bg-primary sp-rounded sp-shadow;
-}
-
-.sp-theme-dark .flatpickr-calendar {
-    @apply sp-shadow-md;
+    @apply sp-bg-primary sp-rounded sp-shadow dark:sp-shadow-md;
 }
 
 .flatpickr-calendar.arrowTop:before,
@@ -39,24 +35,15 @@ input.timepicker::placeholder {
     @apply sp-h-10;
 }
 
-.flatpickr-months .flatpickr-next-month, .flatpickr-months .flatpickr-prev-month {
-    @apply sp-text-primary;
-    fill: var(--color-text-primary);
+.flatpickr-months .flatpickr-next-month,
+.flatpickr-months .flatpickr-prev-month {
+    @apply sp-text-primary sp-fill-[var(--color-text-primary)] dark:sp-text-white dark:sp-fill-[#fff];
     padding: 0.825rem;
 }
 
 .flatpickr-months .flatpickr-next-month:hover svg,
 .flatpickr-months .flatpickr-prev-month:hover svg {
-    @apply sp-text-primary;
-    fill: var(--color-text-primary);
-}
-
-.sp-theme-dark .flatpickr-months .flatpickr-next-month,
-.sp-theme-dark .flatpickr-months .flatpickr-prev-month,
-.sp-theme-dark .flatpickr-months .flatpickr-next-month:hover svg,
-.sp-theme-dark .flatpickr-months .flatpickr-prev-month:hover svg {
-    @apply sp-text-white;
-    fill: #fff;
+    @apply sp-text-primary sp-fill-[var(--color-text-primary)] dark:sp-text-white dark:sp-fill-[#fff];
 }
 
 .flatpickr-months .flatpickr-next-month:hover,

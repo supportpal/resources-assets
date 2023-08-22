@@ -234,22 +234,12 @@
 
 .tox-bg-orange .tox-edit-area__iframe,
 .tox-bg-orange .tox-statusbar {
-    @apply sp-bg-yellow-100;
-}
-
-.sp-theme-dark .tox-bg-orange .tox-edit-area__iframe,
-.sp-theme-dark .tox-bg-orange .tox-statusbar {
-    @apply sp-bg-yellow-800;
+    @apply sp-bg-yellow-100 dark:sp-bg-yellow-800;
 }
 
 .tox-bg-purple .tox-edit-area__iframe,
 .tox-bg-purple .tox-statusbar {
-    @apply sp-bg-purple-100;
-}
-
-.sp-theme-dark .tox-bg-purple .tox-edit-area__iframe,
-.sp-theme-dark .tox-bg-purple .tox-statusbar {
-    @apply sp-bg-purple-800;
+    @apply sp-bg-purple-100 dark:sp-bg-purple-800;
 }
 
 .tox-button-separator {

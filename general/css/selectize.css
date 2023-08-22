@@ -119,14 +119,9 @@
 /* Loading/disabled */
 
 .selectize-control.loading:before {
-    @apply sp-absolute sp-h-8 sp-w-8 sp-top-1 sp-right-2;
-    background: url('../../general/img/spinner.gif');
+    @apply sp-absolute sp-h-8 sp-w-8 sp-top-1 sp-right-2 sp-bg-[url('../../general/img/spinner.gif')] dark:sp-bg-[url('../../general/img/spinner-dark.gif')];
     content: "";
     z-index: 2;
-}
-
-.sp-theme-dark .selectize-control.loading:before {
-    background: url('../../general/img/spinner-dark.gif');
 }
 
 .selectize-control.single.loading:before {
@@ -153,8 +148,8 @@
     @apply sp-bg-transparent sp-opacity-75;
 }
 
-.sp-theme-dark .selectize-control.plugin-remove_button [data-value] .remove {
-    @apply sp-text-black !important;
+.selectize-control.plugin-remove_button [data-value] .remove {
+    @apply dark:sp-text-black !important;
 }
 
 .selectize-control.plugin-remove_button [data-value][style*="color: #fff"] .remove {

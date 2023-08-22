@@ -38,7 +38,7 @@
 
 .sp-editor-content ol,
 .sp-editor-content ul {
-    @apply sp-pl-6 sp-list-decimal;
+    @apply sp-pl-6 sp-list-decimal sp-my-4;
 }
 
 .sp-editor-content ul {
@@ -69,17 +69,9 @@
 }
 
 .sp-editor-content .sp-mention {
-    @apply sp-inline-flex sp-items-center sp-px-1 sp-py-1/2 sp-bg-tertiary sp-rounded sp-text-secondary sp-text-sm;
-}
-
-.sp-theme-dark .sp-editor-content .sp-mention {
-    @apply sp-bg-tertiary !important;
+    @apply sp-inline-flex sp-items-center sp-px-1 sp-py-1/2 sp-bg-tertiary sp-rounded sp-text-secondary sp-text-sm dark:sp-bg-tertiary;
 }
 
 .sp-editor-content .sp-mention.sp-current-user {
-    @apply sp-bg-primary-100;
-}
-
-.sp-theme-dark .sp-editor-content .sp-mention.sp-current-user {
-    @apply sp-bg-primary-800 !important;
+    @apply sp-bg-primary-100 dark:sp-bg-primary-800;
 }

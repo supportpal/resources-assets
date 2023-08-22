@@ -3,31 +3,23 @@ body>.pnotify.pnotify-positioned {
 }
 
 [data-pnotify].supportpal-elem {
-    @apply sp-text-yellow-700;
+    @apply sp-text-yellow-700 dark:sp-text-yellow-200;
 }
 
 [data-pnotify] .supportpal-container {
-    @apply sp-p-4 sp-bg-yellow-100 sp-border-l-2 sp-border-yellow-700 sp-rounded;
+    @apply sp-p-4 sp-bg-yellow-100 sp-border-l-2 sp-border-yellow-700 sp-rounded dark:sp-bg-yellow-700 dark:sp-border-0;
 }
 
 [data-pnotify] .supportpal-container.pnotify-shadow {
     @apply sp-shadow-md;
 }
 
-.sp-theme-dark [data-pnotify].supportpal-elem {
-    @apply sp-text-yellow-200;
+[data-pnotify] .supportpal-content a {
+    @apply dark:sp-text-primary;
 }
 
-.sp-theme-dark [data-pnotify] .supportpal-container {
-    @apply sp-bg-yellow-700 sp-border-0;
-}
-
-.sp-theme-dark [data-pnotify] .supportpal-content a {
-    @apply sp-text-primary;
-}
-
-.sp-theme-dark [data-pnotify] .supportpal-content a:hover {
-    @apply sp-text-white;
+[data-pnotify] .supportpal-content a:hover {
+    @apply dark:sp-text-white;
 }
 
 [data-pnotify] .supportpal-icon {

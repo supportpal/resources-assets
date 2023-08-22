@@ -1,23 +1,19 @@
 .tippy-box {
-    @apply sp-text-center;
+    @apply sp-text-center dark:sp-bg-primary-100 dark:sp-text-primary-900 dark:sp-text-center;
 }
 
-.sp-theme-dark .tippy-box {
-    @apply sp-bg-primary-100 sp-text-primary-900 sp-text-center;
+.tippy-box[data-placement^=top] > .tippy-arrow::before {
+    @apply dark:sp-border-t-[var(--color-primary-100)];
 }
 
-.sp-theme-dark .tippy-box[data-placement^=top] > .tippy-arrow::before {
-    border-top-color: var(--color-primary-100);
+.tippy-box[data-placement^=bottom] > .tippy-arrow::before {
+    @apply dark:sp-border-b-[var(--color-primary-100)];
 }
 
-.sp-theme-dark .tippy-box[data-placement^=bottom] > .tippy-arrow::before {
-    border-bottom-color: var(--color-primary-100);
+.tippy-box[data-placement^=left] > .tippy-arrow::before {
+    @apply dark:sp-border-l-[var(--color-primary-100)];
 }
 
-.sp-theme-dark .tippy-box[data-placement^=left] > .tippy-arrow::before {
-    border-left-color: var(--color-primary-100);
-}
-
-.sp-theme-dark .tippy-box[data-placement^=right] > .tippy-arrow::before {
-    border-right-color: var(--color-primary-100);
+.tippy-box[data-placement^=right] > .tippy-arrow::before {
+    @apply dark:sp-border-r-[var(--color-primary-100)];
 }

@@ -6,19 +6,22 @@
  */
 (function () {
   var undef, lazyLoading, patchApplied;
-  var delayedInits = [], $, win;
-
+  var delayedInits = [],
+    $,
+    win;
   win = typeof global !== 'undefined' ? global : window;
   $ = win.jQuery;
-
   var getTinymce = function () {
     // Reference to tinymce needs to be lazily evaluated since tinymce
     // might be loaded through the compressor or other means
     return win.tinymce;
   };
-
   $.fn.editor = function (settings) {
-    var self = this, url, base, lang, suffix = "";
+    var self = this,
+      url,
+      base,
+      lang,
+      suffix = "";
 
     // No match then just ignore the call
     if (!self.length) {
@@ -29,13 +32,12 @@
     if (getTinymce() && getTinymce().get(self[0].id)) {
       return getTinymce() ? getTinymce().get(self[0].id) : null;
     }
-
     settings = $.extend({}, true, $.fn.editor.defaults, settings);
-
     self.css('visibility', 'hidden'); // Hide textarea to avoid flicker
 
     var init = function () {
-      var editors = [], initCount = 0;
+      var editors = [],
+        initCount = 0;
 
       // Apply patches to the jQuery object, only once
       if (!patchApplied) {
@@ -45,7 +47,9 @@
 
       // Create an editor instance for each matched node
       self.each(function (i, node) {
-        var ed, id = node.id, oninit = settings.oninit;
+        var ed,
+          id = node.id,
+          oninit = settings.oninit;
 
         // Generate unique id for target element if needed
         if (!id) {
@@ -60,10 +64,9 @@
         // Create editor instance and render it
         ed = getTinymce().createEditor(id, settings);
         editors.push(ed);
-
         ed.on('init', function () {
-          var scope, func = oninit;
-
+          var scope,
+            func = oninit;
           self.css('visibility', '');
 
           // Run this if the oninit setting is defined
@@ -73,7 +76,7 @@
             // Fire the oninit event ones each editor instance is initialized
             if (++initCount == editors.length) {
               if (typeof func === "string") {
-                scope = (func.indexOf(".") === -1) ? null : getTinymce().resolve(func.replace(/\.\w+$/, ""));
+                scope = func.indexOf(".") === -1 ? null : getTinymce().resolve(func.replace(/\.\w+$/, ""));
                 func = getTinymce().resolve(func);
               }
 
@@ -113,9 +116,7 @@
       // url contains gzip then we assume it's a compressor
       if (url.indexOf('gzip') != -1) {
         lang = settings.language || "en";
-        url = url + (/\?/.test(url) ? '&' : '?') + "js=true&core=true&suffix=" + escape(suffix) +
-          "&themes=" + escape(settings.theme || 'modern') + "&plugins=" +
-          escape(settings.plugins || '') + "&languages=" + (lang || '');
+        url = url + (/\?/.test(url) ? '&' : '?') + "js=true&core=true&suffix=" + escape(suffix) + "&themes=" + escape(settings.theme || 'modern') + "&plugins=" + escape(settings.plugins || '') + "&languages=" + (lang || '');
 
         // Check if compressor script is already loaded otherwise setup a basic one
         if (!win.tinyMCE_GZ) {
@@ -140,18 +141,14 @@
                 }
               });
             },
-
-            end: function () {
-            }
+            end: function () {}
           };
         }
       }
-
       var script = document.createElement('script');
       script.type = 'text/javascript';
       script.onload = script.onreadystatechange = function (e) {
         e = e || window.event;
-
         if (lazyLoading !== 2 && (e.type == 'load' || /complete|loaded/.test(script.readyState))) {
           getTinymce().dom.Event.domLoaded = 1;
           lazyLoading = 2;
@@ -160,9 +157,7 @@
           if (settings.script_loaded) {
             settings.script_loaded();
           }
-
           init();
-
           $.each(delayedInits, function (i, init) {
             init();
           });
@@ -178,25 +173,21 @@
         init();
       }
     }
-
     return self;
   };
-  $.fn.editor.defaults = {}
+  $.fn.editor.defaults = {};
 
   // Add :tinymce pseudo selector this will select elements that has been converted into editor instances
   // it's now possible to use things like $('*:tinymce') to get all TinyMCE bound elements.
   $.extend($.expr.pseudos || $.expr[':'], {
     tinymce: function (e) {
       var editor;
-
       if (e.id && "tinymce" in win) {
         editor = getTinymce().get(e.id);
-
         if (editor && editor.editorManager === getTinymce()) {
           return true;
         }
       }
-
       return false;
     }
   });
@@ -211,16 +202,13 @@
       if (name === "remove") {
         this.each(function (i, node) {
           var ed = tinyMCEInstance(node);
-
           if (ed) {
             ed.remove();
           }
         });
       }
-
       this.find("span.mceEditor,div.mceEditor").each(function (i, node) {
         var ed = getTinymce().get(node.id.replace(/_parent$/, ""));
-
         if (ed) {
           ed.remove();
         }
@@ -230,7 +218,8 @@
     // Loads or saves contents from/to textarea if the value
     // argument is defined it will set the TinyMCE internal contents
     var loadOrSave = function (value) {
-      var self = this, ed;
+      var self = this,
+        ed;
 
       // Handle set value
       /*jshint eqnull:true */
@@ -240,14 +229,13 @@
         // Saves the contents before get/set value of textarea/div
         self.each(function (i, node) {
           var ed;
-
-          if ((ed = getTinymce().get(node.id))) {
+          if (ed = getTinymce().get(node.id)) {
             ed.setContent(value);
           }
         });
       } else if (self.length > 0) {
         // Handle get value
-        if ((ed = getTinymce().get(self[0].id))) {
+        if (ed = getTinymce().get(self[0].id)) {
           return ed.getContent();
         }
       }
@@ -256,17 +244,15 @@
     // Returns tinymce instance for the specified element or null if it wasn't found
     var tinyMCEInstance = function (element) {
       var ed = null;
-
       if (element && element.id && win.tinymce) {
         ed = getTinymce().get(element.id);
       }
-
       return ed;
     };
 
     // Checks if the specified set contains tinymce instances
     var containsTinyMCE = function (matchedSet) {
-      return !!((matchedSet) && (matchedSet.length) && (win.tinymce) && (matchedSet.is(":tinymce")));
+      return !!(matchedSet && matchedSet.length && win.tinymce && matchedSet.is(":tinymce"));
     };
 
     // Patch various jQuery functions
@@ -277,35 +263,30 @@
     // example $('#editorid').html('Content'); will update the TinyMCE iframe instance
     $.each(["text", "html", "val"], function (i, name) {
       var origFn = jQueryFn[name] = $.fn[name],
-        textProc = (name === "text");
-
+        textProc = name === "text";
       $.fn[name] = function (value) {
         var self = this;
-
         if (!containsTinyMCE(self)) {
           return origFn.apply(self, arguments);
         }
-
         if (value !== undef) {
           loadOrSave.call(self.filter(":tinymce"), value);
           origFn.apply(self.not(":tinymce"), arguments);
-
           return self; // return original set for chaining
         }
 
         var ret = "";
         var args = arguments;
-
         (textProc ? self : self.eq(0)).each(function (i, node) {
           var ed = tinyMCEInstance(node);
-
           if (ed) {
-            ret += textProc ? ed.getContent().replace(/<(?:"[^"]*"|'[^']*'|[^'">])*>/g, "") : ed.getContent({ save: true });
+            ret += textProc ? ed.getContent().replace(/<(?:"[^"]*"|'[^']*'|[^'">])*>/g, "") : ed.getContent({
+              save: true
+            });
           } else {
             ret += origFn.apply($(node), args);
           }
         });
-
         return ret;
       };
     });
@@ -313,28 +294,22 @@
     // Makes it possible to use $('#id').append("content"); to append contents to the TinyMCE editor iframe
     $.each(["append", "prepend"], function (i, name) {
       var origFn = jQueryFn[name] = $.fn[name],
-        prepend = (name === "prepend");
-
+        prepend = name === "prepend";
       $.fn[name] = function (value) {
         var self = this;
-
         if (!containsTinyMCE(self)) {
           return origFn.apply(self, arguments);
         }
-
         if (value !== undef) {
           if (typeof value === "string") {
             self.filter(":tinymce").each(function (i, node) {
               var ed = tinyMCEInstance(node);
-
               if (ed) {
                 ed.setContent(prepend ? value + ed.getContent() : ed.getContent() + value);
               }
             });
           }
-
           origFn.apply(self.not(":tinymce"), arguments);
-
           return self; // return original set for chaining
         }
       };
@@ -343,38 +318,34 @@
     // Makes sure that the editor instance gets properly destroyed when the parent element is removed
     $.each(["remove", "replaceWith", "replaceAll", "empty"], function (i, name) {
       var origFn = jQueryFn[name] = $.fn[name];
-
       $.fn[name] = function () {
         removeEditors.call(this, name);
-
         return origFn.apply(this, arguments);
       };
     });
-
     jQueryFn.attr = $.fn.attr;
 
     // Makes sure that $('#tinymce_id').attr('value') gets the editors current HTML contents
     $.fn.attr = function (name, value) {
-      var self = this, args = arguments;
-
-      if ((!name) || (name !== "value") || (!containsTinyMCE(self))) {
+      var self = this,
+        args = arguments;
+      if (!name || name !== "value" || !containsTinyMCE(self)) {
         if (value !== undef) {
           return jQueryFn.attr.apply(self, args);
         }
-
         return jQueryFn.attr.apply(self, args);
       }
-
       if (value !== undef) {
         loadOrSave.call(self.filter(":tinymce"), value);
         jQueryFn.attr.apply(self.not(":tinymce"), args);
-
         return self; // return original set for chaining
       }
 
-      var node = self[0], ed = tinyMCEInstance(node);
-
-      return ed ? ed.getContent({ save: true }) : jQueryFn.attr.apply($(node), args);
+      var node = self[0],
+        ed = tinyMCEInstance(node);
+      return ed ? ed.getContent({
+        save: true
+      }) : jQueryFn.attr.apply($(node), args);
     };
   };
 })();
