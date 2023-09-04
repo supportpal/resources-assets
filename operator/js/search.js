@@ -81,7 +81,10 @@ $(document.body).ready(function () {
         // Clear set value.
         this.setValue(null, true);
         this.refreshOptions(false);
-        window.location.href = $('.search-form .selectize-dropdown-content div[data-value="' + value + '"] a').attr('href');
+        const $elm = $('.search-form .selectize-dropdown-content div[data-value="' + value + '"] a');
+        if ($elm.length) {
+          window.location.href = $elm.attr('href');
+        }
       },
       onDropdownOpen: function ($dropdown) {
         var $this = this;
@@ -169,15 +172,11 @@ $(document.body).ready(function () {
           }
         }
       },
+      loadThrottle: 500,
       load: function (query, callback) {
         $('.sp-search-clear').addClass('sp-hidden').removeClass('sp-inline-block lg:sp-hidden xl:sp-inline-block');
         if (!query.length) {
           return callback();
-        }
-
-        // Remove # from start when searching
-        if (query.substring(0, 1) === '#') {
-          query = query.substring(1);
         }
 
         // Abort history loading if it us.
@@ -185,9 +184,9 @@ $(document.body).ready(function () {
 
         // Only search if term is two characters or more
         var self = this;
-        $.post(laroute.route('core.operator.search_preview'), {
+        xhr = $.post(laroute.route('core.operator.search_preview'), {
           query: query
-        }).then(function (res) {
+        }).done(function (res) {
           // Clear previous options.
           self.clearOptions();
           self.addOptionGroup('history', {
