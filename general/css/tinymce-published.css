@@ -69,9 +69,10 @@
 }
 
 .sp-editor-content .sp-mention {
-    @apply sp-inline-flex sp-items-center sp-px-1 sp-py-1/2 sp-bg-tertiary sp-rounded sp-text-secondary sp-text-sm dark:sp-bg-tertiary;
+    @apply sp-inline-flex sp-items-center sp-px-1 sp-py-1/2 sp-rounded sp-text-sm;
+    @apply sp-bg-tertiary sp-text-secondary dark:sp-bg-tertiary !important;
 }
 
 .sp-editor-content .sp-mention.sp-current-user {
-    @apply sp-bg-primary-100 dark:sp-bg-primary-800;
+    @apply sp-bg-primary-100 dark:sp-bg-primary-800 !important;
 }
