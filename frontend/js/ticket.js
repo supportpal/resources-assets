@@ -154,7 +154,7 @@ $(document).ready(function () {
       }, 1000);
     };
     this.listen = () => {
-      App.Notifications.connector().join('Frontend.App.Modules.Ticket.Models.Ticket.' + ticketNumber).listen('.App\\Modules\\Ticket\\Events\\OperatorReplyCreated', instance.fetchNewMessage).listen('.App\\Modules\\Ticket\\Events\\UserReplyCreated', instance.fetchNewMessage).listen('.App\\Modules\\Ticket\\Events\\DepartmentUpdated', e => {
+      App.Notifications.connector().join('Frontend.App.Modules.Ticket.Models.Ticket.' + ticketId).listen('.App\\Modules\\Ticket\\Events\\OperatorReplyCreated', instance.fetchNewMessage).listen('.App\\Modules\\Ticket\\Events\\UserReplyCreated', instance.fetchNewMessage).listen('.App\\Modules\\Ticket\\Events\\DepartmentUpdated', e => {
         $('.sp-ticket-department').text(e.name);
       }).listen('.App\\Modules\\Ticket\\Events\\PriorityUpdated', e => {
         $('.sp-ticket-priority').text(e.name).css('background-color', e.colour);
@@ -177,7 +177,7 @@ $(document).ready(function () {
 
       // Unsubscribe from channel before leaving page.
       window.addEventListener('beforeunload', function () {
-        App.Notifications.connector().leave('Frontend.App.Modules.Ticket.Models.Ticket.' + ticketNumber);
+        App.Notifications.connector().leave('Frontend.App.Modules.Ticket.Models.Ticket.' + ticketId);
       });
     };
   }

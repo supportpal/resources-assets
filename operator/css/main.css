@@ -13827,6 +13827,10 @@ ul.sp-attachments > li a div{
   align-items: center;
 }
 
+.sp-justify-end{
+  justify-content: flex-end;
+}
+
 .sp-justify-center{
   justify-content: center;
 }

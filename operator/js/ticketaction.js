@@ -68,8 +68,11 @@
     var params = {
       valueField: 'id',
       labelField: 'number',
-      searchField: ['number', 'subject'],
-      placeholder: Lang.get('ticket.search_number_or_subject'),
+      // Selectize has internal filtering based on searchField which we don't want. So in order to get it to display
+      // all the data returned from the server we're passing a 'searchField' property for each option which is the
+      // term that we've searched for...
+      searchField: ['searchField'],
+      placeholder: Lang.get('core.sSearchPlaceholder'),
       create: false,
       render: {
         item: function (item, escape) {
@@ -94,7 +97,10 @@
           };
         }
         $.get(laroute.route('ticket.operator.action.search'), data).done(function (res) {
-          callback(res.data);
+          callback(res.data.map(function (resource) {
+            resource.searchField = query;
+            return resource;
+          }));
         }).fail(function () {
           callback();
         });

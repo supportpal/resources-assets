@@ -97,19 +97,15 @@ $(document).ready(function () {
         'intended': btoa(window.location.href)
       }));
       return false;
-    } else if (xhr.status == 419) {
-      // Ensure this is a session expired message (VerifyCsrfToken middleware)
-      var json = JSON.parse(xhr.responseText);
-      if (json.message == Lang.get('messages.session_expired')) {
-        // Show error and scroll to it
-        if (!$('.session-error').is(':visible')) {
-          $('.sp-content-inner').prepend('<div class="session-error sp-alert sp-alert-error">' + Lang.get("messages.session_refresh") + '</div>');
-        }
-        $('#content').animate({
-          scrollTop: 0
-        }, 1000);
-        return false;
+    }
+    if (xhr.status == 419) {
+      if (!$('.session-error').is(':visible')) {
+        $('.sp-content-inner').prepend('<div class="session-error sp-alert sp-alert-error">' + Lang.get("messages.session_refresh") + '</div>');
       }
+      $('#content').animate({
+        scrollTop: 0
+      }, 1000);
+      return false;
     }
   });
 

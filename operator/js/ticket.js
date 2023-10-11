@@ -177,12 +177,7 @@
         code = $(html);
 
       // Make the message visible.
-      code.removeClass('sp-message-collapsed').addClass('sp-message-collapsible');
-      code.find('.sp-message-text').children('.sp-message-text-trimmed').addClass('sp-hidden');
-      code.find('.sp-message-text').children('.sp-message-text-original').removeClass('sp-hidden');
-
-      // Remove expandable if appropriate.
-      instance.removeExpandable(code);
+      instance.showMessage(code);
 
       // It's a note and we need to show it somewhere else than messages block only.
       if (code.hasClass('sp-note') && (parameters.notesPosition === 0 || parameters.notesPosition === 1)) {
@@ -213,7 +208,30 @@
           message = code.prependTo('.sp-messages-container[data-position="inline"]');
         }
       }
+      instance.initialiseMessage(message);
+    };
 
+    /**
+     * Makes a message view visible (not collapsed).
+     *
+     * @param message
+     */
+    this.showMessage = function (message) {
+      // Make the message visible.
+      message.removeClass('sp-message-collapsed').addClass('sp-message-collapsible');
+      message.find('.sp-message-text').children('.sp-message-text-trimmed').addClass('sp-hidden');
+      message.find('.sp-message-text').children('.sp-message-text-original').removeClass('sp-hidden');
+
+      // Remove expandable if appropriate.
+      instance.removeExpandable(message);
+    };
+
+    /**
+     * Highlight message and run through final loading of the message.
+     *
+     * @param message
+     */
+    this.initialiseMessage = function (message) {
       // Load attachment previews if needed.
       instance.loadAttachmentPreviews(message);
       instance.highlightUserMentions(message);
@@ -930,7 +948,8 @@
         ticketId: this.parameters().ticketId,
         userId: this.parameters().userId,
         brandId: this.parameters().brandId,
-        departmentId: this.parameters().departmentId
+        departmentId: this.parameters().departmentId,
+        excludeInternalArticles: this.parameters().excludeInternalArticles || false
       };
     };
 

@@ -87,6 +87,7 @@ ul.search-results li.no-results {
     @apply sp-px-2 sp-py-1;
 }
 
+ul.search-results li:focus a,
 ul.search-results li a:hover {
     @apply sp-bg-secondary;
 }

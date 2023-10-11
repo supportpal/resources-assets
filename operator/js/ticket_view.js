@@ -111,7 +111,9 @@
     this.initNotesForm = function () {
       var $form = $('.notes-form');
       initFileUploads($form, 'notesFileUpload');
-      initEditor('#newNote', $form);
+      initEditor('#newNote', $form, {
+        excludeInternalArticles: false
+      });
     };
     this.initForwardForm = function (editor_opts) {
       var $form = $('.forward-form');
@@ -322,12 +324,7 @@
     this.expand = function ($message) {
       // AJAX load the message into the view.
       ticket.loadMessage($message);
-
-      // Toggle between collapsed and collapsible mode
-      $message.find('.sp-message-text').children('.sp-message-text-original').show();
-      $message.find('.sp-message-text').children('.sp-message-text-trimmed').hide();
-      $message.removeClass('sp-message-collapsed');
-      $message.addClass('sp-message-collapsible');
+      ticket.showMessage($message);
     };
     this.collapse = function ($message) {
       // If we're collapsing and the edit view is showing, hide it and show the normal message view.
@@ -406,7 +403,7 @@
       $('ul.sp-viewing-operators').append($('<li>').attr('data-id', user.id).append($('<img>').attr('src', user.avatar_url).attr('class', 'sp-avatar sp-max-w-2xs sp-mr-1')).append($('<span>').text(user.formatted_name)));
     };
     this.listen = () => {
-      App.Notifications.connector().join('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketNumber).here(users => {
+      App.Notifications.connector().join('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketId).here(users => {
         if (users.length > 1) {
           $.each(users, function (index, user) {
             instance.addViewingOperator(user);
@@ -419,7 +416,30 @@
         if ($('ul.sp-viewing-operators li').length === 0) {
           $('.ticket-viewing').hide();
         }
-      }).listen('.App\\Modules\\Ticket\\Events\\UserReplyCreated', instance.fetchNewMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorForwardCreated', instance.fetchOperatorMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorNoteCreated', instance.fetchOperatorMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorReplyCreated', instance.fetchOperatorMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorDraftUpdated', () => {
+      }).listen('.App\\Modules\\Ticket\\Events\\UserReplyCreated', instance.fetchNewMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorForwardCreated', instance.fetchOperatorMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorNoteCreated', instance.fetchOperatorMessage).listen('.App\\Modules\\Ticket\\Events\\OperatorReplyCreated', instance.fetchOperatorMessage).listen('.App\\Modules\\Ticket\\Events\\MessageUpdated', e => {
+        const $elm = $('.sp-message[data-id=' + e.message.id + ']');
+        if (!$elm.length) {
+          return;
+        }
+        $.ajax({
+          url: laroute.route('ticket.operator.message.showRendered', {
+            'id': e.message.id
+          }),
+          success: function (data) {
+            var $message = $(data);
+            if ($elm.parents('.sp-collapsed-messages').length) {
+              $message.hide();
+            }
+            if ($elm.hasClass('sp-message-collapsible')) {
+              ticket.showMessage($message);
+            }
+            $elm.replaceWith($message);
+            ticket.initialiseMessage($message);
+            $('form.message-form').trigger('supportpal.polled_messages');
+          }
+        });
+        instance.ticketUpdate();
+      }).listen('.App\\Modules\\Ticket\\Events\\OperatorDraftUpdated', () => {
         $.ajax({
           url: laroute.route('ticket.operator.message.otherDrafts', {
             'id': ticket.parameters().ticketId
@@ -617,7 +637,7 @@
 
       // Unsubscribe from channel before leaving page.
       window.addEventListener('beforeunload', function () {
-        App.Notifications.connector().leave('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketNumber);
+        App.Notifications.connector().leave('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketId);
       });
     };
   }
