@@ -334,8 +334,8 @@
       }
 
       // Toggle between collapsed and collapsible mode
-      $message.find('.sp-message-text').children('.sp-message-text-original').hide();
-      $message.find('.sp-message-text').children('.sp-message-text-trimmed').show();
+      $message.find('.sp-message-text').children('.sp-message-text-original').addClass('sp-hidden');
+      $message.find('.sp-message-text').children('.sp-message-text-trimmed').removeClass('sp-hidden');
       $message.addClass('sp-message-collapsed');
       $message.removeClass('sp-message-collapsible');
     };
