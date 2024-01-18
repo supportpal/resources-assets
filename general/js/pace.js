@@ -1,6 +1,12 @@
+paceOptions = {
+  ajax: {
+    trackWebSockets: false
+  },
+  eventLag: {
+    lagThreshold: 30
+  }
+};
 if (document.body.hasAttribute('data-disable-pace')) {
-  paceOptions = {
-    ajax: false,
-    startOnPageLoad: false
-  };
+  paceOptions.ajax = false;
+  paceOptions.startOnPageLoad = false;
 }

@@ -153,12 +153,18 @@
     // https://www.tiny.cloud/docs/general-configuration-guide/upload-images/
     images_upload_handler: image_upload_handler,
     image_dimensions: false,
+    // https://www.tiny.cloud/docs/mobile/#mobiledefaultsforselectedsettings
+    // Override default mobile settings.
+    mobile: {
+      toolbar_mode: "floating"
+    },
     language: 'supportpal',
     setup: function (editor) {
       // Toggle expandable quoted sections.
       editor.on('click', function (e) {
         if ($(e.target).is('div.expandable')) {
-          $(e.target).next().toggle();
+          // Make sure to remove display property from the element when hiding it so it doesn't impact emails.
+          $(e.target).next().css('display', $(e.target).next().css('display') === 'block' ? '' : 'block');
           editor.execCommand('mceAutoResize');
         }
       });

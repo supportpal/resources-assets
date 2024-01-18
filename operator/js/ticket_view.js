@@ -208,15 +208,11 @@
           ticket: ticket.parameters().ticketId
         }
       };
-      if (force) {
-        new deleteAlert({
-          ajax: ajaxParams
-        }).fireDefault(Lang.choice('ticket.ticket', 1), '', deleteRelations).then(function (result) {
-          if (result.value) {
-            success();
-          }
+      var actionCall = function () {
+        Swal.fire({
+          allowOutsideClick: false
         });
-      } else {
+        Swal.showLoading();
         $.ajax(ajaxParams).then(function (response) {
           if (response.status == 'success') {
             return success();
@@ -227,6 +223,35 @@
             item: Lang.get('general.record')
           }), 'error');
         });
+      };
+      if (force) {
+        new deleteAlert({
+          ajax: ajaxParams
+        }).fireDefault(Lang.choice('ticket.ticket', 1), '', deleteRelations).then(function (result) {
+          if (result.value) {
+            success();
+          }
+        });
+      } else {
+        if (block) {
+          Swal.fire({
+            title: Lang.get('messages.are_you_sure'),
+            text: Lang.get('ticket.block_user_desc'),
+            icon: "warning",
+            confirmButtonText: Lang.get('messages.yes_im_sure'),
+            cancelButtonText: Lang.get('general.cancel'),
+            showCancelButton: true,
+            showLoaderOnConfirm: true,
+            preConfirm: function () {
+              return actionCall();
+            },
+            allowOutsideClick: function () {
+              return !Swal.isLoading();
+            }
+          });
+        } else {
+          actionCall();
+        }
       }
     };
     this.take = function () {

@@ -147,8 +147,8 @@ $(document).ready(function () {
         }
         $.ajax({
           url: laroute.route('ticket.frontend.message.showRendered', params),
-          success: function (data) {
-            showMessage(data);
+          success: function (response) {
+            showMessage(response.data);
           }
         });
       }, 1000);
