@@ -1178,8 +1178,7 @@
       } else {
         ticket.setMessageDraft(messageWithoutCursorMarker);
       }
-
-      // Make AJAX data.
+      var $usages = $form.find('input[name="cannedresponse_usage[]"]');
       var data = {
         _token: $('meta[name=csrf_token]').prop('content'),
         ticket: [ticket.parameters().ticketId],
@@ -1190,8 +1189,12 @@
         to_address: type == '2' ? $form.find('select[name="to_address[]"]').val() : null,
         cc_address: type == '2' ? $form.find('select[name="cc_address[]"]').val() : null,
         bcc_address: type == '2' ? $form.find('select[name="bcc_address[]"]').val() : null,
-        subject: type == '2' ? $form.find('input[name="subject"]').val() : null
+        subject: type == '2' ? $form.find('input[name="subject"]').val() : null,
+        cannedresponse_usage: $usages.val()
       };
+
+      // Remove them otherwise their usage will be counted twice (when the message is posted).
+      $usages.remove();
 
       // Add attachments to AJAX data.
       $($form.find('input[name^="attachment["]:not(:disabled)').serializeArray()).each(function (index, obj) {
