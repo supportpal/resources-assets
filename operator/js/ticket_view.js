@@ -446,11 +446,19 @@
         if (!$elm.length) {
           return;
         }
+
+        // Don't update message if it was updated in this tab.
+        if ($elm.hasClass('sp-message-updated')) {
+          $elm.removeClass('sp-message-updated');
+          return;
+        }
         $.ajax({
           url: laroute.route('ticket.operator.message.showRendered', {
             'id': e.message.id
           }),
           success: function (data) {
+            // Remove existing editor instance (before HTML is updated).
+            $elm.find('form.edit textarea').editor().remove();
             var $message = $(data);
             if ($elm.parents('.sp-collapsed-messages').length) {
               $message.hide();

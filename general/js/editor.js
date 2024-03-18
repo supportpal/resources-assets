@@ -274,7 +274,6 @@
           origFn.apply(self.not(":tinymce"), arguments);
           return self; // return original set for chaining
         }
-
         var ret = "";
         var args = arguments;
         (textProc ? self : self.eq(0)).each(function (i, node) {
@@ -340,7 +339,6 @@
         jQueryFn.attr.apply(self.not(":tinymce"), args);
         return self; // return original set for chaining
       }
-
       var node = self[0],
         ed = tinyMCEInstance(node);
       return ed ? ed.getContent({

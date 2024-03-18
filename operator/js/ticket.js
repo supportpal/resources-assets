@@ -96,11 +96,6 @@
       // Remove draft related elements
       form.find('.draft-success, .discard-draft').hide();
 
-      // If more than one message, show split ticket button and checkboxes
-      if ($('.sp-message').length > 1) {
-        $('span.split-ticket').removeClass('sp-hidden');
-      }
-
       // If we have one or more CC email in the reply form, show the reply-all button, else hide it (if it's there)
       if ($('.message-form .cc-emails').is(':visible')) {
         if (instance.ccSelectize()[0].selectize.getValue().length) {
@@ -232,6 +227,11 @@
      * @param message
      */
     this.initialiseMessage = function (message) {
+      // If more than one message, show split ticket button and checkboxes
+      if ($('.sp-message').length > 1) {
+        $('span.split-ticket').removeClass('sp-hidden');
+      }
+
       // Load attachment previews if needed.
       instance.loadAttachmentPreviews(message);
       instance.highlightUserMentions(message);
@@ -244,9 +244,6 @@
       setTimeout(function () {
         message.toggleClass('sp-new-message', 1000);
       }, 10000);
-
-      // Update editor for editing this new message
-      message.find('textarea').editor(instance.defaultEditorConfig());
     };
 
     /**
@@ -362,6 +359,8 @@
           withoutCursorMarker: true
         }))
       });
+      var message = $form.parents('.sp-message');
+      message.addClass('sp-message-updated');
       $.ajax({
         url: $form.data('route'),
         type: 'PUT',
@@ -375,7 +374,6 @@
 
         // Replace message view with response (we use the message ID in case it's a note as it could be showing in
         // two places).
-        var message = $form.parents('.sp-message');
         message.find('.sp-message-text').html(response.data.message);
         message.find('.sp-message-text-trimmed').addClass('sp-hidden');
         message.find('.sp-message-text-original').removeClass('sp-hidden');
@@ -383,12 +381,10 @@
 
         // Close the edit form.
         $form.find('button.edit-button').trigger('click');
-
-        // Update editor for editing this updated message
         showFeedback();
-        message.find('textarea').editor(instance.defaultEditorConfig());
       }).fail(function () {
         showFeedback(true);
+        message.removeClass('sp-message-updated');
       }).always(function () {
         always_message_handler($form);
 
@@ -425,9 +421,6 @@
 
             // Load attachment previews if needed.
             instance.loadAttachmentPreviews($messageContainer);
-
-            // Load editor for editing message if not already loaded
-            $messageContainer.find('textarea').editor(instance.defaultEditorConfig());
 
             // If a callback exists, run it.
             typeof successCallback === 'function' && successCallback();
@@ -1097,7 +1090,7 @@
         if ($message.hasClass('sp-message-collapsible')) {
           event.stopPropagation();
         }
-        if ($message.find('.sp-message-text .sp-message-text-original').hasClass('clipped')) {
+        if ($message.find('.sp-message-text .sp-message-text-original').hasClass('sp-message-text-clipped')) {
           // Message is too big, so load the "View entire message" window.
           var url = $message.find('.sp-message-text .sp-message-text-original a.supportpal_clipped_vem').prop('href');
           window.open(url + '?edit=true');
