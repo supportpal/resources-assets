@@ -4,7 +4,7 @@ $(document).ready(function () {
   /**
    * Reload datables on changing filter
    */
-  $('.sp-filter-results').on('change input', ':input', function (event) {
+  $('.sp-filter-results').on('change input', ':input:not(.yadcf-filter)', function (event) {
     // Ignore if losing focus on text input
     if ($(this).is('input:text:not(.datepicker)') && event.type == 'change') {
       return;
@@ -22,14 +22,14 @@ $(document).ready(function () {
             data[value.name] = value.value;
           }
         });
-      }).dataTable().api().ajax.reload(function () {});
+      }).dataTable().api().ajax.reload();
     }, 500);
   });
 
   /**
    * Reset filter
    */
-  $('.reset-filter').on('click', function () {
+  $('.yadcf-filter-reset-button').on('click', function () {
     // Get param and reset
     var $input = $(this).prev();
     if ($input.is('input:text')) {

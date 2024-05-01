@@ -6,8 +6,16 @@
     @apply sp-w-full;
 }
 
-.iti__country-list {
-    @apply sp-m-0 sp-mt-1 sp-bg-primary sp-border-tertiary;
+.iti--inline-dropdown .iti__dropdown-content {
+    @apply sp-mt-1 sp-bg-primary sp-border sp-border-tertiary;
+}
+
+.iti__search-input {
+    @apply sp-min-h-0 sp-bg-primary sp-rounded-t sp-rounded-b-none sp-px-3 sp-py-3/2 sp-text-sm;
+}
+
+.iti__search-input ~ .iti__country-list {
+    @apply sp-border-t sp-border-tertiary;
 }
 
 .iti__country.iti__highlight {
@@ -22,8 +30,12 @@
     @apply sp-px-2 sp-py-1 sp-text-sm;
 }
 
+.iti__country-name {
+    @apply sp-truncate;
+}
+
 .iti__dial-code {
-    @apply sp-text-tertiary;
+    @apply sp-flex-none sp-text-tertiary;
 }
 
 .iti__arrow {
@@ -34,28 +46,30 @@
     border-bottom-color: var(--color-text-primary);
 }
 
-.iti__flag-container {
+.iti__country-container {
     @apply sp-p-0;
 }
 
-.iti__selected-flag {
+.iti__selected-country {
     @apply sp-py-0 sp-px-5/2;
 }
 
-.iti--separate-dial-code .iti__selected-flag {
+.iti--show-selected-dial-code .iti__selected-country {
     @apply sp-bg-tertiary sp-text-sm sp-rounded-l;
 }
 
-.iti--allow-dropdown .iti__flag-container:hover .iti__selected-flag {
+.iti--allow-dropdown .iti__country-container:hover .iti__selected-country,
+.iti--allow-dropdown .iti__country-container:has(+ input[disabled]):hover .iti__selected-country,
+.iti--allow-dropdown .iti__country-container:has(+ input[readonly]):hover .iti__selected-country {
     @apply sp-bg-tertiary;
 }
 
-.sp-input-has-error .iti__flag-container {
-    @apply sp-p-1/2;
+.sp-input-has-error .iti__country-container {
+    @apply sp-p-1/2 sp-pr-0;
 }
 
-.sp-input-has-error .iti__selected-flag {
-    @apply sp-px-2 sp-py-0;
+.sp-input-has-error .iti__selected-country {
+    @apply sp-pl-2 sp-py-0;
 }
 
 /* Small (xs) */

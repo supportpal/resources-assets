@@ -68,6 +68,13 @@
     text-shadow: none;
 }
 
+.sp-editor-content table tbody,
+.sp-editor-content table tr,
+.sp-editor-content table th,
+.sp-editor-content table td {
+    border: inherit;
+}
+
 .sp-editor-content .sp-mention {
     @apply sp-inline-flex sp-items-center sp-px-1 sp-py-1/2 sp-rounded sp-text-sm;
     @apply sp-bg-tertiary sp-text-secondary dark:sp-bg-tertiary !important;

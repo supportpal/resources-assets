@@ -137,10 +137,8 @@ $(function () {
     }
     $element.sourcecode({
       toolbar: true,
-      mergeFields: {
-        tickets: true,
-        organisations: organisationsEnabled
-      }
+      mergefields_tickets: true,
+      mergefields_organisations: organisationsEnabled
     });
     $element.data('init', true);
   }

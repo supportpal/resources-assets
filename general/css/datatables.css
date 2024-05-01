@@ -1,126 +1,144 @@
-.dataTables_wrapper {
+div.dt-container {
     @apply sp--mx-6;
 }
 
-.dataTables_wrapper .dataTables_length,
-.dataTables_wrapper .dataTables_filter,
-.dataTables_wrapper .dataTables_info,
-.dataTables_wrapper .dataTables_processing,
-.dataTables_wrapper .dataTables_paginate,
-.dataTables_wrapper .dataTables_sort {
+div.dt-container div.dt-layout-cell {
+    @apply sp-p-0;
+}
+
+div.dt-container .dt-length,
+div.dt-container .dt-search,
+div.dt-container .dt-info,
+div.dt-container .dt-processing,
+div.dt-container .dt-paging,
+div.dt-container .dataTables_sort {
     @apply sp-mx-6 sp-text-primary;
 }
 
 @media print {
-    .dataTables_wrapper,
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_filter,
-    .dataTables_wrapper .dataTables_info,
-    .dataTables_wrapper .dataTables_processing,
-    .dataTables_wrapper .dataTables_paginate,
-    .dataTables_wrapper .dataTables_sort {
+    div.dt-container,
+    div.dt-container .dt-length,
+    div.dt-container .dt-search,
+    div.dt-container .dt-info,
+    div.dt-container .dt-processing,
+    div.dt-container .dt-paging,
+    div.dt-container .dataTables_sort {
         @apply sp-mx-0;
     }
 }
 
-.dataTables_wrapper .dataTables_processing {
+div.dt-container .dt-processing {
     background: 0;
     @apply sp-h-full sp-w-full sp-left-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
 }
 
-div.dataTables_processing > div:last-child > div {
+div.dt-processing > div:last-child > div {
     @apply sp-h-2 sp-w-2;
 }
 
-.dataTables_length,
-.dataTables_filter {
+.dt-length,
+.dt-search {
     @apply sp-p-0 sp-pb-4;
 }
 
-.dataTables_wrapper .dataTables_filter input {
+div.dt-container .dt-search input {
     @apply sp-ml-0;
 }
 
-.dataTables_wrapper .dataTables_length select,
-.dataTables_wrapper .dataTables_sort select,
-.dataTables_wrapper .dataTables_filter input,
-.dataTables_wrapper .dataTables_paginate .paginate_input,
-.dataTables_paginate .paginate_input {
+div.dt-container .dt-length select,
+div.dt-container .dataTables_sort select,
+div.dt-container .dt-search input,
+div.dt-container .dt-paging .paginate_input,
+.dt-paging .paginate_input {
     @apply sp-px-3 sp-py-1/2 sp-bg-secondary sp-border-2 sp-border-secondary sp-rounded;
     min-height: 2rem;
 }
 
-.dataTables_wrapper .dataTables_length select,
-.dataTables_wrapper .dataTables_sort select {
+div.dt-container .dt-length select,
+div.dt-container .dataTables_sort select {
     @apply sp-pr-8;
 }
 
-.dataTables_wrapper .dataTables_length select,
-.dataTables_wrapper .dataTables_paginate .paginate_input,
-.dataTables_paginate .paginate_input {
-    @apply sp-ml-1;
+div.dt-container .dt-length select {
+    @apply sp-mx-1;
 }
 
-.dataTables_wrapper .dataTables_sort {
+div.dt-container .dataTables_sort {
     @apply sp-pb-4 sp-float-right;
 }
 
-.dataTables_wrapper .dataTables_info,
-.dataTables_wrapper .dataTables_paginate {
+div.dt-container .dt-info,
+div.dt-container .dt-paging {
     @apply sp-pt-6;
 }
 
-.dataTables_wrapper .top .dataTables_info {
+div.dt-container .dt-paging .ellipsis {
+    @apply sp-p-0;
+}
+
+div.dt-container .top .dt-info {
     @apply sp-px-0 sp-pt-1 sp-pb-5;
 }
 
-.dataTables_info {
+div.dt-container .dt-info {
     @apply sp-leading-loose;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_input,
-.dataTables_paginate .paginate_input {
-    @apply sp-w-16;
+div.dt-container .dt-paging .paginate_input,
+.dt-paging .paginate_input {
+    @apply sp-w-16 sp-mx-2;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button,
-.dataTables_wrapper .dataTables_paginate .paginate_page,
-.dataTables_paginate .paginate_button,
-.dataTables_paginate .paginate_page {
+div.dt-container .dt-paging .dt-paging-button,
+div.dt-container .dt-paging .paginate_page,
+.dt-paging .dt-paging-button,
+.dt-paging .paginate_page {
     @apply sp-p-0 sp-ml-4 sp-border-0;
     min-width: auto;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_of,
-.dataTables_paginate .paginate_of {
+div.dt-container .dt-paging .paginate_of,
+.dt-paging .paginate_of {
     @apply sp-mr-4;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button,
-.dataTables_paginate .paginate_button {
+div.dt-container .dt-paging .dt-paging-button,
+.dt-paging .dt-paging-button {
     @apply sp-px-3 sp-py-1 sp-ml-0 sp-rounded;
     @apply sp-text-secondary !important;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button:active,
-.dataTables_paginate .paginate_button:hover,
-.dataTables_paginate .paginate_button:active {
+div.dt-container .dt-paging .dt-paging-button:hover,
+div.dt-container .dt-paging .dt-paging-button:active,
+.dt-paging .dt-paging-button:hover,
+.dt-paging .dt-paging-button:active {
     @apply sp-border-0 sp-shadow-inner sp-cursor-pointer;
     @apply sp-text-primary !important;
 
     background: var(--color-background-tertiary) !important;
 }
 
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover,
-.dataTables_wrapper .dataTables_paginate .paginate_button.disabled:active,
-.dataTables_paginate .paginate_button.disabled,
-.dataTables_paginate .paginate_button.disabled:hover,
-.dataTables_paginate .paginate_button.disabled:active {
+div.dt-container .dt-paging .dt-paging-button.disabled,
+div.dt-container .dt-paging .dt-paging-button.disabled:hover,
+div.dt-container .dt-paging .dt-paging-button.disabled:active,
+.dt-paging .dt-paging-button.disabled,
+.dt-paging .dt-paging-button.disabled:hover,
+.dt-paging .dt-paging-button.disabled:active {
     @apply sp-shadow-none sp-cursor-auto sp-opacity-25;
     @apply sp-text-secondary !important;
     background: 0;
+}
+
+div.dt-container .dt-input {
+    @apply sp-px-3 sp-py-3/2 sp-bg-secondary sp-border-2 sp-border-secondary sp-rounded;
+}
+
+div.dt-container .dt-input:focus {
+    @apply sp-bg-primary;
+}
+
+div.dt-container .dt-input.md\:sp-rounded-r-none {
+    @apply sp-rounded-r-none;
 }
 
 table.dataTable {
@@ -199,47 +217,69 @@ table.settings thead th:first-child {
     @apply sp-border-l-0;
 }
 
-table.dataTable thead > tr > th.sorting,
-table.dataTable thead > tr > th.sorting_asc,
-table.dataTable thead > tr > th.sorting_desc {
-    @apply sp-bg-none !important;
+table.dataTable thead > tr > th.dt-orderable-asc,
+table.dataTable thead > tr > th.dt-orderable-desc,
+table.dataTable thead > tr > th.dt-ordering-asc,
+table.dataTable thead > tr > th.dt-ordering-desc {
+    @apply sp-pr-7;
 }
 
-table.dataTable thead > tr > th.sorting:before,
-table.dataTable thead > tr > th.sorting_asc:before,
-table.dataTable thead > tr > th.sorting_desc:before {
-    @apply sp-top-4 sp-right-3 sp-ml-1 sp-font-icon sp-font-bold sp-text-base;
+table.dataTable thead > tr > th:last-child.dt-orderable-asc,
+table.dataTable thead > tr > th:last-child.dt-orderable-desc,
+table.dataTable thead > tr > th:last-child.dt-ordering-asc,
+table.dataTable thead > tr > th:last-child.dt-ordering-desc {
+    @apply sp-pr-11;
 }
 
-table.dataTable thead > tr > th.sorting:before {
-    @apply sp-opacity-25;
-    content: "\f0dc";
+table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order,
+table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order,
+table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order,
+table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order {
+    @apply sp-right-2;
 }
 
-table.dataTable thead > tr > th.sorting_asc:before,
-table.dataTable thead > tr > th.sorting_desc:before {
-    @apply sp-opacity-100;
+table.dataTable thead > tr > th:last-child.dt-orderable-asc span.dt-column-order,
+table.dataTable thead > tr > th:last-child.dt-orderable-desc span.dt-column-order,
+table.dataTable thead > tr > th:last-child.dt-ordering-asc span.dt-column-order,
+table.dataTable thead > tr > th:last-child.dt-ordering-desc span.dt-column-order {
+    @apply sp-right-6;
 }
 
-table.dataTable thead > tr > th.sorting_asc:before {
+table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
+table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before,
+table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after,
+table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after {
+    @apply sp-font-icon sp-text-base sp-leading-0;
+}
+
+table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
+table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before {
     content: "\f0de";
 }
 
-table.dataTable thead > tr > th.sorting_desc:before {
+table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after,
+table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after {
+    @apply sp-font-icon;
     content: "\f0dd";
 }
 
-table.dataTable thead > tr > th.sorting:after,
-table.dataTable thead > tr > th.sorting.asc:after,
-table.dataTable thead > tr > th.sorting_desc:after,
-table.dataTable thead > tr > th.sorting.sp-hide-sorting:before,
-table.dataTable thead > tr > th.sorting_asc.sp-hide-sorting:before,
-table.dataTable thead > tr > th.sorting_desc.sp-hide-sorting:before {
-    content: '';
+table.dataTable > tbody > tr:first-child > * {
+    @apply sp-border-t-0;
 }
 
-table.dataTable tbody tr {
-    background: 0;
+table.dataTable > tbody > tr:last-child > * {
+    @apply sp-border-b sp-border-tertiary sp-border-solid;
+}
+
+div.dt-container.dt-empty-footer tbody > tr:last-child > * {
+    @apply sp-border-b-tertiary;
+}
+
+table.dataTable th.dt-type-numeric,
+table.dataTable th.dt-type-date,
+table.dataTable td.dt-type-numeric,
+table.dataTable td.dt-type-date {
+    @apply sp-text-left;
 }
 
 table.dataTable tbody tr.selected {
@@ -260,6 +300,7 @@ table.dataTable tfoot td {
     @apply sp-border-t sp-border-tertiary;
 }
 
+
 table.dataTable tbody td.all a .fas {
     @apply sp-text-secondary;
 }
@@ -268,16 +309,9 @@ table.dataTable tbody td.all a:hover .fas {
     @apply sp-text-primary;
 }
 
-.sp-quick-actions .dataTables_paginate {
-    @apply sp-leading-none;
-}
-
-.sp-quick-actions .paginate_button {
-    @apply sp-inline-block sp-py-5/2 sp-align-middle;
-}
-
-.sp-quick-actions .paginate_input {
-    @apply sp-py-1;
+.sp-quick-actions .dt-paging-button {
+    @apply sp-inline-block sp-py-3/2 sp-shadow-none sp-align-middle;
+    background: 0;
 }
 
 .sp-quick-actions .paginate_page,
@@ -286,7 +320,7 @@ table.dataTable tbody td.all a:hover .fas {
     @apply sp-hidden;
 }
 
-.sp-quick-actions .dataTables_filter {
+.sp-quick-actions .dt-search {
     @apply sp-p-0;
     padding: 0;
 }
@@ -334,27 +368,27 @@ table.dataTable tbody td.all a:hover .fas {
 
 /* Medium (md) */
 @media screen and (max-width: 768px) {
-    .dataTables_wrapper .dataTables_length,
-    .dataTables_wrapper .dataTables_sort {
+    div.dt-container .dt-length,
+    div.dt-container .dataTables_sort {
         @apply sp-hidden;
     }
 
-    .dataTables_wrapper .dataTables_filter {
+    div.dt-container .dt-search {
         @apply sp-float-none;
     }
 
-    .dataTables_wrapper .dataTables_filter input {
+    div.dt-container .dt-search input {
         @apply sp-w-full;
         width: 100%;
     }
 
-    .dataTables_wrapper .dataTables_paginate {
+    div.dt-container .dt-paging {
         @apply sp-pt-3 sp-mt-0;
     }
 
-    .dataTables_wrapper .dataTables_paginate .paginate_input,
-    .dataTables_paginate .paginate_input {
-        @apply sp-w-14 sp-px-2 sp-mx-0;
+    div.dt-container .dt-paging .paginate_input,
+    .dt-paging .paginate_input {
+        @apply sp-w-14 sp-px-2;
     }
 
     table.dataTable thead th.md\:sp-pr-3,
@@ -395,22 +429,18 @@ table.dataTable tbody td.all a:hover .fas {
 
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
+    @apply sp-pl-14;
     position: relative;
 }
 
-table.dataTable.dtr-inline.collapsed > thead > tr > th:first-child,
-table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child {
-    @apply sp-pl-14;
-}
-
-table.dataTable.dtr-inline.collapsed > tbody > tr > td:first-child:before,
-table.dataTable.dtr-inline.collapsed > tbody > tr > th:first-child:before {
-    @apply sp-absolute sp-left-6 sp-top-1/2 sp-h-5 sp-w-5 sp-bg-green-500 sp-rounded sp-font-icon sp-font-bold sp-text-xs sp-text-white sp-text-center sp-leading-5 sp-transform sp--translate-y-1/2;
+table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+    @apply sp-absolute sp-left-6 sp-top-1/2 sp-h-5 sp-w-5 sp-bg-green-500 sp-border-0 sp-rounded sp-font-icon sp-font-bold sp-text-xs sp-text-white sp-text-center sp-leading-5 sp-transform sp--translate-y-1/2;
     content: "\f067";
 }
 
-table.dataTable.dtr-inline.collapsed > tbody > tr.parent > td:first-child:before {
-    @apply sp-bg-red-500;
+table.dataTable.dtr-inline.collapsed > tbody > tr.dtr-expanded > td.dtr-control:before {
+    @apply sp-bg-red-500 sp-border-0;
     content: "\f068";
 }
 
@@ -420,6 +450,10 @@ table.dataTable > tbody > tr.child ul.dtr-details > li {
 
 table.dataTable > tbody > tr.child span.dtr-title {
     min-width: auto;
+}
+
+table.dataTable.sp-table-fixed colgroup:nth-child(2) {
+    @apply sp-hidden;
 }
 
 /* yadcf */

@@ -35,13 +35,15 @@
         return;
       }
       const editor = $(selector).editor($.extend({}, ticket.defaultEditorConfig(), {
-        oninit: function (editor) {
-          loadEditorContent(selector, $form, editor).then(function () {
-            if (focus && !isFocused(selector)) {
-              editor.focus();
-            }
-            setEditor(selector, focus, editor);
-            $(selector).trigger('loaded-editor-content', [selector, $form, editor]);
+        setup: function (editor) {
+          editor.on('init', function () {
+            loadEditorContent(selector, $form, editor).then(function () {
+              if (focus && !isFocused(selector)) {
+                editor.focus();
+              }
+              setEditor(selector, focus, editor);
+              $(selector).trigger('loaded-editor-content', [selector, $form, editor]);
+            });
           });
         }
       }, opts));
@@ -140,16 +142,18 @@
       hideAllForms();
       var isFresh = $('.sp-reply-type .sp-action[data-type="2"]').hasClass('sp-fresh'),
         editor_opts = {
-          oninit: function (editor) {
-            // Choose right message depending on reply order.
-            var $message;
-            if (ticket.parameters().replyOrder === 'ASC') {
-              $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):last');
-            } else {
-              $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):first');
-            }
-            ticket.forwardFrom($message);
-            setEditor(forward_selector, true, editor);
+          setup: function (editor) {
+            editor.on('init', function () {
+              // Choose right message depending on reply order.
+              var $message;
+              if (ticket.parameters().replyOrder === 'ASC') {
+                $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):last');
+              } else {
+                $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):first');
+              }
+              ticket.forwardFrom($message);
+              setEditor(forward_selector, true, editor);
+            });
           }
         };
       const $form = $('.forward-form').toggle();

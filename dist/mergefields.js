@@ -1,19 +1,19 @@
-(function ($, window, document, undefined) {
+(function (global, factory) {
+  typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) : typeof define === 'function' && define.amd ? define(['exports'], factory) : (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global.MergeFields = {}));
+})(this, function (exports) {
+  'use strict';
+
   /*
-   * DOMParser HTML extension
-   * 2012-09-04
-   *
-   * By Eli Grey, http://eligrey.com
-   * Public domain.
-   * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-   */
+     * DOMParser HTML extension
+     * 2012-09-04
+     *
+     * By Eli Grey, http://eligrey.com
+     * Public domain.
+     * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
+     */
 
   /*! @source https://gist.github.com/1129031 */
-  /*global document, DOMParser*/
-
-  (function (DOMParser) {
-    "use strict";
-
+  function DOMParser() {
     var proto = DOMParser.prototype,
       nativeParse = proto.parseFromString;
 
@@ -38,7 +38,7 @@
         return nativeParse.apply(this, arguments);
       }
     };
-  })(DOMParser);
+  }
 
   /**
    * Merge fields.
@@ -47,8 +47,6 @@
    * @constructor
    */
   function MergeFields(parameters) {
-    "use strict";
-
     var instance = this;
 
     /**
@@ -58,12 +56,7 @@
       $toolbar,
       $preview,
       $editor,
-      valFn = parameters.valFn || function () {
-        return parameters.codemirror.codemirror().getValue();
-      },
-      syncFn = parameters.syncFn || function () {
-        parameters.codemirror.codemirror().save();
-      };
+      valFn = parameters.valFn;
 
     /**
      * List of node attributes that are permitted to contain twig template code.
@@ -165,9 +158,6 @@
      * @param html
      */
     this.callback = function (html) {
-      // Sync the textarea and editor.
-      syncFn();
-
       // Check if the editor contains {{ operator.reply_template }}.
       containsReplyTemplate(html);
 
@@ -306,11 +296,11 @@
    * @type {string}
    */
   MergeFields.modalContent = '<section> \
-                          <span class="sp-description">' + MergeFields.translations.merge_fields_desc + '</span> \
-                          <br /><br /> \
-                          <div class="sp-merge-fields sp-flex sp-flex-wrap"> \
-                          </div> \
-                        </section>';
+                        <span class="sp-description">' + MergeFields.translations.merge_fields_desc + '</span> \
+                        <br /><br /> \
+                        <div class="sp-merge-fields sp-flex sp-flex-wrap"> \
+                        </div> \
+                      </section>';
 
   /**
    * Ticket merge fields.
@@ -349,5 +339,5 @@
       });
     });
   };
-  App.extend('mergefields', MergeFields);
-})($, window, document);
+  exports.MergeFields = MergeFields;
+});

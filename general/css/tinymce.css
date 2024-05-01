@@ -1,7 +1,11 @@
 .tox-tinymce {
-    @apply sp-border-tertiary sp-rounded;
+    @apply sp-border sp-border-tertiary sp-rounded;
 
     font-family: inherit;
+}
+
+.tox:not(.tox-tinymce-inline) .tox-editor-header {
+    @apply sp-p-0 sp-shadow-none;
 }
 
 .tox-tinymce--disabled {
@@ -9,7 +13,15 @@
 }
 
 .tox-tinymce-aux {
-    z-index: 10051;
+    @apply sp-z-[10051];
+}
+
+.tox:not(.tox-tinymce-inline).tox-tinymce--toolbar-sticky-on .tox-editor-header {
+    @apply sp-p-0 sp-bg-none sp-shadow sp-z-[49];
+}
+
+.tox:not(.tox-tinymce-inline).tox-tinymce--toolbar-sticky-on .tox-editor-header.sp-with-quick-actions {
+    @apply sp-top-24 !important;
 }
 
 .tox .tox-toolbar-overlord {
@@ -35,10 +47,18 @@
     @apply sp-border-tertiary;
 }
 
+.tox .tox-tbtn {
+    @apply sp-h-8;
+}
+
 .tox .tox-tbtn,
 .tox .tox-tbtn--select,
 .tox .tox-split-button {
     @apply sp-m-0;
+}
+
+.tox .tox-tbtn--bespoke {
+    @apply sp-bg-inherit;
 }
 
 .tox .tox-tbtn,
@@ -67,11 +87,14 @@
 }
 
 .tox .tox-tbtn svg,
+.tox .tox-icon svg,
+.tox .tox-notification__icon svg,
 .tox .tox-split-button svg {
     fill: var(--color-text-primary) !important;
 }
 
 .tox .tox-tbtn:hover svg,
+.tox .tox-icon:hover svg,
 .tox .tox-split-button:hover svg,
 .tox .tox-split-button:focus svg {
     fill: var(--color-text-secondary) !important;
@@ -83,15 +106,19 @@
 
 .tox.tox-tinymce-aux .tox-toolbar__overflow,
 .tox .tox-menu {
-    @apply sp-mt-px sp-bg-primary sp-border-t-0 sp-border-tertiary sp-rounded-b sp-rounded-t-none sp-shadow-none;
+    @apply sp-p-0 sp-mt-px sp-bg-primary sp-border sp-border-t-0 sp-border-solid sp-border-tertiary sp-rounded-b sp-rounded-t-none sp-shadow-none;
 }
 
 .tox .tox-autocompleter .tox-menu {
     @apply sp-mt-1/2 sp-border-t sp-rounded-t;
 }
 
+.tox .tox-tiered-menu .tox-menu {
+    @apply sp-border-t sp--mt-px sp--ml-px;
+}
+
 .tox .tox-collection--list .tox-collection__group {
-    @apply sp-p-0;
+    @apply sp-p-0 sp-border-tertiary;
 }
 
 .tox .tox-collection__group-heading {
@@ -124,18 +151,46 @@
     @apply sp-leading-normal;
 }
 
+.tox .tox-collection__item-caret svg {
+    fill: var(--color-text-primary);
+}
+
 .tox .tox-edit-area__iframe {
     @apply sp-bg-primary sp-text-secondary;
 }
 
 .tox .tox-statusbar {
-    @apply sp-bg-primary sp-border-t sp-border-secondary sp-text-secondary;
+    @apply sp-bg-primary sp-border-t sp-border-secondary sp-text-secondary sp-box-content;
 }
 
 .tox .tox-statusbar a,
 .tox .tox-statusbar__path-item,
 .tox .tox-statusbar__wordcount {
     @apply sp-text-secondary;
+}
+
+.tox .tox-statusbar__branding svg {
+    @apply sp-fill-inherit sp-opacity-50;
+}
+
+.tox .tox-statusbar__branding a:hover:not(:disabled):not([aria-disabled="true"]) svg,
+.tox .tox-statusbar__branding a:focus:not(:disabled):not([aria-disabled="true"]) svg {
+    @apply sp-fill-inherit;
+}
+
+.sp-theme-dark .tox .tox-statusbar__branding svg,
+.sp-theme-dark .tox .tox-statusbar__branding a:hover:not(:disabled):not([aria-disabled="true"]) svg,
+.sp-theme-dark .tox .tox-statusbar__branding a:focus:not(:disabled):not([aria-disabled="true"]) svg {
+    @apply sp-fill-white;
+}
+
+.tox .tox-statusbar a:hover:not(:disabled):not([aria-disabled="true"]),
+.tox .tox-statusbar__path-item:hover:not(:disabled):not([aria-disabled="true"]),
+.tox .tox-statusbar__wordcount:hover:not(:disabled):not([aria-disabled="true"]),
+.tox .tox-statusbar a:focus:not(:disabled):not([aria-disabled="true"]),
+.tox .tox-statusbar__path-item:focus:not(:disabled):not([aria-disabled="true"]),
+.tox .tox-statusbar__wordcount:focus:not(:disabled):not([aria-disabled="true"]) {
+    @apply sp-text-inherit;
 }
 
 .tox .tox-dialog {
@@ -160,7 +215,8 @@
 }
 
 .tox .tox-dialog__body-nav-item,
-.tox .tox-dialog__body-nav-item--active {
+.tox .tox-dialog__body-nav-item--active,
+.tox .tox-dialog__body {
     @apply sp-text-primary;
 }
 
@@ -185,6 +241,10 @@
     @apply sp-text-primary;
 }
 
+.tox .tox-toolbar__group {
+    @apply sp-px-1;
+}
+
 .tox .tox-button {
     @apply sp-border-0;
 }
@@ -206,16 +266,108 @@
 }
 
 .tox .tox-button--naked,
+.tox .tox-button--naked:focus:not(:disabled),
 .tox .tox-button--naked:hover:not(:disabled) {
     background: transparent;
 }
 
+.tox .tox-button--naked:focus:not(:disabled),
 .tox .tox-button--naked:hover:not(:disabled) {
     @apply sp-text-primary;
 }
 
 .tox .tox-pop__dialog {
     @apply sp-bg-secondary sp-border sp-border-tertiary sp-rounded sp-shadow;
+}
+
+.tox .tox-pop.tox-pop--bottom::after {
+    @apply sp-border-t-secondary;
+}
+.tox .tox-pop.tox-pop--bottom::before {
+    @apply sp-border-t-tertiary;
+}
+
+.tox .tox-pop.tox-pop--top::after {
+    @apply sp-border-b-secondary;
+}
+.tox .tox-pop.tox-pop--top::before {
+    @apply sp-border-b-tertiary;
+}
+
+.tox .tox-pop.tox-pop--left::after {
+    @apply sp-border-r-secondary;
+}
+.tox .tox-pop.tox-pop--left::before {
+    @apply sp-border-r-tertiary;
+}
+
+.tox .tox-pop.tox-pop--right::after {
+    @apply sp-border-l-secondary;
+}
+.tox .tox-pop.tox-pop--right::before {
+    @apply sp-border-l-tertiary;
+}
+
+.tox .tox-dialog__title {
+    @apply sp-font-display;
+}
+
+.tox .tox-textfield,
+.tox .tox-toolbar-textfield,
+.tox .tox-listboxfield .tox-listbox--select,
+.tox .tox-textarea,
+.tox .tox-textarea-wrap .tox-textarea:focus {
+    @apply sp-rounded;
+}
+
+.tox .tox-notification--error {
+    @apply sp-bg-red-200 sp-border-red-500 dark:sp-bg-red-700;
+}
+
+.tox .tox-notification--error,
+.tox .tox-notification--error p {
+    @apply sp-text-red-800 dark:sp-text-red-100;
+}
+
+.tox .tox-notification--info {
+    @apply sp-bg-blue-200 sp-border-blue-500 dark:sp-bg-blue-700;
+}
+
+.tox .tox-notification--info p {
+    @apply sp-text-blue-800 dark:sp-text-blue-100;
+}
+
+.tox .tox-notification--success {
+    @apply sp-bg-green-200 sp-border-green-500 dark:sp-bg-green-700;
+}
+
+.tox .tox-notification--success,
+.tox .tox-notification--success p {
+    @apply sp-text-green-800 dark:sp-text-green-100;
+}
+
+.tox .tox-notification--warn,
+.tox .tox-notification--warning {
+    @apply sp-bg-yellow-200 sp-border-yellow-500 dark:sp-bg-yellow-700;
+}
+
+.tox .tox-notification--warn,
+.tox .tox-notification--warn p,
+.tox .tox-notification--warning,
+.tox .tox-notification--warning p {
+    @apply sp-text-yellow-800 dark:sp-text-yellow-100;
+}
+
+.tox .tox-collection--list .tox-collection__group .tox-insert-table-picker {
+    @apply sp-m-0;
+}
+
+.tox .tox-insert-table-picker > div {
+    @apply sp-border-tertiary;
+}
+
+.tox .tox-insert-table-picker .tox-insert-table-picker__label {
+    @apply sp-text-secondary;
 }
 
 /* Custom */
@@ -256,4 +408,16 @@
 
 .tox-sp-mr-1 {
     @apply sp-mr-1 !important;
+}
+
+.tox .tox-menu.tox-collection.tox-collection--list {
+    @apply sp-p-0;
+}
+
+.tox .tox-collection__item {
+    @apply sp-rounded-none;
+}
+
+.tox .tox-collection__item:hover {
+    @apply sp-cursor-pointer;
 }

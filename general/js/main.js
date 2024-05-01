@@ -234,7 +234,7 @@ $(function () {
       return title;
     },
     onShow: function (instance) {
-      return instance.reference.hasAttribute('data-tippy-content') && !instance.reference.classList.contains('tox-edit-area__iframe') && !instance.reference.classList.contains('tox-collection__item') && instance.reference.getAttribute('data-tippy-content').length > 0;
+      return instance.reference.hasAttribute('data-tippy-content') && !instance.reference.classList.contains('tox-edit-area__iframe') && !instance.reference.classList.contains('tox-collection__item') && (!instance.reference.classList.contains('tox-button') || instance.reference.classList.contains('tox-button--icon')) && instance.reference.getAttribute('data-tippy-content').length > 0;
     },
     target: '[title]',
     touch: ['hold', 500],

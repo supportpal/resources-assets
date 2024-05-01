@@ -18,6 +18,20 @@ $(document).ready(function () {
     selector: '.sp-lightbox'
   });
 
+  // Comment editor.
+  $('.add-comment textarea').editor({
+    // Paste settings.
+    valid_elements: 'a[href|target=_blank],br,p',
+    // Toolbar settings.
+    toolbar: false,
+    // https://www.tiny.cloud/docs/plugins/opensource/autoresize/#min_height
+    min_height: 100,
+    // Statusbar settings.
+    statusbar: false,
+    // Disable keyboard shortcuts.
+    plugins: $.fn.editor.defaults.plugins.concat(['disable_shortcuts'])
+  });
+
   // Change ordering
   $('.sp-comment-ordering').on('change', function () {
     // Show loading
@@ -145,14 +159,17 @@ $(document).ready(function () {
       scrollTop: $(".add-comment-form").position().top - 24
     }, 500);
 
-    // Add to textarea
-    name = $.trim(name.replace(/\s/g, ''));
-    $(".add-comment").find('textarea').val('@' + $.trim(name) + ' ').trigger('focus');
-
     // Show reply form if it's not already visible
     if (!$('.add-comment-form').next().is(':visible')) {
       $('.add-comment-form').trigger('click');
     }
+
+    // Add to textarea
+    var $editor = $('.add-comment').find('textarea').editor();
+    $editor.setContent('@' + $.trim(name.replace(/\s/g, '')) + '&nbsp;');
+    $editor.selection.select(tinyMCE.activeEditor.getBody(), true);
+    $editor.selection.collapse(false);
+    $editor.focus();
   })
 
   // Handles the rating of a comment
@@ -189,7 +206,7 @@ $(document).ready(function () {
     $('.sp-replying-to').hide();
 
     // Clear textarea
-    $(".add-comment").find('textarea').val('');
+    $('.add-comment').find('textarea').editor().setContent('');
   });
 
   // Handles the rating of an article

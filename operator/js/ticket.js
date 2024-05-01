@@ -121,11 +121,12 @@
       if (tinymce.get(textarea_id)) {
         var editor = $textarea.editor(),
           content = editor.getContent({
+            format: 'text',
             withoutCursorMarker: true
           }),
           message = null,
           isEmpty = content.length === 0,
-          isTooLong = editor.settings.character_limit && content.length >= editor.settings.character_limit;
+          isTooLong = typeof editor.plugins.limiter !== "undefined" && editor.plugins.limiter.exceedsCharacterLimit();
 
         // Validation.
         // We're using manual validation here because jquery validate does not support multiple fields with the
@@ -137,17 +138,19 @@
         } else if (isTooLong) {
           message = Lang.get('validation.max.string', {
             'attribute': Lang.get('general.text').toLowerCase(),
-            'max': editor.settings.character_limit
+            'max': editor.options.get('character_limit')
           });
         }
+        var error_id = textarea_id + '-error';
         if (message !== null) {
-          var error_id = textarea_id + '-error';
           if ($("#" + error_id).length === 0) {
             $textarea.parents('.sp-form-row, .sp-message-text-edit').addClass('sp-input-has-error');
             $(editor.getContainer()).after('<span id="' + error_id + '" class="sp-input-error"></span>');
           }
           $('#' + error_id).text(message).show();
           return false;
+        } else {
+          $('#' + error_id).hide();
         }
       }
 
@@ -662,11 +665,25 @@
      */
     this.updateLogTable = function (force) {
       force = force || false;
-      if (this.isLogTableLoaded() || force) {
-        // Refresh the table
-        $('#tabLog .dataTable').dataTable().api().ajax.reload(function () {
+      var $tab = $('#tabLog');
+      if ($tab.is(':empty')) {
+        if ($tab.hasClass('loading')) {
+          return;
+        }
+        $tab.on('xhr.dt', function (e, settings, json, xhr) {
           datatablesLoaded.log = true;
         });
+        $tab.html('<i class="fas fa-spinner fa-pulse fa-fw"></i>').addClass('loading');
+        $.get(laroute.route('ticket.operator.log.render', {
+          id: ticket.parameters().ticketId
+        })).done(function (response) {
+          if (response.status === 'success') $tab.html(response.data);
+        });
+      } else {
+        // Refresh the table
+        if (this.isLogTableLoaded() || force) {
+          $tab.find('.dataTable').dataTable().api().ajax.reload();
+        }
       }
     };
 
@@ -686,23 +703,37 @@
      */
     this.updateEscalationsTable = function (force) {
       force = force || false;
-      if (this.isEscalationsTableLoaded() || force) {
-        // Refresh the table
-        $('#tabEscalationRules .dataTable').dataTable().api().ajax.reload(function (data) {
-          var $escalationRules = $('.sp-tabs #EscalationRules');
-          if (data.iTotalRecords > 0) {
+      var $tab = $('#tabEscalationRules');
+      if ($tab.is(':empty')) {
+        if ($tab.hasClass('loading')) {
+          return;
+        }
+        $tab.on('xhr.dt', function (e, settings, data, xhr) {
+          var $button = $('.sp-tabs #EscalationRules');
+          if (data.recordsTotal > 0) {
             // Show the tab if hidden and update the count of rules
-            $escalationRules.show();
+            $button.show();
           } else {
             // Switch to messages if we're currently on escalation rules
-            if ($escalationRules.hasClass('active')) {
+            if ($button.hasClass('sp-active')) {
               $('.sp-tabs #Messages').trigger('click');
             }
             // Hide the tab as no more rules exist
-            $escalationRules.hide();
+            $button.hide();
           }
           datatablesLoaded.escalationRules = true;
         });
+        $tab.html('<i class="fas fa-spinner fa-pulse fa-fw"></i>').addClass('loading');
+        $.get(laroute.route('ticket.operator.escalationRules.render', {
+          id: ticket.parameters().ticketId
+        })).done(function (response) {
+          if (response.status === 'success') $tab.html(response.data);
+        });
+      } else {
+        if (this.isEscalationsTableLoaded() || force) {
+          // Refresh the table
+          $tab.find('.dataTable').dataTable().api().ajax.reload();
+        }
       }
     };
 
