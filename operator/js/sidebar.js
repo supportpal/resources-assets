@@ -8,6 +8,34 @@ var sideBar = function () {
 
   var storageName = 'sidebarData',
     storageExpiry = 3600000;
+  var initJQueryListeners = function () {
+    $('select[name="search_tag"]').selectize({
+      valueField: 'id',
+      searchField: ['name'],
+      load: function (query, callback) {
+        if (!query.length) return callback();
+        $.get(laroute.route('ticket.operator.tag.search'), {
+          q: query
+        }).done(function (res) {
+          callback(res.data);
+        }).fail(function () {
+          callback();
+        });
+      },
+      render: {
+        option: function (item, escape) {
+          return '<div>' + '<i class="fas fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
+        }
+      },
+      onChange: function (value) {
+        if (value) {
+          Swal.showLoading();
+          window.location.href = window.location.href.split(/[?#]/)[0] + '?tag=' + value;
+          this.clear(true);
+        }
+      }
+    });
+  };
 
   /**
    * Convert string to HTML entities.
@@ -73,6 +101,8 @@ var sideBar = function () {
   /*
    * Initialise sidebar.
    */
+
+  initJQueryListeners();
 
   // If we have the sidebar data stored in local storage, use that initially before refreshing it
   var sidebarData = localStorage.getItem(storageName);

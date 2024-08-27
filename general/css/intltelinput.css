@@ -1,3 +1,8 @@
+:root {
+    --iti-arrow-padding: 0.25rem;
+    --iti-hover-color: transparent;
+}
+
 .sp-phone-number {
     @apply sp-mb-3;
 }
@@ -51,17 +56,18 @@
 }
 
 .iti__selected-country {
-    @apply sp-py-0 sp-px-5/2;
+    @apply sp-py-0 sp-px-5/2 sp-bg-tertiary sp-text-sm sp-rounded-l;
 }
 
-.iti--show-selected-dial-code .iti__selected-country {
-    @apply sp-bg-tertiary sp-text-sm sp-rounded-l;
+.iti--allow-dropdown .iti__country-container:hover .iti__selected-country {
+    @apply sp-bg-tertiary;
 }
 
-.iti--allow-dropdown .iti__country-container:hover .iti__selected-country,
+.iti--allow-dropdown .iti__country-container:has(+ input[disabled]) .iti__selected-country,
+.iti--allow-dropdown .iti__country-container:has(+ input[readonly]) .iti__selected-country,
 .iti--allow-dropdown .iti__country-container:has(+ input[disabled]):hover .iti__selected-country,
 .iti--allow-dropdown .iti__country-container:has(+ input[readonly]):hover .iti__selected-country {
-    @apply sp-bg-tertiary;
+    @apply sp-bg-secondary sp-cursor-default;
 }
 
 .sp-input-has-error .iti__country-container {
@@ -70,6 +76,10 @@
 
 .sp-input-has-error .iti__selected-country {
     @apply sp-pl-2 sp-py-0;
+}
+
+.iti__selected-country-primary {
+    @apply sp-pl-0;
 }
 
 /* Small (xs) */

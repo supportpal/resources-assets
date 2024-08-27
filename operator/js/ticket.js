@@ -503,15 +503,17 @@
       $currentHtml.find('.expandable, .supportpal_quote').remove();
 
       // Insert into the textarea where the cursor/caret currently is, sets to start if not in focus
-      var $textarea = instance.visibleTextarea();
-      $textarea.editor().focus();
-      $textarea.editor().execCommand('mceInsertContent', false, '<blockquote>' + $currentHtml.html() + '</blockquote>');
+      instance.visibleEditor().then(function (editor) {
+        editor.focus();
+        editor.execCommand('mceInsertContent', false, '<blockquote>' + $currentHtml.html() + '</blockquote>');
+      });
     };
 
     /**
      * Get the visible text area.
      *
      * @returns {JQuery|jQuery|HTMLElement|jQuery|[]}
+     * @deprecated Use visibleEditor() instead.
      */
     this.visibleTextarea = function () {
       var $form = $('.ticket-reply-form:visible');
@@ -520,8 +522,21 @@
       }
 
       // Show the reply form.
-      $('.sp-reply-type .sp-action[data-type="0"]').removeClass('sp-fresh').show().trigger('click');
+      $('.sp-reply-type .sp-action[data-type="0"]').trigger('click');
       return $('#newMessage');
+    };
+
+    /**
+     * Get the visible editor.
+     */
+    this.visibleEditor = function () {
+      if ($('.ticket-reply-form.notes-form').is(':visible')) {
+        return App.TicketViewForm.showNotesForm();
+      }
+      if ($('.ticket-reply-form.forward-form').is(':visible')) {
+        return App.TicketViewForm.showForwardForm();
+      }
+      return App.TicketViewForm.showReplyForm();
     };
 
     /**

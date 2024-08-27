@@ -19,6 +19,10 @@ a {
     @apply sp-text-secondary;
 }
 
+hr {
+    @apply sp-my-6 sp-border-0 sp-border-t sp-border-tertiary sp-border-solid;
+}
+
 code,
 pre:not(.moz-signature) {
     @apply sp-font-code sp-text-primary;

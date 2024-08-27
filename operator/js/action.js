@@ -70,7 +70,7 @@ $(function () {
       $action = $(this).parents('.action'),
       getCodeMirror = function ($element) {
         if ($element[0].sourcecode) {
-          return $element[0].sourcecode.codemirror().getValue();
+          return $element[0].sourcecode.codemirror().state.doc.toString();
         }
         return '';
       },

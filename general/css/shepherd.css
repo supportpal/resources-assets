@@ -1,3 +1,5 @@
+@import 'shepherd.js/dist/css/shepherd.css';
+
 .shepherd-element {
     @apply sp-bg-primary sp-border sp-border-tertiary sp-text-primary sp-shadow-md dark:sp-bg-secondary;
     z-index: 10005;

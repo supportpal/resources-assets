@@ -27,12 +27,16 @@
     };
     var initEditor = function (selector, $form, opts, focus) {
       focus = typeof focus !== 'undefined' ? focus : true;
+      const dfd = $.Deferred();
       if (isInitialised(selector)) {
         // If it's loaded but not focused once and we want to.
         if (focus && !isFocused(selector)) {
           editors[selector]['editor'].focus();
         }
-        return;
+
+        // This helps reset the sticky toolbar which can sometimes get stuck when switching tabs.
+        editors[selector]['editor'].fire('ResizeWindow');
+        return dfd.resolve(editors[selector]['editor']).promise();
       }
       const editor = $(selector).editor($.extend({}, ticket.defaultEditorConfig(), {
         setup: function (editor) {
@@ -43,11 +47,13 @@
               }
               setEditor(selector, focus, editor);
               $(selector).trigger('loaded-editor-content', [selector, $form, editor]);
+              dfd.resolve(editor);
             });
           });
         }
       }, opts));
       setEditor(selector, false, editor);
+      return dfd.promise();
     };
     var initFileUploads = function ($form, name, params) {
       if (ticket.parameters()[name]) {
@@ -108,60 +114,47 @@
     this.initReplyForm = function (opts, focus) {
       var $form = $('.message-form');
       initFileUploads($form, 'replyFileUpload');
-      initEditor(reply_selector, $form, opts, focus);
+      return initEditor(reply_selector, $form, opts, focus);
     };
     this.initNotesForm = function () {
       var $form = $('.notes-form');
       initFileUploads($form, 'notesFileUpload');
-      initEditor('#newNote', $form, {
+      return initEditor('#newNote', $form, {
         excludeInternalArticles: false
       });
     };
-    this.initForwardForm = function (editor_opts) {
+    this.initForwardForm = function () {
       var $form = $('.forward-form');
       initFileUploads($form, 'forwardFileUpload', {
         blueimp: {
           cumulativeMaxFileSize: $form.data('cumulative-max-file-size')
         }
       });
-      initEditor(forward_selector, $form, editor_opts);
+      return initEditor(forward_selector, $form, {});
     };
     this.showReplyForm = function () {
       hideAllForms();
       const $form = $('.message-form:not(.edit)').toggle();
-      instance.initReplyForm();
-      focusForm($form, 0);
+      return instance.initReplyForm().then(function (editor) {
+        focusForm($form, 0);
+        return editor;
+      });
     };
     this.showNotesForm = function () {
       hideAllForms();
       const $form = $('.notes-form').toggle();
-      instance.initNotesForm();
-      focusForm($form, 1);
+      return instance.initNotesForm().then(function (editor) {
+        focusForm($form, 1);
+        return editor;
+      });
     };
     this.showForwardForm = function () {
       hideAllForms();
-      var isFresh = $('.sp-reply-type .sp-action[data-type="2"]').hasClass('sp-fresh'),
-        editor_opts = {
-          setup: function (editor) {
-            editor.on('init', function () {
-              // Choose right message depending on reply order.
-              var $message;
-              if (ticket.parameters().replyOrder === 'ASC') {
-                $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):last');
-              } else {
-                $message = $('#tabMessages .sp-message:not(.sp-note, .sp-forward):first');
-              }
-              ticket.forwardFrom($message);
-              setEditor(forward_selector, true, editor);
-            });
-          }
-        };
       const $form = $('.forward-form').toggle();
-      instance.initForwardForm(isFresh ? editor_opts : {});
-      if (isFresh) {
-        return;
-      }
-      focusForm($form, 2);
+      return instance.initForwardForm().then(function (editor) {
+        focusForm($form, 2);
+        return editor;
+      });
     };
   }
   function TicketViewAction() {
@@ -528,6 +521,7 @@
               $('#sidebar .customfields').find('input[type=password]').hideShowPassword();
               customfieldEditor();
               $('.datepicker').datepicker();
+              $('#sidebar .customfields').trigger('refreshed');
             }
           }
         });
@@ -736,7 +730,17 @@
           App.TicketViewForm.showNotesForm();
           break;
         case 2:
-          App.TicketViewForm.showForwardForm();
+          App.TicketViewForm.showForwardForm().then(function (editor) {
+            if (editor.getContent({
+              format: 'text',
+              withoutCursorMarker: true
+            }).length > 0) {
+              return;
+            }
+            var selector = '#tabMessages .sp-message:not(.sp-note, .sp-forward)';
+            selector += ticket.parameters().replyOrder === 'ASC' ? ':last' : ':first';
+            ticket.forwardFrom($(selector));
+          });
           break;
         default:
           App.TicketViewForm.showReplyForm();
@@ -922,8 +926,9 @@
 
     // Update ticket custom fields
     $('.save-fields').on('click', function () {
-      var data = $(this).parents('form').serializeArray();
-      updateTicket(data);
+      var $this = $(this);
+      var data = $this.parents('form').serializeArray();
+      updateTicket(data).then(() => $this.trigger('fields-saved'));
     });
 
     // Forward message.
@@ -1339,7 +1344,6 @@
             }));
           } else if (replyType == 2) {
             $('#newForward').editor().setContent('');
-            $('.sp-reply-type .sp-action[data-type="2"]').addClass('sp-fresh');
             ticket.setForwardDraft($('#newForward').editor().getContent({
               withoutCursorMarker: true
             }));
@@ -1582,12 +1586,6 @@
     $(document).on('click', '.sp-reply-options-header', function () {
       $(this).next(".sp-reply-options-content").slideToggle(500);
       $(this).find(".fas").toggleClass("fa-chevron-down fa-chevron-up");
-    });
-
-    // Add a new canned response
-    $('input[name=add_canned]').on('change', function () {
-      var $table = $(this).parents('.sp-reply-option').find('div');
-      this.checked ? $table.removeClass('sp-hidden') : $table.addClass('sp-hidden');
     });
 
     /**
@@ -2023,7 +2021,7 @@
       });
 
       // Post updated data
-      $.post(laroute.route('ticket.operator.action.update'), data, function (response) {
+      return $.post(laroute.route('ticket.operator.action.update'), data, function (response) {
         if (response.status == 'success') {
           $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 

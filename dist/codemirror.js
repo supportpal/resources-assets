@@ -2948,6 +2948,8 @@ function enterFragments(mounts,ranges){let result=[];for(let{pos,mount,frag}of m
   */class Tag{/**
       @internal
       */constructor(/**
+      The optional name of the base tag @internal
+      */name,/**
       The set of this tag and all its parent tags, starting with
       this one itself and sorted in order of decreasing specificity.
       */set,/**
@@ -2955,15 +2957,9 @@ function enterFragments(mounts,ranges){let result=[];for(let{pos,mount,frag}of m
       modified @internal
       */base,/**
       The modifiers applied to this.base @internal
-      */modified){this.set=set;this.base=base;this.modified=modified;/**
+      */modified){this.name=name;this.set=set;this.base=base;this.modified=modified;/**
           @internal
-          */this.id=nextTagID++;}/**
-      Define a new tag. If `parent` is given, the tag is treated as a
-      sub-tag of that parent, and
-      [highlighters](#highlight.tagHighlighter) that don't mention
-      this tag will try to fall back to the parent tag (or grandparent
-      tag, etc).
-      */static define(parent){if(parent===null||parent===void 0?void 0:parent.base)throw new Error("Can not derive from a modified tag");let tag=new Tag([],null,[]);tag.set.push(tag);if(parent)for(let t of parent.set)tag.set.push(t);return tag;}/**
+          */this.id=nextTagID++;}toString(){let{name}=this;for(let mod of this.modified)if(mod.name)name=`${mod.name}(${name})`;return name;}static define(nameOrParent,parent){let name=typeof nameOrParent=="string"?nameOrParent:"?";if(nameOrParent instanceof Tag)parent=nameOrParent;if(parent===null||parent===void 0?void 0:parent.base)throw new Error("Can not derive from a modified tag");let tag=new Tag(name,[],null,[]);tag.set.push(tag);if(parent)for(let t of parent.set)tag.set.push(t);return tag;}/**
       Define a tag _modifier_, which is a function that, given a tag,
       will return a tag that is a subtag of the original. Applying the
       same modifier to a twice tag will return the same value (`m1(t1)
@@ -2974,7 +2970,7 @@ function enterFragments(mounts,ranges){let result=[];for(let{pos,mount,frag}of m
       smaller set of modifiers is registered as a parent, so that for
       example `m1(m2(m3(t1)))` is a subtype of `m1(m2(t1))`,
       `m1(m3(t1)`, and so on.
-      */static defineModifier(){let mod=new Modifier();return tag=>{if(tag.modified.indexOf(mod)>-1)return tag;return Modifier.get(tag.base||tag,tag.modified.concat(mod).sort((a,b)=>a.id-b.id));};}}let nextModifierID=0;class Modifier{constructor(){this.instances=[];this.id=nextModifierID++;}static get(base,mods){if(!mods.length)return base;let exists=mods[0].instances.find(t=>t.base==base&&sameArray(mods,t.modified));if(exists)return exists;let set=[],tag=new Tag(set,base,mods);for(let m of mods)m.instances.push(tag);let configs=powerSet(mods);for(let parent of base.set)if(!parent.modified.length)for(let config of configs)set.push(Modifier.get(parent,config));return tag;}}function sameArray(a,b){return a.length==b.length&&a.every((x,i)=>x==b[i]);}function powerSet(array){let sets=[[]];for(let i=0;i<array.length;i++){for(let j=0,e=sets.length;j<e;j++){sets.push(sets[j].concat(array[i]));}}return sets.sort((a,b)=>b.length-a.length);}/**
+      */static defineModifier(name){let mod=new Modifier(name);return tag=>{if(tag.modified.indexOf(mod)>-1)return tag;return Modifier.get(tag.base||tag,tag.modified.concat(mod).sort((a,b)=>a.id-b.id));};}}let nextModifierID=0;class Modifier{constructor(name){this.name=name;this.instances=[];this.id=nextModifierID++;}static get(base,mods){if(!mods.length)return base;let exists=mods[0].instances.find(t=>t.base==base&&sameArray(mods,t.modified));if(exists)return exists;let set=[],tag=new Tag(base.name,set,base,mods);for(let m of mods)m.instances.push(tag);let configs=powerSet(mods);for(let parent of base.set)if(!parent.modified.length)for(let config of configs)set.push(Modifier.get(parent,config));return tag;}}function sameArray(a,b){return a.length==b.length&&a.every((x,i)=>x==b[i]);}function powerSet(array){let sets=[[]];for(let i=0;i<array.length;i++){for(let j=0,e=sets.length;j<e;j++){sets.push(sets[j].concat(array[i]));}}return sets.sort((a,b)=>b.length-a.length);}/**
   This function is used to add a set of tags to a language syntax
   via [`NodeSet.extend`](#common.NodeSet.extend) or
   [`LRParser.configure`](#lr.LRParser.configure).
@@ -3197,7 +3193,7 @@ function enterFragments(mounts,ranges){let result=[];for(let{pos,mount,frag}of m
       */heading5:t(heading),/**
       A level 6 [heading](#highlight.tags.heading).
       */heading6:t(heading),/**
-      A prose separator (such as a horizontal rule).
+      A prose [content](#highlight.tags.content) separator (such as a horizontal rule).
       */contentSeparator:t(content),/**
       [Content](#highlight.tags.content) that represents a list.
       */list:t(content),/**
@@ -3237,30 +3233,30 @@ function enterFragments(mounts,ranges){let result=[];for(let{pos,mount,frag}of m
       [Modifier](#highlight.Tag^defineModifier) that indicates that a
       given element is being defined. Expected to be used with the
       various [name](#highlight.tags.name) tags.
-      */definition:Tag.defineModifier(),/**
+      */definition:Tag.defineModifier("definition"),/**
       [Modifier](#highlight.Tag^defineModifier) that indicates that
       something is constant. Mostly expected to be used with
       [variable names](#highlight.tags.variableName).
-      */constant:Tag.defineModifier(),/**
+      */constant:Tag.defineModifier("constant"),/**
       [Modifier](#highlight.Tag^defineModifier) used to indicate that
       a [variable](#highlight.tags.variableName) or [property
       name](#highlight.tags.propertyName) is being called or defined
       as a function.
-      */function:Tag.defineModifier(),/**
+      */function:Tag.defineModifier("function"),/**
       [Modifier](#highlight.Tag^defineModifier) that can be applied to
       [names](#highlight.tags.name) to indicate that they belong to
       the language's standard environment.
-      */standard:Tag.defineModifier(),/**
+      */standard:Tag.defineModifier("standard"),/**
       [Modifier](#highlight.Tag^defineModifier) that indicates a given
       [names](#highlight.tags.name) is local to some scope.
-      */local:Tag.defineModifier(),/**
+      */local:Tag.defineModifier("local"),/**
       A generic variant [modifier](#highlight.Tag^defineModifier) that
       can be used to tag language-specific alternative variants of
       some common tag. It is recommended for themes to define special
       forms of at least the [string](#highlight.tags.string) and
       [variable name](#highlight.tags.variableName) tags, since those
       come up a lot.
-      */special:Tag.defineModifier()};/**
+      */special:Tag.defineModifier("special")};for(let name in tags$1){let val=tags$1[name];if(val instanceof Tag)val.name=name;}/**
   This is a highlighter that adds stable, predictable classes to
   tokens, for styling with external CSS.
 

@@ -21,7 +21,7 @@
 }
 
 .tox:not(.tox-tinymce-inline).tox-tinymce--toolbar-sticky-on .tox-editor-header.sp-with-quick-actions {
-    @apply sp-top-24 !important;
+    @apply sp-top-24 sp-left-auto !important;
 }
 
 .tox .tox-toolbar-overlord {
@@ -89,7 +89,8 @@
 .tox .tox-tbtn svg,
 .tox .tox-icon svg,
 .tox .tox-notification__icon svg,
-.tox .tox-split-button svg {
+.tox .tox-split-button svg,
+.tox .tox-listbox__select-chevron svg {
     fill: var(--color-text-primary) !important;
 }
 
@@ -319,9 +320,21 @@
 .tox .tox-textfield,
 .tox .tox-toolbar-textfield,
 .tox .tox-listboxfield .tox-listbox--select,
-.tox .tox-textarea,
-.tox .tox-textarea-wrap .tox-textarea:focus {
-    @apply sp-text-primary sp-rounded;
+.tox .tox-textarea {
+    @apply sp-bg-secondary sp-text-primary sp-border-2 sp-border-secondary sp-rounded;
+}
+
+.tox .tox-textfield:focus,
+.tox .tox-listboxfield .tox-listbox--select:focus,
+.tox .tox-textarea-wrap:focus-within,
+.tox .tox-textarea:focus,
+.tox .tox-textarea-wrap .tox-textarea:focus,
+.tox .tox-custom-editor:focus-within {
+    @apply sp-bg-primary sp-text-primary sp-border-2 sp-border-secondary sp-outline-none sp-shadow-none;
+}
+
+.tox .tox-textarea-wrap {
+    @apply sp-border-0;
 }
 
 .tox .tox-notification--error {

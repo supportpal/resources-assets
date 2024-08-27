@@ -2,6 +2,10 @@ div.dt-container {
     @apply sp--mx-6;
 }
 
+div.dt-container div.dt-layout-row {
+    @apply sp-m-0;
+}
+
 div.dt-container div.dt-layout-cell {
     @apply sp-p-0;
 }
@@ -104,7 +108,7 @@ div.dt-container .dt-paging .paginate_of,
 
 div.dt-container .dt-paging .dt-paging-button,
 .dt-paging .dt-paging-button {
-    @apply sp-px-3 sp-py-1 sp-ml-0 sp-rounded;
+    @apply sp-px-3 sp-py-1 sp-ml-0 sp-rounded sp-shadow-none;
     @apply sp-text-secondary !important;
 }
 
