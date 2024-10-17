@@ -1,4 +1,18 @@
 $(document).ready(function () {
+  function getErrorMessage(jqXHR) {
+    var message = Lang.get('messages.general_error');
+    if (jqXHR.status === 429) {
+      var resetTime = jqXHR.getResponseHeader('X-RateLimit-Reset') || Date.now();
+      if (resetTime) {
+        resetTime = '<time class="timeago" datetime="' + new Date(resetTime * 1000).toISOString() + '">' + timeAgo.format(new Date(resetTime * 1000)) + '</time>';
+      }
+      message = Lang.get('messages.throttle_error', {
+        'in_time': resetTime
+      });
+    }
+    return message;
+  }
+
   /**
    * Class name for addNewItem() function.
    *
@@ -72,14 +86,13 @@ $(document).ready(function () {
               if (response.status === 'success') {
                 return response;
               }
-              throw new Error(response.message || '');
-            }).catch(function (err) {
-              Swal.showValidationMessage(err.message);
+              Swal.showValidationMessage(response.message || Lang.get('messages.general_error'));
+            }).catch(function (jqXHR, textStatus, errorThrown) {
+              Swal.showValidationMessage(getErrorMessage(jqXHR));
+              timeAgo.render($('time.timeago'));
             });
           },
-          allowOutsideClick: function () {
-            return !Swal.isLoading();
-          }
+          allowOutsideClick: false
         }).then(function (result) {
           if (result.value) {
             Swal.fire(Lang.get('messages.success'), '', 'success');
@@ -87,8 +100,9 @@ $(document).ready(function () {
             $row.find('.sp-number-not-verified').remove();
           }
         });
-      }).catch(function (err) {
-        Swal.fire(Lang.get('messages.error'), err.message, 'error');
+      }).catch(function (jqXHR, textStatus, errorThrown) {
+        Swal.fire(Lang.get('messages.error'), getErrorMessage(jqXHR), 'error');
+        timeAgo.render($('time.timeago'));
       });
     });
   });

@@ -22,7 +22,10 @@ $(function () {
   });
 
   // Toggle sidebar open/closed state.
-  $sidebar.on('click', '.sp-toggle-sidebar', function () {
+  // helpdesk#3401 - on Safari iOS, 'click' event is often not sent, just touch events, so also handle 'touchend'.
+  // The preventDefault stops links in the sidebar being accidentally clicked.
+  $sidebar.on('touchend click', '.sp-toggle-sidebar', function (e) {
+    e.preventDefault();
     toggleSidebar();
 
     // The sidebar must have an ID to store the cookie.
