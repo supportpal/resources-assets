@@ -13,6 +13,7 @@ input.timepicker::placeholder {
 
 .flatpickr-calendar {
     @apply sp-bg-primary sp-rounded sp-shadow dark:sp-shadow-md;
+    direction: inherit;
 }
 
 .flatpickr-calendar.arrowTop:before,
@@ -37,8 +38,17 @@ input.timepicker::placeholder {
 
 .flatpickr-months .flatpickr-next-month,
 .flatpickr-months .flatpickr-prev-month {
-    @apply sp-text-primary sp-fill-[var(--color-text-primary)] dark:sp-text-white dark:sp-fill-[#fff];
-    padding: 0.825rem;
+    @apply sp-px-3.5 sp-py-2.5 sp-text-primary dark:sp-text-white;
+}
+
+.flatpickr-months .flatpickr-prev-month.flatpickr-next-month,
+.flatpickr-months .flatpickr-next-month.flatpickr-next-month {
+    @apply sp-right-auto sp-end-0;
+}
+
+.flatpickr-months .flatpickr-prev-month.flatpickr-prev-month,
+.flatpickr-months .flatpickr-next-month.flatpickr-prev-month {
+    @apply sp-left-auto sp-start-0;
 }
 
 .flatpickr-months .flatpickr-next-month:hover svg,
@@ -52,12 +62,14 @@ input.timepicker::placeholder {
 }
 
 .flatpickr-months .flatpickr-next-month:hover {
-    @apply sp-rounded-none sp-rounded-tr;
+    @apply sp-rounded-none sp-rounded-se;
 }
 
 .flatpickr-months .flatpickr-prev-month:hover {
-    @apply sp-rounded-none sp-rounded-tl;
+    @apply sp-rounded-none sp-rounded-ss;
 }
+
+
 
 .flatpickr-current-month {
     @apply sp-p-0 sp-text-base;
@@ -69,18 +81,14 @@ input.timepicker::placeholder {
 }
 
 .flatpickr-calendar select.flatpickr-monthDropdown-months {
-    @apply sp-bg-secondary sp-bg-no-repeat sp-border-0 sp-rounded-none sp-leading-normal sp-box-border sp-appearance-none;
+    @apply sp-pe-7 sp-bg-secondary sp-bg-[right_0.125rem_center] sp-bg-[length:1.5rem] sp-bg-no-repeat sp-border-0 sp-rounded-none sp-leading-normal sp-box-border sp-appearance-none rtl:sp-bg-[left_0.125rem_center];
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3e%3cpath d='M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.4l3.3 3.29 3.3-3.3z'/%3e%3c/svg%3e");
-    background-position: right 0.125rem center;
-    background-size: 1.5rem;
 }
 
 .flatpickr-calendar select.flatpickr-monthDropdown-months,
 .flatpickr-current-month select.flatpickr-monthDropdown-months:hover {
-    @apply sp-bg-secondary sp-bg-no-repeat;
+    @apply sp-bg-secondary sp-bg-[right_0.125rem_center] sp-bg-[length:1.5rem] sp-bg-no-repeat rtl:sp-bg-[left_0.125rem_center];
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3e%3cpath d='M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.4l3.3 3.29 3.3-3.3z'/%3e%3c/svg%3e");
-    background-position: right 0.125rem center;
-    background-size: 1.5rem;
 }
 
 .flatpickr-calendar select.flatpickr-monthDropdown-months option.flatpickr-monthDropdown-month {
@@ -193,10 +201,10 @@ span.flatpickr-weekday {
 
 .flatpickr-calendar.noCalendar .flatpickr-time input.flatpickr-hour:focus,
 .flatpickr-calendar.noCalendar .flatpickr-time input.flatpickr-hour:hover {
-    @apply sp-rounded-l sp-rounded-r-none;
+    @apply sp-rounded-s sp-rounded-e-none;
 }
 
 .flatpickr-calendar.noCalendar .flatpickr-time input.flatpickr-minute:focus,
 .flatpickr-calendar.noCalendar .flatpickr-time input.flatpickr-minute:hover {
-    @apply sp-rounded-l-none sp-rounded-r;
+    @apply sp-rounded-s-none sp-rounded-e;
 }

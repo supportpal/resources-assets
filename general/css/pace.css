@@ -7,7 +7,7 @@
 }
 
 .pace .pace-progress {
-    @apply sp-fixed sp-h-0.5 sp-w-full sp-right-full sp-bg-primary-800;
+    @apply sp-fixed sp-h-0.5 sp-w-full sp-end-full sp-bg-primary-800;
     z-index: 10005;
 }
 

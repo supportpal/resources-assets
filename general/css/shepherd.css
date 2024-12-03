@@ -20,11 +20,11 @@
 
 .shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,
 .shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{
-    @apply sp-border-r sp-border-tertiary;
+    @apply sp-border-e sp-border-tertiary;
 }
 
 .shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before {
-    @apply sp-border-l sp-border-tertiary;
+    @apply sp-border-s sp-border-tertiary;
 }
 
 .shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before {

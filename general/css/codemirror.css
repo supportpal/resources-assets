@@ -41,7 +41,7 @@
 }
 
 .codemirror-box .cm-gutters {
-    @apply sp-text-tertiary sp-rounded-bl;
+    @apply sp-text-tertiary sp-rounded-es;
     background-color: #00000025;
 }
 

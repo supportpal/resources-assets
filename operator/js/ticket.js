@@ -243,9 +243,9 @@
       instance.showDownloadAllButton();
 
       // Special effects, set as blue for 10 seconds.
-      message.toggleClass('sp-new-message', 1000);
+      message.addClass('sp-new-message');
       setTimeout(function () {
-        message.toggleClass('sp-new-message', 1000);
+        message.removeClass('sp-new-message');
       }, 10000);
     };
 
@@ -464,11 +464,30 @@
     };
 
     /**
+     * Scroll to a specific spot on the page.
+     *
+     * @param {int} position
+     */
+    this.scrollTo = function (position) {
+      // Need to add all sticky messages as they stack and affect the scroll position.
+      var $stickyHeight = $('.sp-alert-sticky:visible').length ? -48 : 0;
+      $('.sp-alert-sticky:visible').each(function () {
+        $stickyHeight += $(this).outerHeight();
+      });
+      $('#content').animate({
+        scrollTop: position + $stickyHeight - 12
+      }, 1000);
+    };
+
+    /**
      * Scroll to a message in the view.
      *
      * @param $message
      */
     this.scrollToMessage = function ($message) {
+      // Uncollapse messages first
+      App.TicketViewAction.removeCollapsedMessageGroup();
+
       // AJAX load the message into the view.
       instance.loadMessage($message);
 
@@ -477,10 +496,14 @@
         $message.toggleClass('sp-message-collapsible sp-message-collapsed').find('.sp-message-text').children('.sp-message-text-original, .sp-message-text-trimmed').toggle();
       }
 
+      // Special effects, set as blue for 3 seconds.
+      $message.addClass('sp-new-message');
+      setTimeout(function () {
+        $message.removeClass('sp-new-message');
+      }, 3000);
+
       // Scroll to it.
-      $('#content').animate({
-        scrollTop: $message.position().top - 24
-      }, 1000);
+      instance.scrollTo($message.position().top);
     };
 
     /**
@@ -862,87 +885,87 @@
       Swal.showLoading();
 
       // Switch to Forward tab.
-      App.TicketViewForm.showForwardForm();
-
-      // Delete any attachments currently tied to the form.
-      var deferred = [];
-      $('.forward-form .sp-attached-files li:not(.sp-hidden) .sp-delete-attachment').each(function (index, element) {
-        deferred.push(parameters.forwardFileUpload.deleteNewFile(element, true));
-      });
-
-      // Load any messages that need to be AJAX loaded.
-      $messages.each(function (index, message) {
-        deferred.push(instance.loadMessage($(message)));
-      });
-
-      // Can't pass a literal array, so use apply.
-      $.when.apply($, deferred).then(function () {
-        // Grab the text of all prior messages (excluding notes).
-        var subject = $(document).find('.sp-ticket-subject').text().trim(),
-          messages = [],
-          attachments = [],
-          failed_attachments = [];
-        var departmentEmail = $('select[name="department_email"] option:selected').text();
-        departmentEmail = departmentEmail.slice(departmentEmail.lastIndexOf('<') + 1, -1);
-        $messages.each(function (index, message) {
-          var $message = $(message),
-            message_attachments = [];
-
-          // Message has attachments.
-          $message.find('ul.sp-attachments li').each(function (index, attachment) {
-            var $attachment = $(attachment),
-              size = $attachment.find('.sp-delete-attachment').data('size'),
-              filename = $attachment.find('.sp-attachment-name').text().trim();
-
-            // If we've gone above the cumulative file size, don't attach any more.
-            parameters.forwardFileUpload.incrementTotalUploadedFileSize(size);
-            if (parameters.forwardFileUpload.totalUploadedFileSize() > parameters.forwardFileUpload.cumulativeMaxFileSize) {
-              parameters.forwardFileUpload.decrementTotalUploadedFileSize(size);
-              failed_attachments.push(filename);
-            } else {
-              attachments.push({
-                hash: $attachment.find('.sp-delete-attachment').data('hash'),
-                filename: filename,
-                size: size
-              });
-              message_attachments.push(filename);
-            }
-          });
-          messages.push('<strong>' + Lang.get('ticket.from') + ':</strong> ' + he.encode($message.find('.sp-name').html().trim()) + '&nbsp;&lt;' + he.encode($message.find('.sp-name').data('email') || departmentEmail) + '&gt;<br />' + '<strong>' + Lang.get('customfield.date') + ':</strong> ' + he.encode($message.find('time').data('date')) + '<br />' + '<strong>' + Lang.get('ticket.subject') + ':</strong> ' + he.encode(subject) + '<br />' + (message_attachments.length > 0 ? '<strong>' + Lang.choice('general.attachment', 2) + ':</strong> ' + he.encode(message_attachments.join(', ')) + '<br />' : '') + '<br />' + $message.find('.sp-message-text .sp-message-text-original').html().trim());
+      App.TicketViewForm.showForwardForm().then(function (editor) {
+        // Delete any attachments currently tied to the form.
+        var deferred = [];
+        $('.forward-form .sp-attached-files li:not(.sp-hidden) .sp-delete-attachment').each(function (index, element) {
+          deferred.push(parameters.forwardFileUpload.deleteNewFile(element, true));
         });
 
-        // Make forwarded message.
-        var message = parameters.replyTemplate + '<br /><br />' + '<div class="expandable"></div>' + '<div class="supportpal_quote">' + '<span>' + Lang.get('ticket.forwarded_message') + '</span><br />' + messages.join('<br /><br />') + '</div>';
+        // Load any messages that need to be AJAX loaded.
+        $messages.each(function (index, message) {
+          deferred.push(instance.loadMessage($(message)));
+        });
 
-        // Set attachments.
-        for (var i = 0; i < attachments.length; i++) {
-          var filename = attachments[i].filename,
-            hash = attachments[i].hash,
-            $item = parameters.forwardFileUpload.addFile(filename, attachments[i].size);
-          parameters.forwardFileUpload.registerFile($item, filename, hash);
-        }
+        // Can't pass a literal array, so use apply.
+        $.when.apply($, deferred).then(function () {
+          // Grab the text of all prior messages (excluding notes).
+          var subject = $(document).find('.sp-ticket-subject').text().trim(),
+            messages = [],
+            attachments = [],
+            failed_attachments = [];
+          var departmentEmail = $('select[name="department_email"] option:selected').text();
+          departmentEmail = departmentEmail.slice(departmentEmail.lastIndexOf('<') + 1, -1);
+          $messages.each(function (index, message) {
+            var $message = $(message),
+              message_attachments = [];
 
-        // Set content on a delay, as for some reason sometimes tinymce wipes the content (some race condition).
-        $('#newForward').editor().setContent(message);
-        $('#newForward').editor().focus();
+            // Message has attachments.
+            $message.find('ul.sp-attachments li').each(function (index, attachment) {
+              var $attachment = $(attachment),
+                size = $attachment.find('.sp-delete-attachment').data('size'),
+                filename = $attachment.find('.sp-attachment-name').text().trim();
 
-        // Update draft message variable so it doesn't save a draft automatically
-        instance.setForwardDraft($('#newForward').editor().getContent({
-          withoutCursorMarker: true
-        }));
-
-        // Show an alert of which attachments we failed to attach.
-        if (failed_attachments.length > 0) {
-          Swal.fire({
-            title: Lang.get('messages.failed_attachments'),
-            html: failed_attachments.join(', ') + '<br /><br />' + Lang.get('core.attachment_limit_reached', {
-              size: parameters.forwardFileUpload.cumulativeMaxFileSize.fileSize()
-            }),
-            icon: 'info'
+              // If we've gone above the cumulative file size, don't attach any more.
+              parameters.forwardFileUpload.incrementTotalUploadedFileSize(size);
+              if (parameters.forwardFileUpload.totalUploadedFileSize() > parameters.forwardFileUpload.cumulativeMaxFileSize) {
+                parameters.forwardFileUpload.decrementTotalUploadedFileSize(size);
+                failed_attachments.push(filename);
+              } else {
+                attachments.push({
+                  hash: $attachment.find('.sp-delete-attachment').data('hash'),
+                  filename: filename,
+                  size: size
+                });
+                message_attachments.push(filename);
+              }
+            });
+            messages.push('<strong>' + Lang.get('ticket.from') + ':</strong> ' + he.encode($message.find('.sp-name').html().trim()) + '&nbsp;&lt;' + he.encode($message.find('.sp-name').data('email') || departmentEmail) + '&gt;<br />' + '<strong>' + Lang.get('customfield.date') + ':</strong> ' + he.encode($message.find('time').data('date')) + '<br />' + '<strong>' + Lang.get('ticket.subject') + ':</strong> ' + he.encode(subject) + '<br />' + (message_attachments.length > 0 ? '<strong>' + Lang.choice('general.attachment', 2) + ':</strong> ' + he.encode(message_attachments.join(', ')) + '<br />' : '') + '<br />' + $message.find('.sp-message-text .sp-message-text-original').html().trim());
           });
-        } else {
-          Swal.close();
-        }
+
+          // Make forwarded message.
+          var message = parameters.replyTemplate + '<br /><br />' + '<div class="expandable"></div>' + '<div class="supportpal_quote">' + '<span>' + Lang.get('ticket.forwarded_message') + '</span><br />' + messages.join('<br /><br />') + '</div>';
+
+          // Set attachments.
+          for (var i = 0; i < attachments.length; i++) {
+            var filename = attachments[i].filename,
+              hash = attachments[i].hash,
+              $item = parameters.forwardFileUpload.addFile(filename, attachments[i].size);
+            parameters.forwardFileUpload.registerFile($item, filename, hash);
+          }
+
+          // Set content on a delay, as for some reason sometimes tinymce wipes the content (some race condition).
+          editor.setContent(message);
+          editor.focus();
+
+          // Update draft message variable so it doesn't save a draft automatically
+          instance.setForwardDraft(editor.getContent({
+            withoutCursorMarker: true
+          }));
+
+          // Show an alert of which attachments we failed to attach.
+          if (failed_attachments.length > 0) {
+            Swal.fire({
+              title: Lang.get('messages.failed_attachments'),
+              html: failed_attachments.join(', ') + '<br /><br />' + Lang.get('core.attachment_limit_reached', {
+                size: parameters.forwardFileUpload.cumulativeMaxFileSize.fileSize()
+              }),
+              icon: 'info'
+            });
+          } else {
+            Swal.close();
+          }
+        });
       });
     };
 
@@ -1088,7 +1111,15 @@
      * Register ticket message jQuery events.
      */
     this.registerMessageEvents = function () {
-      $(document)
+      $(document).on('click', '.sp-pinned-message', function () {
+        const $message = $('.sp-messages-container').find('.sp-message[data-id="' + $(this).data('id') + '"]');
+        if ($message.length) {
+          setTimeout(function () {
+            instance.scrollToMessage($message);
+          }, 100);
+        }
+      })
+
       // Expand quoted areas
       .on('click', '.expandable', function () {
         $(this).next().toggle();
@@ -1115,6 +1146,32 @@
 
       // Message header actions
       //
+      // Pin/unpin message.
+      .on('click', '.pin-message, .unpin-message', function (event) {
+        event.stopPropagation();
+        Swal.showLoading();
+        const $this = $(this),
+          $message = $this.parents('.sp-message');
+        $.post($this.data('href')).done(function (response) {
+          $message.find('.pin-message, .unpin-message').toggleClass('sp-hidden');
+          if (response.data.pinned === null) {
+            $('.sp-pinned-message[data-id="' + $message.data('id') + '"]').remove();
+          } else {
+            $(response.data.pinned).insertAfter($('.sp-pinned-messages'));
+
+            // Sort messages into right order.
+            const $messages = $('.sp-pinned-message').sort(function (a, b) {
+              if (parameters.replyOrder == 'ASC') {
+                return $(a).data('id') - $(b).data('id');
+              }
+              return $(b).data('id') - $(a).data('id');
+            });
+            $('.sp-pinned-message').remove();
+            $messages.insertAfter($('.sp-pinned-messages'));
+          }
+        }).always(() => Swal.close());
+      })
+
       // Quote a message.
       .on('click', '.quote-message', function (event) {
         // Don't expand or collapse message

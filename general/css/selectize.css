@@ -5,7 +5,7 @@
 }
 
 .selectize-control.single .selectize-input {
-    @apply sp-pr-7;
+    @apply sp-pe-7;
 }
 
 .selectize-input,
@@ -49,10 +49,8 @@
 
 .selectize-control.single .selectize-input.has-options,
 .selectize-control.single .selectize-input.has-options.input-active {
-    @apply sp-bg-no-repeat;
+    @apply sp-bg-[right_0.125rem_center] sp-bg-[length:1.5rem] sp-bg-no-repeat rtl:sp-bg-[left_0.125rem_center];
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3e%3cpath d='M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.4l3.3 3.29 3.3-3.3z'/%3e%3c/svg%3e");
-    background-position: right 0.125rem center;
-    background-size: 1.5rem;
 }
 
 .selectize-control.single .selectize-input:after {
@@ -64,7 +62,7 @@
 }
 
 .selectize-control.multi .selectize-input > div {
-    @apply sp-px-2 sp-py-0 sp-mt-0 sp-ml-1 sp-mb-1 sp-mr-0;
+    @apply sp-px-2 sp-py-0 sp-mt-0 sp-ms-1 sp-mb-1 sp-me-0;
 }
 
 .selectize-control.multi .selectize-input > div,
@@ -119,17 +117,17 @@
 /* Loading/disabled */
 
 .selectize-control.loading .selectize-input:before {
-    @apply sp-absolute sp-top-[0.375rem] sp-right-3 sp-text-primary-100 sp-font-icon sp-font-bold sp-text-base sp-z-50;
+    @apply sp-absolute sp-top-[0.375rem] sp-end-3 sp-text-primary-100 sp-font-icon sp-font-bold sp-text-base sp-z-50;
     animation: fa-spin 2s infinite linear;
     content: "\f110";
 }
 
 .selectize-control.single.loading .selectize-input.has-options:before {
-    @apply sp-right-7;
+    @apply sp-end-7;
 }
 
 .selectize-control.loading .selectize-input.dropdown-active:before {
-    @apply sp-h-auto sp-bottom-auto sp-left-auto;
+    @apply sp-h-auto sp-bottom-auto sp-start-auto;
 }
 
 .selectize-control .selectize-input.disabled {
@@ -139,21 +137,26 @@
 /* Remove button and unremovable */
 
 .selectize-control.plugin-remove_button [data-value] {
-    padding-right: 1.625rem !important;
+    @apply sp-pr-2 !important;
+}
+
+.selectize-control.plugin-remove_button [data-value]:not([data-selectable]) {
+    @apply sp-pe-[1.625rem] !important;
 }
 
 .selectize-control.plugin-remove_button [data-value] .remove,
 .selectize-control.plugin-remove_button [data-value].active .remove {
-    @apply sp-h-full sp-pt-px sp-text-sm;
-    border-left-color: var(--color-background-secondary);
+    @apply sp-right-auto sp-h-full sp-pt-px sp-text-sm sp-border-l-0 sp-border-s sp-border-s-secondary;
+    @apply sp-end-0 !important;
+}
+
+.selectize-control.plugin-remove_button [data-value] .remove,
+.selectize-control.plugin-remove_button [data-value].active .remove {
+    @apply sp-h-full sp-pt-px sp-text-sm sp-border-s-secondary;
 }
 
 .selectize-control.plugin-remove_button [data-value] .remove:hover {
     @apply sp-bg-transparent sp-opacity-75;
-}
-
-.selectize-control.plugin-remove_button [data-value] .remove {
-    @apply dark:sp-text-black !important;
 }
 
 .selectize-control.plugin-remove_button [data-value][style*="color: #fff"] .remove {
@@ -161,7 +164,7 @@
 }
 
 .selectize-control.plugin-remove_button [data-value].unremovable {
-    @apply sp-pr-2 !important;
+    @apply sp-pe-2 !important;
 }
 
 .selectize-control.plugin-remove_button [data-value].unremovable .remove {

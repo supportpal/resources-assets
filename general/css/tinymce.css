@@ -21,7 +21,7 @@
 }
 
 .tox:not(.tox-tinymce-inline).tox-tinymce--toolbar-sticky-on .tox-editor-header.sp-with-quick-actions {
-    @apply sp-top-24 sp-left-auto !important;
+    @apply sp-top-24 sp-start-auto !important;
 }
 
 .tox .tox-toolbar-overlord {
@@ -115,7 +115,7 @@
 }
 
 .tox .tox-tiered-menu .tox-menu {
-    @apply sp-border-t sp--mt-px sp--ml-px;
+    @apply sp-border-t sp--mt-px sp--ms-px;
 }
 
 .tox .tox-collection--list .tox-collection__group {
@@ -158,6 +158,22 @@
 
 .tox .tox-edit-area__iframe {
     @apply sp-bg-primary sp-text-secondary;
+}
+
+.tox-editor-header--empty + .tox-sidebar-wrap .tox-edit-area__iframe {
+    @apply sp-bg-secondary;
+}
+
+.tox-edit-area::before {
+    transition: none !important;
+}
+
+.tox.tox-edit-focus .tox-edit-area::before {
+    @apply sp-border-0;
+}
+
+.tox.tox-edit-focus {
+    @apply sp-border-primary-200 sp-outline sp-outline-1 sp-outline-primary-200;
 }
 
 .tox .tox-statusbar {
@@ -296,17 +312,17 @@
 }
 
 .tox .tox-pop.tox-pop--left::after {
-    @apply sp-border-r-secondary;
+    @apply sp-border-e-secondary;
 }
 .tox .tox-pop.tox-pop--left::before {
-    @apply sp-border-r-tertiary;
+    @apply sp-border-e-tertiary;
 }
 
 .tox .tox-pop.tox-pop--right::after {
-    @apply sp-border-l-secondary;
+    @apply sp-border-s-secondary;
 }
 .tox .tox-pop.tox-pop--right::before {
-    @apply sp-border-l-tertiary;
+    @apply sp-border-s-tertiary;
 }
 
 .tox-pop__dialog .tox-tbtn {
@@ -401,6 +417,14 @@
     @apply sp-rounded-b-none;
 }
 
+.tox-border-none .tox-tinymce {
+    @apply sp-border-0;
+}
+
+.tox-border-none .tox.tox-edit-focus {
+    @apply sp-outline-2;
+}
+
 .tox-bg-orange .tox-edit-area__iframe,
 .tox-bg-orange .tox-statusbar {
     @apply sp-bg-yellow-100 dark:sp-bg-yellow-800;
@@ -412,19 +436,19 @@
 }
 
 .tox-button-separator {
-    @apply sp-px-0 sp-py-2 sp-mx-3/2 sp-inline sp-border-l sp-border-tertiary sp-align-middle;
+    @apply sp-px-0 sp-py-2 sp-mx-3/2 sp-inline sp-border-s sp-border-tertiary sp-align-middle;
 }
 
 .tox-sp-avatar {
-    @apply sp-inline-block sp-h-6 sp-w-6 sp-rounded-full sp-mr-2 !important;
+    @apply sp-inline-block sp-h-6 sp-w-6 sp-rounded-full sp-me-2 !important;
 }
 
 .tox-sp-description {
     @apply sp-text-secondary sp-text-sm !important;
 }
 
-.tox-sp-mr-1 {
-    @apply sp-mr-1 !important;
+.tox-sp-me-1 {
+    @apply sp-me-1 !important;
 }
 
 .tox .tox-menu.tox-collection.tox-collection--list {

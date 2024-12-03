@@ -100,9 +100,7 @@
       $('.sp-reply-type .sp-action[data-type=' + type + ']').addClass('sp-active');
 
       // Scroll to form
-      $('#content').animate({
-        scrollTop: $form.position().top - 24
-      }, 1000);
+      ticket.scrollTo($form.position().top);
     };
     this.destroyReplyForm = function () {
       if (!isInitialised(reply_selector)) {
@@ -254,8 +252,10 @@
     this.take = function () {
       run(laroute.route('ticket.operator.action.take'));
     };
-    this.close = function () {
-      run(laroute.route('ticket.operator.action.close')).done(function () {
+    this.close = function (notify) {
+      run(laroute.route('ticket.operator.action.close', {
+        notify: notify || '1'
+      })).done(function () {
         window.location.href = ticket.parameters().ticketGridUrl;
       });
     };
@@ -422,7 +422,7 @@
         return;
       }
       $('.ticket-viewing').show();
-      $('ul.sp-viewing-operators').append($('<li>').attr('data-id', user.id).append($('<img>').attr('src', user.avatar_url).attr('class', 'sp-avatar sp-max-w-2xs sp-mr-1')).append($('<span>').text(user.formatted_name)));
+      $('ul.sp-viewing-operators').append($('<li>').attr('data-id', user.id).append($('<img>').attr('src', user.avatar_url).attr('class', 'sp-avatar sp-max-w-2xs sp-me-1')).append($('<span>').text(user.formatted_name)));
     };
     this.listen = () => {
       App.Notifications.connector().join('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketId).here(users => {
@@ -627,9 +627,11 @@
 
         // Update reply options status and if closed, hide close button
         if (e.id == closedStatusId) {
-          $('.close-ticket').addClass('sp-hidden');
+          $('.close-ticket, .close-ticket-options, .close-ticket-without-notification').addClass('sp-hidden');
+          $('.sp-dropdown-container:not(.close-ticket-options) .lock-ticket').removeClass('md:sp-hidden');
         } else {
-          $('.close-ticket').removeClass('sp-hidden');
+          $('.close-ticket, .close-ticket-options, .close-ticket-without-notification').removeClass('sp-hidden');
+          $('.sp-dropdown-container:not(.close-ticket-options) .lock-ticket').addClass('md:sp-hidden');
         }
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\SubjectUpdated', e => {
@@ -751,6 +753,7 @@
     $('.take-ticket').on('click', App.TicketViewAction.take);
     // Process close button
     $('.close-ticket').on('click', App.TicketViewAction.close);
+    $('.close-ticket-without-notification').on('click', () => App.TicketViewAction.close(false));
     // Process lock button
     $('.lock-ticket').on('click', App.TicketViewAction.lock);
     // Process unlock button
@@ -1457,7 +1460,7 @@
     // Expand recipients list to full form for editing
     $('.sp-simplified-recipients').on('click', function () {
       $('.sp-simplified-recipients, .sp-full-recipients').toggleClass('sp-hidden');
-      $('.reply-all').prependTo('.to-emails').addClass('sp-inline-block').find('.sp-action').toggleClass('sp-m-1 sp-mr-2');
+      $('.reply-all').prependTo('.to-emails').addClass('sp-inline-block').find('.sp-action').toggleClass('sp-m-1 sp-me-2');
     });
 
     // From email input

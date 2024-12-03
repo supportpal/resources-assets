@@ -15,10 +15,10 @@
 }
 
 .daterangepicker.opensright:before {
-    left: 15px;
+    inset-inline-start: 15px;
 }
 .daterangepicker.opensright:after {
-    @apply sp-left-4;
+    @apply sp-start-4;
 }
 
 .daterangepicker.show-ranges.ltr .drp-calendar.left {
@@ -43,16 +43,16 @@
 }
 
 .daterangepicker .calendar-table .next span {
-    margin-right: 3px;
+    margin-inline-end: 3px;
 }
 
 .daterangepicker .calendar-table .prev span {
-    @apply sp-ml-1/2;
+    @apply sp-ms-1/2;
 }
 
 .daterangepicker select.monthselect,
 .daterangepicker select.yearselect {
-    @apply sp-w-auto sp-px-2 sp-py-1 sp-pr-7;
+    @apply sp-w-auto sp-px-2 sp-py-1 sp-pe-7;
     min-height: auto;
 }
 

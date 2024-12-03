@@ -38,7 +38,7 @@
 
 .sp-editor-content ol,
 .sp-editor-content ul {
-    @apply sp-pl-6 sp-list-decimal sp-my-4;
+    @apply sp-ps-6 sp-list-decimal sp-my-4;
 }
 
 .sp-editor-content ul {
@@ -50,7 +50,7 @@
 }
 
 .sp-editor-content blockquote {
-    @apply sp-pl-3 sp-ml-2 sp-my-4 sp-border-0 sp-border-l-4 sp-border-solid sp-border-tertiary;
+    @apply sp-ps-3 sp-ms-2 sp-my-4 sp-border-0 sp-border-s-4 sp-border-solid sp-border-tertiary;
 }
 
 .sp-editor-content pre:not(.moz-signature),

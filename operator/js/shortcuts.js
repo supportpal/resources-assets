@@ -54,7 +54,7 @@
     var checked = KeyboardShortcuts.isEnabled() ? 'checked="checked"' : '';
     Swal.fire({
       title: Lang.get('core.keyboard_shortcuts'),
-      html: '<div class="sp-shortcuts-container ' + (checked ? '' : 'sp-hidden') + '">' + '<div class="sp-mb-4">' + '<input type="text" placeholder="' + Lang.get('core.sSearchPlaceholder') + '" class="sp-shortcuts-search sp-w-full">' + '</div>' + '<table class="sp-mb-6 sp-text-left">' + rows + '</table>' + '<hr />' + '</div>' + '<div class="sp-mt-6">' + '<input class="sp-toggle" id="toggle_keyboard_shortcuts" name="keyboard_shortcuts" ' + checked + ' type="checkbox" value="1">' + '<label for="toggle_keyboard_shortcuts"></label>' + '<label class="sp-ml-4">' + Lang.get('core.enable_keyboard_shortcuts') + '</label>' + '</div>',
+      html: '<div class="sp-shortcuts-container ' + (checked ? '' : 'sp-hidden') + '">' + '<div class="sp-mb-4">' + '<input type="text" placeholder="' + Lang.get('core.sSearchPlaceholder') + '" class="sp-shortcuts-search sp-w-full">' + '</div>' + '<table class="sp-mb-6 sp-text-start">' + rows + '</table>' + '<hr />' + '</div>' + '<div class="sp-mt-6">' + '<input class="sp-toggle" id="toggle_keyboard_shortcuts" name="keyboard_shortcuts" ' + checked + ' type="checkbox" value="1">' + '<label for="toggle_keyboard_shortcuts"></label>' + '<label class="sp-ms-4">' + Lang.get('core.enable_keyboard_shortcuts') + '</label>' + '</div>',
       showCloseButton: true,
       showConfirmButton: false,
       showCancelButton: false,

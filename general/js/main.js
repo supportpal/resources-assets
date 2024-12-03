@@ -66,7 +66,10 @@ if (typeof Lang !== 'undefined') {
 $.fn.datepicker = function (options) {
   var defaults = {
     // Convert from PHP date format to flatpickr format.
-    dateFormat: $('meta[name=date_format]').prop('content').replace('jS', 'J').replace(/([^a-zA-Z])/g, "\\\\$1")
+    dateFormat: $('meta[name=date_format]').prop('content').replace('jS', 'J').replace(/([^a-zA-Z])/g, "\\\\$1"),
+    // RTL support for the arrows.
+    nextArrow: '<span class="rtl:sp-hidden"><i class="fas fa-chevron-right" aria-hidden="true"></i></span><span class="ltr:sp-hidden"><i class="fas fa-chevron-left" aria-hidden="true"></i></span>',
+    prevArrow: '<span class="rtl:sp-hidden"><i class="fas fa-chevron-left" aria-hidden="true"></i></span><span class="ltr:sp-hidden"><i class="fas fa-chevron-right" aria-hidden="true"></i></span>'
   };
   return $(this).each(function () {
     // Quick fix to stop flatpickr being loaded twice on an input
@@ -305,10 +308,10 @@ $(function () {
   // Smooth scrolling for anchors
   .on('click', 'a[href^="#"]', function (event) {
     event.preventDefault();
-    var target = document.getElementById($.attr(this, 'href').substr(1));
+    var target = document.getElementById($.attr(this, 'href').substring(1));
     if (target !== null) {
       $('html, body, #content').animate({
-        scrollTop: $(target).position().top - $('header.sp-sticky').height() - 24
+        scrollTop: $(target).offset().top - $('header.sp-sticky').height() - 24
       }, 500);
     }
   })
@@ -319,13 +322,12 @@ $(function () {
 
   // Handle anchors on page load
   const hash = window.location.hash.substring(1);
-  if (hash !== '' && document.getElementById(hash) !== null) {
-    // Scroll to top just in case
-    scroll(0, 0);
+  var target;
+  if (hash !== '' && (target = document.getElementById(hash)) !== null) {
     // Now scroll to anchor
     $('html, body, #content').animate({
-      scrollTop: $(target).position().top - $('header.sp-sticky').height() - 24
-    }, 1000);
+      scrollTop: $(target).offset().top - $('header.sp-sticky').height() - 24
+    }, 500);
   }
 
   // Global AJAX setup handler to add the CSRF token to ALL POST requests.

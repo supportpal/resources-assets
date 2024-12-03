@@ -11,9 +11,9 @@
 }
 
 .tippy-box[data-placement^=left] > .tippy-arrow::before {
-    @apply dark:sp-border-l-[var(--color-primary-100)];
+    @apply dark:sp-border-s-[var(--color-primary-100)];
 }
 
 .tippy-box[data-placement^=right] > .tippy-arrow::before {
-    @apply dark:sp-border-r-[var(--color-primary-100)];
+    @apply dark:sp-border-e-[var(--color-primary-100)];
 }

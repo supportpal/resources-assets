@@ -157,9 +157,9 @@ $(document).ready(function () {
     var $quickActions = $('.sp-quick-actions'),
       $ul = $quickActions.find('ul:first'),
       $li = $('<li>');
-    $quickActions.prepend($('<div>').addClass('sp-filter-grid sp-absolute sp-flex sp-w-full sp-bg-primary sp-px-3 sp--mx-3 sp-z-50 sp-hidden').append($wrapper.find('div.dt-search').removeClass('sp-hidden').addClass('sp-grow sp-inline-block sm:sp-flex-initial')).append($('<button>').addClass('sp-filter-results sp-px-2 sp-rounded-l-none').prop('title', Lang.get('general.filter_results')).append('<i class="fas fa-fw fa-caret-down"></i>')));
-    $quickActions.find('.sp-filter-grid').find('input').addClass('sp-w-full sp-border-r-0 sp-rounded-r-none sm:sp-w-auto');
-    $ul.append($li.addClass('sp-action-group sp-inline-block sp-relative sp-float-right').append($('<div>').addClass('sp-grid-pagination sp-inline-block').append($wrapper.find('div.dt-paging'))));
+    $quickActions.prepend($('<div>').addClass('sp-filter-grid sp-absolute sp-flex sp-w-full sp-bg-primary sp-px-3 sp--mx-3 sp-z-50 sp-hidden').append($wrapper.find('div.dt-search').removeClass('sp-hidden').addClass('sp-grow sp-inline-block sm:sp-flex-initial')).append($('<button>').addClass('sp-filter-results sp-px-2 sp-rounded-s-none').prop('title', Lang.get('general.filter_results')).append('<i class="fas fa-fw fa-caret-down"></i>')));
+    $quickActions.find('.sp-filter-grid').find('input').addClass('sp-w-full sp-border-e-0 sp-rounded-e-none sm:sp-w-auto');
+    $ul.append($li.addClass('sp-action-group sp-inline-block sp-relative sp-float-end').append($('<div>').addClass('sp-grid-pagination sp-inline-block').append($wrapper.find('div.dt-paging'))));
     $ul.trigger('dt.header.init', $li);
   });
 });

@@ -27,10 +27,8 @@ input[type="checkbox"], input[type="radio"] {
 }
 
 select {
-    @apply sp-pr-8 sp-bg-no-repeat;
+    @apply sp-pe-8 sp-bg-[right_0.125rem_center] sp-bg-[length:1.5rem] sp-bg-no-repeat rtl:sp-bg-[left_0.125rem_center];
     background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3e%3cpath d='M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.4l3.3 3.29 3.3-3.3z'/%3e%3c/svg%3e");
-    background-position: right 0.125rem center;
-    background-size: 1.5rem;
 }
 
 input:hover,
@@ -62,7 +60,7 @@ button:hover {
 }
 
 .sp-loading:after {
-    @apply sp-absolute sp-block sp-top-2 sp-right-3 sp-text-secondary sp-font-icon sp-font-bold sp-z-50;
+    @apply sp-absolute sp-block sp-top-2 sp-end-3 sp-text-secondary sp-font-icon sp-font-bold sp-z-50;
     animation: fa-spin 2s infinite linear;
     content: "\f110";
 }

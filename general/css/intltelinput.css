@@ -52,11 +52,11 @@
 }
 
 .iti__country-container {
-    @apply sp-p-0;
+    @apply sp-p-0 sp-z-[101];
 }
 
 .iti__selected-country {
-    @apply sp-py-0 sp-px-5/2 sp-bg-tertiary sp-text-sm sp-rounded-l;
+    @apply sp-py-0 sp-px-5/2 sp-bg-tertiary sp-text-sm sp-rounded-s;
 }
 
 .iti--allow-dropdown .iti__country-container:hover .iti__selected-country {
@@ -71,15 +71,15 @@
 }
 
 .sp-input-has-error .iti__country-container {
-    @apply sp-p-1/2 sp-pr-0;
+    @apply sp-p-1/2 sp-pe-0;
 }
 
 .sp-input-has-error .iti__selected-country {
-    @apply sp-pl-2 sp-py-0;
+    @apply sp-ps-2 sp-py-0;
 }
 
 .iti__selected-country-primary {
-    @apply sp-pl-0;
+    @apply sp-ps-0;
 }
 
 /* Small (xs) */

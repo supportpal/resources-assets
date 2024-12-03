@@ -10,6 +10,14 @@ div.dt-container div.dt-layout-cell {
     @apply sp-p-0;
 }
 
+div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+    @apply sp-me-auto sp-mr-0;
+}
+
+div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+    @apply sp-ms-auto sp-ml-0;
+}
+
 div.dt-container .dt-length,
 div.dt-container .dt-search,
 div.dt-container .dt-info,
@@ -33,7 +41,7 @@ div.dt-container .dataTables_sort {
 
 div.dt-container .dt-processing {
     background: 0;
-    @apply sp-h-full sp-w-full sp-left-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
+    @apply sp-h-full sp-w-full sp-start-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
 }
 
 div.dt-processing > div:last-child > div {
@@ -46,7 +54,7 @@ div.dt-processing > div:last-child > div {
 }
 
 div.dt-container .dt-search input {
-    @apply sp-ml-0;
+    @apply sp-ms-0;
 }
 
 div.dt-container .dt-length select,
@@ -60,7 +68,7 @@ div.dt-container .dt-paging .paginate_input,
 
 div.dt-container .dt-length select,
 div.dt-container .dataTables_sort select {
-    @apply sp-pr-8;
+    @apply sp-pe-8;
 }
 
 div.dt-container .dt-length select {
@@ -68,7 +76,7 @@ div.dt-container .dt-length select {
 }
 
 div.dt-container .dataTables_sort {
-    @apply sp-pb-4 sp-float-right;
+    @apply sp-pb-4 sp-float-end;
 }
 
 div.dt-container .dt-info,
@@ -94,21 +102,18 @@ div.dt-container .dt-paging .paginate_input,
 }
 
 div.dt-container .dt-paging .dt-paging-button,
-div.dt-container .dt-paging .paginate_page,
-.dt-paging .dt-paging-button,
-.dt-paging .paginate_page {
-    @apply sp-p-0 sp-ml-4 sp-border-0;
+.dt-paging .dt-paging-button {
+    @apply sp-p-0 sp-ms-4 sp-border-0;
     min-width: auto;
 }
 
-div.dt-container .dt-paging .paginate_of,
-.dt-paging .paginate_of {
-    @apply sp-mr-4;
+div.dt-container .dt-paging .ellipsis {
+    @apply sp-mx-4;
 }
 
 div.dt-container .dt-paging .dt-paging-button,
 .dt-paging .dt-paging-button {
-    @apply sp-px-3 sp-py-1 sp-ml-0 sp-rounded sp-shadow-none;
+    @apply sp-px-3 sp-py-1 sp-ms-0 sp-rounded sp-shadow-none;
     @apply sp-text-secondary !important;
 }
 
@@ -141,8 +146,8 @@ div.dt-container .dt-input:focus {
     @apply sp-bg-primary;
 }
 
-div.dt-container .dt-input.md\:sp-rounded-r-none {
-    @apply sp-rounded-r-none;
+div.dt-container .dt-input.md\:sp-rounded-e-none {
+    @apply sp-rounded-e-none;
 }
 
 table.dataTable {
@@ -190,7 +195,7 @@ table.dataTable tbody th:first-child,
 table.dataTable tbody td:first-child,
 table.dataTable tfoot th:first-child,
 table.dataTable tfoot td:first-child {
-    @apply sp-pl-6;
+    @apply sp-ps-6;
 }
 
 table.dataTable thead th:first-child[style*="display: none"] + th:not([style*="display: none"]),
@@ -199,7 +204,7 @@ table.dataTable tbody th:first-child[style*="display: none"] + th:not([style*="d
 table.dataTable tbody td:first-child[style*="display: none"] + td:not([style*="display: none"]),
 table.dataTable tfoot th:first-child[style*="display: none"] + th:not([style*="display: none"]),
 table.dataTable tfoot td:first-child[style*="display: none"] + td:not([style*="display: none"]) {
-    @apply sp-pl-6;
+    @apply sp-ps-6;
 }
 
 table.dataTable thead th:last-child,
@@ -208,45 +213,45 @@ table.dataTable tbody th:last-child,
 table.dataTable tbody td:last-child,
 table.dataTable tfoot th:last-child,
 table.dataTable tfoot td:last-child,
-table.dataTable thead th.sp-pr-6,
-table.dataTable thead td.sp-pr-6,
-table.dataTable tbody th.sp-pr-6,
-table.dataTable tbody td.sp-pr-6,
-table.dataTable tfoot th.sp-pr-6,
-table.dataTable tfoot td.sp-pr-6 {
-    padding-right: 1.5rem;
+table.dataTable thead th.sp-pe-6,
+table.dataTable thead td.sp-pe-6,
+table.dataTable tbody th.sp-pe-6,
+table.dataTable tbody td.sp-pe-6,
+table.dataTable tfoot th.sp-pe-6,
+table.dataTable tfoot td.sp-pe-6 {
+    padding-inline-end: 1.5rem;
 }
 
 table.settings thead th:first-child {
-    @apply sp-border-l-0;
+    @apply sp-border-s-0;
 }
 
 table.dataTable thead > tr > th.dt-orderable-asc,
 table.dataTable thead > tr > th.dt-orderable-desc,
 table.dataTable thead > tr > th.dt-ordering-asc,
 table.dataTable thead > tr > th.dt-ordering-desc {
-    @apply sp-pr-7;
+    @apply sp-pe-[1.875rem];
 }
 
 table.dataTable thead > tr > th:last-child.dt-orderable-asc,
 table.dataTable thead > tr > th:last-child.dt-orderable-desc,
 table.dataTable thead > tr > th:last-child.dt-ordering-asc,
 table.dataTable thead > tr > th:last-child.dt-ordering-desc {
-    @apply sp-pr-11;
+    @apply sp-pe-11;
 }
 
 table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order,
 table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order,
 table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order,
 table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order {
-    @apply sp-right-2;
+    @apply sp-end-2 !important;
 }
 
 table.dataTable thead > tr > th:last-child.dt-orderable-asc span.dt-column-order,
 table.dataTable thead > tr > th:last-child.dt-orderable-desc span.dt-column-order,
 table.dataTable thead > tr > th:last-child.dt-ordering-asc span.dt-column-order,
 table.dataTable thead > tr > th:last-child.dt-ordering-desc span.dt-column-order {
-    @apply sp-right-6;
+    @apply sp-end-6 !important;
 }
 
 table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
@@ -277,13 +282,6 @@ table.dataTable > tbody > tr:last-child > * {
 
 div.dt-container.dt-empty-footer tbody > tr:last-child > * {
     @apply sp-border-b-tertiary;
-}
-
-table.dataTable th.dt-type-numeric,
-table.dataTable th.dt-type-date,
-table.dataTable td.dt-type-numeric,
-table.dataTable td.dt-type-date {
-    @apply sp-text-left;
 }
 
 table.dataTable tbody tr.selected {
@@ -331,25 +329,25 @@ table.dataTable tbody td.all a:hover .fas {
 
 /* Small (xs) */
 @media (min-width: 480px) {
-    table.dataTable thead th.xs\:sp-pr-3,
-    table.dataTable thead td.xs\:sp-pr-3,
-    table.dataTable tbody th.xs\:sp-pr-3,
-    table.dataTable tbody td.xs\:sp-pr-3,
-    table.dataTable tfoot th.xs\:sp-pr-3,
-    table.dataTable tfoot td.xs\:sp-pr-3 {
-        padding-right: 0.75rem;
+    table.dataTable thead th.xs\:sp-pe-3,
+    table.dataTable thead td.xs\:sp-pe-3,
+    table.dataTable tbody th.xs\:sp-pe-3,
+    table.dataTable tbody td.xs\:sp-pe-3,
+    table.dataTable tfoot th.xs\:sp-pe-3,
+    table.dataTable tfoot td.xs\:sp-pe-3 {
+        padding-inline-end: 0.75rem;
     }
 }
 
 /* Small (sm) */
 @media (min-width: 640px) {
-    table.dataTable thead th.sm\:sp-pr-3,
-    table.dataTable thead td.sm\:sp-pr-3,
-    table.dataTable tbody th.sm\:sp-pr-3,
-    table.dataTable tbody td.sm\:sp-pr-3,
-    table.dataTable tfoot th.sm\:sp-pr-3,
-    table.dataTable tfoot td.sm\:sp-pr-3 {
-        padding-right: 0.75rem;
+    table.dataTable thead th.sm\:sp-pe-3,
+    table.dataTable thead td.sm\:sp-pe-3,
+    table.dataTable tbody th.sm\:sp-pe-3,
+    table.dataTable tbody td.sm\:sp-pe-3,
+    table.dataTable tfoot th.sm\:sp-pe-3,
+    table.dataTable tfoot td.sm\:sp-pe-3 {
+        padding-inline-end: 0.75rem;
     }
 
     .sp-quick-actions .paginate_page,
@@ -357,12 +355,8 @@ table.dataTable tbody td.all a:hover .fas {
         @apply sp-inline;
     }
 
-    .sp-quick-actions .paginate_page {
-        @apply sp-ml-3;
-    }
-
-    .sp-quick-actions .paginate_of {
-        @apply sp-mr-3;
+    .sp-quick-actions .ellipsis {
+        @apply sp-mx-3;
     }
 
     .sp-quick-actions .paginate_input {
@@ -395,37 +389,37 @@ table.dataTable tbody td.all a:hover .fas {
         @apply sp-w-14 sp-px-2;
     }
 
-    table.dataTable thead th.md\:sp-pr-3,
-    table.dataTable thead td.md\:sp-pr-3,
-    table.dataTable tbody th.md\:sp-pr-3,
-    table.dataTable tbody td.md\:sp-pr-3,
-    table.dataTable tfoot th.md\:sp-pr-3,
-    table.dataTable tfoot td.md\:sp-pr-3 {
-        padding-right: 0.75rem;
+    table.dataTable thead th.md\:sp-pe-3,
+    table.dataTable thead td.md\:sp-pe-3,
+    table.dataTable tbody th.md\:sp-pe-3,
+    table.dataTable tbody td.md\:sp-pe-3,
+    table.dataTable tfoot th.md\:sp-pe-3,
+    table.dataTable tfoot td.md\:sp-pe-3 {
+        padding-inline-end: 0.75rem;
     }
 }
 
 /* Large (lg) */
 @media (min-width: 1024px) {
-    table.dataTable thead th.lg\:sp-pr-3,
-    table.dataTable thead td.lg\:sp-pr-3,
-    table.dataTable tbody th.lg\:sp-pr-3,
-    table.dataTable tbody td.lg\:sp-pr-3,
-    table.dataTable tfoot th.lg\:sp-pr-3,
-    table.dataTable tfoot td.lg\:sp-pr-3 {
-        padding-right: 0.75rem;
+    table.dataTable thead th.lg\:sp-pe-3,
+    table.dataTable thead td.lg\:sp-pe-3,
+    table.dataTable tbody th.lg\:sp-pe-3,
+    table.dataTable tbody td.lg\:sp-pe-3,
+    table.dataTable tfoot th.lg\:sp-pe-3,
+    table.dataTable tfoot td.lg\:sp-pe-3 {
+        padding-inline-end: 0.75rem;
     }
 }
 
 /* Extra Large (xl) */
 @media (min-width: 1280px) {
-    table.dataTable thead th.xl\:sp-pr-3,
-    table.dataTable thead td.xl\:sp-pr-3,
-    table.dataTable tbody th.xl\:sp-pr-3,
-    table.dataTable tbody td.xl\:sp-pr-3,
-    table.dataTable tfoot th.xl\:sp-pr-3,
-    table.dataTable tfoot td.xl\:sp-pr-3 {
-        padding-right: 0.75rem;
+    table.dataTable thead th.xl\:sp-pe-3,
+    table.dataTable thead td.xl\:sp-pe-3,
+    table.dataTable tbody th.xl\:sp-pe-3,
+    table.dataTable tbody td.xl\:sp-pe-3,
+    table.dataTable tfoot th.xl\:sp-pe-3,
+    table.dataTable tfoot td.xl\:sp-pe-3 {
+        padding-inline-end: 0.75rem;
     }
 }
 
@@ -433,13 +427,13 @@ table.dataTable tbody td.all a:hover .fas {
 
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
-    @apply sp-pl-14;
+    @apply sp-ps-14;
     position: relative;
 }
 
 table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
 table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
-    @apply sp-absolute sp-left-6 sp-top-1/2 sp-h-5 sp-w-5 sp-bg-green-500 sp-border-0 sp-rounded sp-font-icon sp-font-bold sp-text-xs sp-text-white sp-text-center sp-leading-5 sp-transform sp--translate-y-1/2;
+    @apply sp-absolute sp-start-6 sp-top-1/2 sp-h-5 sp-w-5 sp-bg-green-500 sp-border-0 sp-rounded sp-font-icon sp-font-bold sp-text-xs sp-text-white sp-text-center sp-leading-5 sp-transform sp--translate-y-1/2;
     content: "\f067";
 }
 
@@ -463,7 +457,7 @@ table.dataTable.sp-table-fixed colgroup:nth-child(2) {
 /* yadcf */
 
 .yadcf-filter-wrapper {
-    @apply sp-ml-0 !important;
+    @apply sp-ms-0 !important;
     width: calc(100% - 2.25rem);
 }
 
@@ -485,6 +479,6 @@ table.dataTable.sp-table-fixed colgroup:nth-child(2) {
 }
 
 .yadcf-filter-reset-button:before {
-    @apply sp-absolute sp-left-3 sp-top-2 sp-text-primary sp-font-icon sp-font-bold;
+    @apply sp-absolute sp-start-3 sp-top-2 sp-text-primary sp-font-icon sp-font-bold;
     content: "\f00d";
 }

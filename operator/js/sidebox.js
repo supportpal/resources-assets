@@ -45,11 +45,11 @@ $(function () {
     if ($(window).width() < 1024) {
       // Mobile view
       $sidebar.removeClass(sidebarClosedState).addClass('lg:sp-w-72').toggleClass('sp-w-72 sm:sp-w-72 sm:sp-w-8 ' + sidebarOpenState);
-      $sidebar.find('.sp-toggle-sidebar').addClass('lg:sp-ml-72').toggleClass('sp-ml-72 sm:sp-ml-72 sm:sp-ml-8');
+      $sidebar.find('.sp-toggle-sidebar').addClass('lg:sp-ms-72').toggleClass('sp-ms-72 sm:sp-ms-72 sm:sp-ms-8');
     } else {
       // Desktop view
       $sidebar.removeClass('sp-w-72 sm:sp-w-72 ' + sidebarOpenState).toggleClass('lg:sp-w-72 ' + sidebarClosedState);
-      $sidebar.find('.sp-toggle-sidebar').removeClass('sp-ml-72 sm:sp-ml-72').toggleClass('lg:sp-ml-72');
+      $sidebar.find('.sp-toggle-sidebar').removeClass('sp-ms-72 sm:sp-ms-72').toggleClass('lg:sp-ms-72');
     }
   }
 

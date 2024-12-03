@@ -1,9 +1,9 @@
 .minicolors-theme-default .minicolors-swatch {
-    @apply sp-h-6 sp-w-6 sp-top-2 sp-left-2 sp-border sp-border-primary;
+    @apply sp-h-6 sp-w-6 sp-top-2 sp-start-2 sp-border sp-border-primary;
 }
 
 .minicolors-theme-default .minicolors-input {
-    @apply sp-h-auto sp-pl-10;
+    @apply sp-h-auto sp-ps-10;
 }
 
 .minicolors-panel {

@@ -113,4 +113,16 @@ jQuery(function ($) {
   });
   select_dependentField = $select_dependentField[0].selectize;
   select_dependentOption = $select_dependentOption[0].selectize;
+  $('.sp-input-translatable textarea').editor({
+    // Paste settings.
+    valid_elements: 'a[href|target=_blank],br,p',
+    // Toolbar settings.
+    toolbar: false,
+    // https://www.tiny.cloud/docs/plugins/opensource/autoresize/#min_height
+    min_height: 50,
+    // Statusbar settings.
+    statusbar: false,
+    // Disable keyboard shortcuts.
+    plugins: $.fn.editor.defaults.plugins.concat(['disable_shortcuts'])
+  });
 });

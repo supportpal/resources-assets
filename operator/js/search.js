@@ -145,9 +145,9 @@ $(document.body).ready(function () {
         },
         option: function (item, escape) {
           if (item.optgroup === 'history') {
-            return "<div class='sp-search-history'>" + "<div class='sp-flex sp-px-3 sp-py-1'>" + "<div class='sp-flex-initial sp-mr-3 sp-text-tertiary'>" + "<i class='fa-solid fa-clock fa-fw'></i>" + "</div>" + "<div class='sp-search-term sp-flex-grow'>" + escape(item.label) + "</div>" + "<div class='sp-search-history-clear sp-flex-initial sp-ml-3 sp-text-tertiary sp-text-sm'>" + "<i class='fa-solid fa-xmark fa-fw'></i>" + "</div>" + "</div>" + "</div>";
+            return "<div class='sp-search-history'>" + "<div class='sp-flex sp-px-3 sp-py-1'>" + "<div class='sp-flex-initial sp-me-3 sp-text-tertiary'>" + "<i class='fa-solid fa-clock fa-fw'></i>" + "</div>" + "<div class='sp-search-term sp-flex-grow'>" + escape(item.label) + "</div>" + "<div class='sp-search-history-clear sp-flex-initial sp-ms-3 sp-text-tertiary sp-text-sm'>" + "<i class='fa-solid fa-xmark fa-fw'></i>" + "</div>" + "</div>" + "</div>";
           } else if (item.optgroup === 'showall') {
-            return "<div>" + "<a class='sp-block sp-px-3 sp-py-1' href='" + escape(item.link) + "'>" + "<div class='sp-inline-block sp-mr-3 sp-text-tertiary'>" + "<i class='fa-solid fa-magnifying-glass fa-fw'></i>" + "</div>" + "<span class='sp-text-sm sp-text-secondary'>" + escape(item.label) + "</span>" + "</a>" + "</div>";
+            return "<div>" + "<a class='sp-block sp-px-3 sp-py-1' href='" + escape(item.link) + "'>" + "<div class='sp-inline-block sp-me-3 sp-text-tertiary'>" + "<i class='fa-solid fa-magnifying-glass fa-fw'></i>" + "</div>" + "<span class='sp-text-sm sp-text-secondary'>" + escape(item.label) + "</span>" + "</a>" + "</div>";
           } else if (item.id !== 0 && item.id !== '') {
             var icon,
               badge = false;
@@ -166,7 +166,7 @@ $(document.body).ready(function () {
                 icon = 'fa-file-lines';
                 break;
             }
-            return "<div>" + "<a class='sp-flex sp-items-center sp-px-3 sp-py-1' href='" + escape(item.link) + "'>" + "<div class='sp-flex-initial sp-mr-3 sp-text-tertiary'>" + "<i class='fa-solid " + icon + " fa-fw'></i>" + "</div>" + "<div class='sp-flex-grow sp-truncate sp-leading-snug'>" + (badge ? "<span class='result-id sp-tag sp-bg-primary-800 sp-text-white'>" + escape("#" + item.id.toString()) + "</span>" : "") + "<span class='result-name'>" + item.label + "</span><br />" + "<span class='result-secondary sp-description'>" + item.secondary + "</span>" + "</div>" + "</a>" + "</div>";
+            return "<div>" + "<a class='sp-flex sp-items-center sp-px-3 sp-py-1' href='" + escape(item.link) + "'>" + "<div class='sp-flex-initial sp-me-3 sp-text-tertiary'>" + "<i class='fa-solid " + icon + " fa-fw'></i>" + "</div>" + "<div class='sp-flex-grow sp-truncate sp-leading-snug'>" + (badge ? "<span class='result-id sp-tag sp-bg-primary-800 sp-text-white'>" + escape("#" + item.id.toString()) + "</span>" : "") + "<span class='result-name'>" + item.label + "</span><br />" + "<span class='result-secondary sp-description'>" + item.secondary + "</span>" + "</div>" + "</a>" + "</div>";
           } else {
             return "<div>" + item.label + "</div>";
           }

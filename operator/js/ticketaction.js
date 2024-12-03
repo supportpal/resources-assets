@@ -26,7 +26,7 @@
    * @returns {*|jQuery}
    */
   var createList = function (tickets) {
-    var ticketList = $('<ul />').addClass('sp-list-none sp-p-0 sp-m-0 sp-border sp-border-secondary sp-rounded sp-text-left sp-overflow-y-auto').css('max-height', '15rem');
+    var ticketList = $('<ul />').addClass('sp-list-none sp-p-0 sp-m-0 sp-border sp-border-secondary sp-rounded sp-text-start sp-overflow-y-auto').css('max-height', '15rem');
 
     // Add each ticket to list.
     $.each(tickets, function (index, value) {

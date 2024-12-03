@@ -3,7 +3,7 @@
 })(function () {
   'use strict';
 
-  /*! shepherd.js 12.0.6 */
+  /*! shepherd.js 13.0.3 */
 
   /**
    * Checks if `value` is classified as an `Element`.
@@ -138,74 +138,6 @@
       return this;
     }
   }
-  function _AsyncGenerator(e) {
-    var r, t;
-    function resume(r, t) {
-      try {
-        var n = e[r](t),
-          o = n.value,
-          u = o instanceof _OverloadYield;
-        Promise.resolve(u ? o.v : o).then(function (t) {
-          if (u) {
-            var i = "return" === r ? "return" : "next";
-            if (!o.k || t.done) return resume(i, t);
-            t = e[i](t).value;
-          }
-          settle(n.done ? "return" : "normal", t);
-        }, function (e) {
-          resume("throw", e);
-        });
-      } catch (e) {
-        settle("throw", e);
-      }
-    }
-    function settle(e, n) {
-      switch (e) {
-        case "return":
-          r.resolve({
-            value: n,
-            done: !0
-          });
-          break;
-        case "throw":
-          r.reject(n);
-          break;
-        default:
-          r.resolve({
-            value: n,
-            done: !1
-          });
-      }
-      (r = r.next) ? resume(r.key, r.arg) : t = null;
-    }
-    this._invoke = function (e, n) {
-      return new Promise(function (o, u) {
-        var i = {
-          key: e,
-          arg: n,
-          resolve: o,
-          reject: u,
-          next: null
-        };
-        t ? t = t.next = i : (r = t = i, resume(e, n));
-      });
-    }, "function" != typeof e.return && (this.return = void 0);
-  }
-  _AsyncGenerator.prototype["function" == typeof Symbol && Symbol.asyncIterator || "@@asyncIterator"] = function () {
-    return this;
-  }, _AsyncGenerator.prototype.next = function (e) {
-    return this._invoke("next", e);
-  }, _AsyncGenerator.prototype.throw = function (e) {
-    return this._invoke("throw", e);
-  }, _AsyncGenerator.prototype.return = function (e) {
-    return this._invoke("return", e);
-  };
-  function _OverloadYield(e, d) {
-    this.v = e, this.k = d;
-  }
-  function _awaitAsyncGenerator(e) {
-    return new _OverloadYield(e, 0);
-  }
   function _extends() {
     return _extends = Object.assign ? Object.assign.bind() : function (n) {
       for (var e = 1; e < arguments.length; e++) {
@@ -219,15 +151,10 @@
     if (null == r) return {};
     var t = {};
     for (var n in r) if ({}.hasOwnProperty.call(r, n)) {
-      if (e.indexOf(n) >= 0) continue;
+      if (e.includes(n)) continue;
       t[n] = r[n];
     }
     return t;
-  }
-  function _wrapAsyncGenerator(r) {
-    return function () {
-      return new _AsyncGenerator(r.apply(this, arguments));
-    };
   }
 
   /**
@@ -830,12 +757,22 @@
     };
   }
   function rectToClientRect(rect) {
-    return _extends({}, rect, {
-      top: rect.y,
-      left: rect.x,
-      right: rect.x + rect.width,
-      bottom: rect.y + rect.height
-    });
+    const {
+      x,
+      y,
+      width,
+      height
+    } = rect;
+    return {
+      width,
+      height,
+      top: y,
+      left: x,
+      right: x + width,
+      bottom: y + height,
+      x,
+      y
+    };
   }
   const _excluded2 = ["mainAxis", "crossAxis", "fallbackPlacements", "fallbackStrategy", "fallbackAxisSideDirection", "flipAlignment"],
     _excluded4 = ["mainAxis", "crossAxis", "limiter"];
@@ -1019,10 +956,12 @@
       rootBoundary,
       strategy
     }));
-    const rect = elementContext === 'floating' ? _extends({}, rects.floating, {
+    const rect = elementContext === 'floating' ? {
       x,
-      y
-    }) : rects.reference;
+      y,
+      width: rects.floating.width,
+      height: rects.floating.height
+    } : rects.reference;
     const offsetParent = await (platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(elements.floating));
     const offsetScale = (await (platform.isElement == null ? void 0 : platform.isElement(offsetParent))) ? (await (platform.getScale == null ? void 0 : platform.getScale(offsetParent))) || {
       x: 1,
@@ -1168,10 +1107,12 @@
           return {};
         }
         const side = getSide(placement);
+        const initialSideAxis = getSideAxis(initialPlacement);
         const isBasePlacement = getSide(initialPlacement) === initialPlacement;
         const rtl = await (platform.isRTL == null ? void 0 : platform.isRTL(elements.floating));
         const fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipAlignment ? [getOppositePlacement(initialPlacement)] : getExpandedPlacements(initialPlacement));
-        if (!specifiedFallbackPlacements && fallbackAxisSideDirection !== 'none') {
+        const hasFallbackAxisSideDirection = fallbackAxisSideDirection !== 'none';
+        if (!specifiedFallbackPlacements && hasFallbackAxisSideDirection) {
           fallbackPlacements.push(...getOppositeAxisPlacements(initialPlacement, flipAlignment, fallbackAxisSideDirection, rtl));
         }
         const placements = [initialPlacement, ...fallbackPlacements];
@@ -1217,8 +1158,17 @@
             switch (fallbackStrategy) {
               case 'bestFit':
                 {
-                  var _overflowsData$map$so;
-                  const placement = (_overflowsData$map$so = overflowsData.map(d => [d.placement, d.overflows.filter(overflow => overflow > 0).reduce((acc, overflow) => acc + overflow, 0)]).sort((a, b) => a[1] - b[1])[0]) == null ? void 0 : _overflowsData$map$so[0];
+                  var _overflowsData$filter2;
+                  const placement = (_overflowsData$filter2 = overflowsData.filter(d => {
+                    if (hasFallbackAxisSideDirection) {
+                      const currentSideAxis = getSideAxis(d.placement);
+                      return currentSideAxis === initialSideAxis ||
+                      // Create a bias to the `y` side axis due to horizontal
+                      // reading directions favoring greater width.
+                      currentSideAxis === 'y';
+                    }
+                    return true;
+                  }).map(d => [d.placement, d.overflows.filter(overflow => overflow > 0).reduce((acc, overflow) => acc + overflow, 0)]).sort((a, b) => a[1] - b[1])[0]) == null ? void 0 : _overflowsData$filter2[0];
                   if (placement) {
                     resetPlacement = placement;
                   }
@@ -1426,9 +1376,18 @@
   function isTableElement(element) {
     return ['table', 'td', 'th'].includes(getNodeName(element));
   }
-  function isContainingBlock(element) {
+  function isTopLayer(element) {
+    return [':popover-open', ':modal'].some(selector => {
+      try {
+        return element.matches(selector);
+      } catch (e) {
+        return false;
+      }
+    });
+  }
+  function isContainingBlock(elementOrCss) {
     const webkit = isWebKit();
-    const css = getComputedStyle(element);
+    const css = isElement(elementOrCss) ? getComputedStyle(elementOrCss) : elementOrCss;
 
     // https://developer.mozilla.org/en-US/docs/Web/CSS/Containing_block#identifying_the_containing_block
     return css.transform !== 'none' || css.perspective !== 'none' || (css.containerType ? css.containerType !== 'normal' : false) || !webkit && (css.backdropFilter ? css.backdropFilter !== 'none' : false) || !webkit && (css.filter ? css.filter !== 'none' : false) || ['transform', 'perspective', 'filter'].some(value => (css.willChange || '').includes(value)) || ['paint', 'layout', 'strict', 'content'].some(value => (css.contain || '').includes(value));
@@ -1438,9 +1397,10 @@
     while (isHTMLElement(currentNode) && !isLastTraversableNode(currentNode)) {
       if (isContainingBlock(currentNode)) {
         return currentNode;
-      } else {
-        currentNode = getParentNode(currentNode);
+      } else if (isTopLayer(currentNode)) {
+        return null;
       }
+      currentNode = getParentNode(currentNode);
     }
     return null;
   }
@@ -1462,8 +1422,8 @@
       };
     }
     return {
-      scrollLeft: element.pageXOffset,
-      scrollTop: element.pageYOffset
+      scrollLeft: element.scrollX,
+      scrollTop: element.scrollY
     };
   }
   function getParentNode(node) {
@@ -1627,16 +1587,6 @@
       height,
       x,
       y
-    });
-  }
-  const topLayerSelectors = [':popover-open', ':modal'];
-  function isTopLayer(element) {
-    return topLayerSelectors.some(selector => {
-      try {
-        return element.matches(selector);
-      } catch (e) {
-        return false;
-      }
     });
   }
   function convertOffsetParentRelativeRectToViewportRelativeRect(_ref) {
@@ -2281,8 +2231,11 @@
         crossAxis: true
       }));
       if (arrowEl) {
+        var _attachToOptions$on, _attachToOptions$on2;
+        const hasEdgeAlignment = (attachToOptions == null || (_attachToOptions$on = attachToOptions.on) == null ? void 0 : _attachToOptions$on.includes('-start')) || (attachToOptions == null || (_attachToOptions$on2 = attachToOptions.on) == null ? void 0 : _attachToOptions$on2.includes('-end'));
         options.middleware.push(arrow({
-          element: arrowEl
+          element: arrowEl,
+          padding: hasEdgeAlignment ? 4 : 0
         }));
       }
       options.placement = attachToOptions.on;
@@ -2998,7 +2951,7 @@
       v: new Set()
     })).v.add(PUBLIC_VERSION);
 
-  /* src/components/shepherd-button.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-button.svelte generated by Svelte v4.2.18 */
   function create_fragment$8(ctx) {
     let button;
     let button_aria_label_value;
@@ -3088,7 +3041,7 @@
     }
   }
 
-  /* src/components/shepherd-footer.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-footer.svelte generated by Svelte v4.2.18 */
   function get_each_context(ctx, list, i) {
     const child_ctx = ctx.slice();
     child_ctx[2] = list[i];
@@ -3284,7 +3237,7 @@
     }
   }
 
-  /* src/components/shepherd-cancel-icon.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-cancel-icon.svelte generated by Svelte v4.2.18 */
   function create_fragment$6(ctx) {
     let button;
     let span;
@@ -3354,7 +3307,7 @@
     }
   }
 
-  /* src/components/shepherd-title.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-title.svelte generated by Svelte v4.2.18 */
   function create_fragment$5(ctx) {
     let h3;
     return {
@@ -3421,7 +3374,7 @@
     }
   }
 
-  /* src/components/shepherd-header.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-header.svelte generated by Svelte v4.2.18 */
   function create_if_block_1$1(ctx) {
     let shepherdtitle;
     let current;
@@ -3609,7 +3562,7 @@
     }
   }
 
-  /* src/components/shepherd-text.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-text.svelte generated by Svelte v4.2.18 */
   function create_fragment$3(ctx) {
     let div;
     return {
@@ -3683,7 +3636,7 @@
     }
   }
 
-  /* src/components/shepherd-content.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-content.svelte generated by Svelte v4.2.18 */
   function create_if_block_2(ctx) {
     let shepherdheader;
     let current;
@@ -3936,7 +3889,7 @@
     }
   }
 
-  /* src/components/shepherd-element.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-element.svelte generated by Svelte v4.2.18 */
   function create_if_block(ctx) {
     let div;
     return {
@@ -4553,158 +4506,6 @@
       target.classList.remove('shepherd-target-click-disabled', `${this.classPrefix}shepherd-enabled`, `${this.classPrefix}shepherd-target`);
     }
   }
-  function getContext(window) {
-    let context = {};
-    if (window.navigator) {
-      const userAgent = window.navigator.userAgent;
-      context = _extends({}, context, {
-        $os: os(window),
-        $browser: browser(userAgent, window.navigator.vendor, !!window.opera),
-        $referrer: window.document.referrer,
-        $referring_domain: referringDomain(window.document.referrer),
-        $device: device(userAgent),
-        $current_url: window.location.href,
-        $host: window.location.host,
-        $pathname: window.location.pathname,
-        $browser_version: browserVersion(userAgent, window.navigator.vendor, !!window.opera),
-        $screen_height: window.screen.height,
-        $screen_width: window.screen.width,
-        $screen_dpr: window.devicePixelRatio
-      });
-    }
-    context = _extends({}, context, {
-      $lib: 'js',
-      // $lib_version: version,
-      $insert_id: Math.random().toString(36).substring(2, 10) + Math.random().toString(36).substring(2, 10),
-      $time: new Date().getTime() / 1000 // epoch time in seconds
-    });
-    return context; // TODO: strip empty props?
-  }
-  function includes(haystack, needle) {
-    return haystack.indexOf(needle) >= 0;
-  }
-  function browser(userAgent, vendor, opera) {
-    vendor = vendor || ''; // vendor is undefined for at least IE9
-    if (opera || includes(userAgent, ' OPR/')) {
-      if (includes(userAgent, 'Mini')) {
-        return 'Opera Mini';
-      }
-      return 'Opera';
-    } else if (/(BlackBerry|PlayBook|BB10)/i.test(userAgent)) {
-      return 'BlackBerry';
-    } else if (includes(userAgent, 'IEMobile') || includes(userAgent, 'WPDesktop')) {
-      return 'Internet Explorer Mobile';
-    } else if (includes(userAgent, 'SamsungBrowser/')) {
-      // https://developer.samsung.com/internet/user-agent-string-format
-      return 'Samsung Internet';
-    } else if (includes(userAgent, 'Edge') || includes(userAgent, 'Edg/')) {
-      return 'Microsoft Edge';
-    } else if (includes(userAgent, 'FBIOS')) {
-      return 'Facebook Mobile';
-    } else if (includes(userAgent, 'Chrome')) {
-      return 'Chrome';
-    } else if (includes(userAgent, 'CriOS')) {
-      return 'Chrome iOS';
-    } else if (includes(userAgent, 'UCWEB') || includes(userAgent, 'UCBrowser')) {
-      return 'UC Browser';
-    } else if (includes(userAgent, 'FxiOS')) {
-      return 'Firefox iOS';
-    } else if (includes(vendor, 'Apple')) {
-      if (includes(userAgent, 'Mobile')) {
-        return 'Mobile Safari';
-      }
-      return 'Safari';
-    } else if (includes(userAgent, 'Android')) {
-      return 'Android Mobile';
-    } else if (includes(userAgent, 'Konqueror')) {
-      return 'Konqueror';
-    } else if (includes(userAgent, 'Firefox')) {
-      return 'Firefox';
-    } else if (includes(userAgent, 'MSIE') || includes(userAgent, 'Trident/')) {
-      return 'Internet Explorer';
-    } else if (includes(userAgent, 'Gecko')) {
-      return 'Mozilla';
-    } else {
-      return '';
-    }
-  }
-  function browserVersion(userAgent, vendor, opera) {
-    const regexList = {
-      'Internet Explorer Mobile': /rv:(\d+(\.\d+)?)/,
-      'Microsoft Edge': /Edge?\/(\d+(\.\d+)?)/,
-      Chrome: /Chrome\/(\d+(\.\d+)?)/,
-      'Chrome iOS': /CriOS\/(\d+(\.\d+)?)/,
-      'UC Browser': /(UCBrowser|UCWEB)\/(\d+(\.\d+)?)/,
-      Safari: /Version\/(\d+(\.\d+)?)/,
-      'Mobile Safari': /Version\/(\d+(\.\d+)?)/,
-      Opera: /(Opera|OPR)\/(\d+(\.\d+)?)/,
-      Firefox: /Firefox\/(\d+(\.\d+)?)/,
-      'Firefox iOS': /FxiOS\/(\d+(\.\d+)?)/,
-      Konqueror: /Konqueror:(\d+(\.\d+)?)/,
-      BlackBerry: /BlackBerry (\d+(\.\d+)?)/,
-      'Android Mobile': /android\s(\d+(\.\d+)?)/,
-      'Samsung Internet': /SamsungBrowser\/(\d+(\.\d+)?)/,
-      'Internet Explorer': /(rv:|MSIE )(\d+(\.\d+)?)/,
-      Mozilla: /rv:(\d+(\.\d+)?)/
-    };
-    const browserString = browser(userAgent, vendor, opera);
-    const regex = regexList[browserString] || undefined;
-    if (regex === undefined) {
-      return null;
-    }
-    const matches = userAgent.match(regex);
-    if (!matches) {
-      return null;
-    }
-    return parseFloat(matches[matches.length - 2]);
-  }
-  function os(window) {
-    const a = window.navigator.userAgent;
-    if (/Windows/i.test(a)) {
-      if (/Phone/.test(a) || /WPDesktop/.test(a)) {
-        return 'Windows Phone';
-      }
-      return 'Windows';
-    } else if (/(iPhone|iPad|iPod)/.test(a)) {
-      return 'iOS';
-    } else if (/Android/.test(a)) {
-      return 'Android';
-    } else if (/(BlackBerry|PlayBook|BB10)/i.test(a)) {
-      return 'BlackBerry';
-    } else if (/Mac/i.test(a)) {
-      return 'Mac OS X';
-    } else if (/Linux/.test(a)) {
-      return 'Linux';
-    } else if (/CrOS/.test(a)) {
-      return 'Chrome OS';
-    } else {
-      return '';
-    }
-  }
-  function device(userAgent) {
-    if (/Windows Phone/i.test(userAgent) || /WPDesktop/.test(userAgent)) {
-      return 'Windows Phone';
-    } else if (/iPad/.test(userAgent)) {
-      return 'iPad';
-    } else if (/iPod/.test(userAgent)) {
-      return 'iPod Touch';
-    } else if (/iPhone/.test(userAgent)) {
-      return 'iPhone';
-    } else if (/(BlackBerry|PlayBook|BB10)/i.test(userAgent)) {
-      return 'BlackBerry';
-    } else if (/Android/.test(userAgent)) {
-      return 'Android';
-    } else {
-      return '';
-    }
-  }
-  function referringDomain(referrer) {
-    const split = referrer.split('/');
-    if (split.length >= 3) {
-      return split[2];
-    }
-    return '';
-  }
 
   /**
    * Cleanup the steps and set pointerEvents back to 'auto'
@@ -4722,344 +4523,6 @@
           }
         }
       });
-    }
-  }
-  const instanceOfAny = (object, constructors) => constructors.some(c => object instanceof c);
-  let idbProxyableTypes;
-  let cursorAdvanceMethods;
-  // This is a function to prevent it throwing up in node environments.
-  function getIdbProxyableTypes() {
-    return idbProxyableTypes || (idbProxyableTypes = [IDBDatabase, IDBObjectStore, IDBIndex, IDBCursor, IDBTransaction]);
-  }
-  // This is a function to prevent it throwing up in node environments.
-  function getCursorAdvanceMethods() {
-    return cursorAdvanceMethods || (cursorAdvanceMethods = [IDBCursor.prototype.advance, IDBCursor.prototype.continue, IDBCursor.prototype.continuePrimaryKey]);
-  }
-  const transactionDoneMap = new WeakMap();
-  const transformCache = new WeakMap();
-  const reverseTransformCache = new WeakMap();
-  function promisifyRequest(request) {
-    const promise = new Promise((resolve, reject) => {
-      const unlisten = () => {
-        request.removeEventListener('success', success);
-        request.removeEventListener('error', error);
-      };
-      const success = () => {
-        resolve(wrap(request.result));
-        unlisten();
-      };
-      const error = () => {
-        reject(request.error);
-        unlisten();
-      };
-      request.addEventListener('success', success);
-      request.addEventListener('error', error);
-    });
-    // This mapping exists in reverseTransformCache but doesn't doesn't exist in transformCache. This
-    // is because we create many promises from a single IDBRequest.
-    reverseTransformCache.set(promise, request);
-    return promise;
-  }
-  function cacheDonePromiseForTransaction(tx) {
-    // Early bail if we've already created a done promise for this transaction.
-    if (transactionDoneMap.has(tx)) return;
-    const done = new Promise((resolve, reject) => {
-      const unlisten = () => {
-        tx.removeEventListener('complete', complete);
-        tx.removeEventListener('error', error);
-        tx.removeEventListener('abort', error);
-      };
-      const complete = () => {
-        resolve();
-        unlisten();
-      };
-      const error = () => {
-        reject(tx.error || new DOMException('AbortError', 'AbortError'));
-        unlisten();
-      };
-      tx.addEventListener('complete', complete);
-      tx.addEventListener('error', error);
-      tx.addEventListener('abort', error);
-    });
-    // Cache it for later retrieval.
-    transactionDoneMap.set(tx, done);
-  }
-  let idbProxyTraps = {
-    get(target, prop, receiver) {
-      if (target instanceof IDBTransaction) {
-        // Special handling for transaction.done.
-        if (prop === 'done') return transactionDoneMap.get(target);
-        // Make tx.store return the only store in the transaction, or undefined if there are many.
-        if (prop === 'store') {
-          return receiver.objectStoreNames[1] ? undefined : receiver.objectStore(receiver.objectStoreNames[0]);
-        }
-      }
-      // Else transform whatever we get back.
-      return wrap(target[prop]);
-    },
-    set(target, prop, value) {
-      target[prop] = value;
-      return true;
-    },
-    has(target, prop) {
-      if (target instanceof IDBTransaction && (prop === 'done' || prop === 'store')) {
-        return true;
-      }
-      return prop in target;
-    }
-  };
-  function replaceTraps(callback) {
-    idbProxyTraps = callback(idbProxyTraps);
-  }
-  function wrapFunction(func) {
-    // Due to expected object equality (which is enforced by the caching in `wrap`), we
-    // only create one new func per func.
-    // Cursor methods are special, as the behaviour is a little more different to standard IDB. In
-    // IDB, you advance the cursor and wait for a new 'success' on the IDBRequest that gave you the
-    // cursor. It's kinda like a promise that can resolve with many values. That doesn't make sense
-    // with real promises, so each advance methods returns a new promise for the cursor object, or
-    // undefined if the end of the cursor has been reached.
-    if (getCursorAdvanceMethods().includes(func)) {
-      return function (...args) {
-        // Calling the original function with the proxy as 'this' causes ILLEGAL INVOCATION, so we use
-        // the original object.
-        func.apply(unwrap(this), args);
-        return wrap(this.request);
-      };
-    }
-    return function (...args) {
-      // Calling the original function with the proxy as 'this' causes ILLEGAL INVOCATION, so we use
-      // the original object.
-      return wrap(func.apply(unwrap(this), args));
-    };
-  }
-  function transformCachableValue(value) {
-    if (typeof value === 'function') return wrapFunction(value);
-    // This doesn't return, it just creates a 'done' promise for the transaction,
-    // which is later returned for transaction.done (see idbObjectHandler).
-    if (value instanceof IDBTransaction) cacheDonePromiseForTransaction(value);
-    if (instanceOfAny(value, getIdbProxyableTypes())) return new Proxy(value, idbProxyTraps);
-    // Return the same value back if we're not going to transform it.
-    return value;
-  }
-  function wrap(value) {
-    // We sometimes generate multiple promises from a single IDBRequest (eg when cursoring), because
-    // IDB is weird and a single IDBRequest can yield many responses, so these can't be cached.
-    if (value instanceof IDBRequest) return promisifyRequest(value);
-    // If we've already transformed this value before, reuse the transformed value.
-    // This is faster, but it also provides object equality.
-    if (transformCache.has(value)) return transformCache.get(value);
-    const newValue = transformCachableValue(value);
-    // Not all types are transformed.
-    // These may be primitive types, so they can't be WeakMap keys.
-    if (newValue !== value) {
-      transformCache.set(value, newValue);
-      reverseTransformCache.set(newValue, value);
-    }
-    return newValue;
-  }
-  const unwrap = value => reverseTransformCache.get(value);
-
-  /**
-   * Open a database.
-   *
-   * @param name Name of the database.
-   * @param version Schema version.
-   * @param callbacks Additional callbacks.
-   */
-  function openDB(name, version, {
-    blocked,
-    upgrade,
-    blocking,
-    terminated
-  } = {}) {
-    const request = indexedDB.open(name, version);
-    const openPromise = wrap(request);
-    if (upgrade) {
-      request.addEventListener('upgradeneeded', event => {
-        upgrade(wrap(request.result), event.oldVersion, event.newVersion, wrap(request.transaction), event);
-      });
-    }
-    if (blocked) {
-      request.addEventListener('blocked', event => blocked(
-      // Casting due to https://github.com/microsoft/TypeScript-DOM-lib-generator/pull/1405
-      event.oldVersion, event.newVersion, event));
-    }
-    openPromise.then(db => {
-      if (terminated) db.addEventListener('close', () => terminated());
-      if (blocking) {
-        db.addEventListener('versionchange', event => blocking(event.oldVersion, event.newVersion, event));
-      }
-    }).catch(() => {});
-    return openPromise;
-  }
-  const readMethods = ['get', 'getKey', 'getAll', 'getAllKeys', 'count'];
-  const writeMethods = ['put', 'add', 'delete', 'clear'];
-  const cachedMethods = new Map();
-  function getMethod(target, prop) {
-    if (!(target instanceof IDBDatabase && !(prop in target) && typeof prop === 'string')) {
-      return;
-    }
-    if (cachedMethods.get(prop)) return cachedMethods.get(prop);
-    const targetFuncName = prop.replace(/FromIndex$/, '');
-    const useIndex = prop !== targetFuncName;
-    const isWrite = writeMethods.includes(targetFuncName);
-    if (
-    // Bail if the target doesn't exist on the target. Eg, getAll isn't in Edge.
-    !(targetFuncName in (useIndex ? IDBIndex : IDBObjectStore).prototype) || !(isWrite || readMethods.includes(targetFuncName))) {
-      return;
-    }
-    const method = async function method(storeName, ...args) {
-      // isWrite ? 'readwrite' : undefined gzipps better, but fails in Edge :(
-      const tx = this.transaction(storeName, isWrite ? 'readwrite' : 'readonly');
-      let target = tx.store;
-      if (useIndex) target = target.index(args.shift());
-      // Must reject if op rejects.
-      // If it's a write operation, must reject if tx.done rejects.
-      // Must reject with op rejection first.
-      // Must resolve with op value.
-      // Must handle both promises (no unhandled rejections)
-      return (await Promise.all([target[targetFuncName](...args), isWrite && tx.done]))[0];
-    };
-    cachedMethods.set(prop, method);
-    return method;
-  }
-  replaceTraps(oldTraps => _extends({}, oldTraps, {
-    get: (target, prop, receiver) => getMethod(target, prop) || oldTraps.get(target, prop, receiver),
-    has: (target, prop) => !!getMethod(target, prop) || oldTraps.has(target, prop)
-  }));
-  const advanceMethodProps = ['continue', 'continuePrimaryKey', 'advance'];
-  const methodMap = {};
-  const advanceResults = new WeakMap();
-  const ittrProxiedCursorToOriginalProxy = new WeakMap();
-  const cursorIteratorTraps = {
-    get(target, prop) {
-      if (!advanceMethodProps.includes(prop)) return target[prop];
-      let cachedFunc = methodMap[prop];
-      if (!cachedFunc) {
-        cachedFunc = methodMap[prop] = function (...args) {
-          advanceResults.set(this, ittrProxiedCursorToOriginalProxy.get(this)[prop](...args));
-        };
-      }
-      return cachedFunc;
-    }
-  };
-  function iterate() {
-    return _iterate.apply(this, arguments);
-  }
-  function _iterate() {
-    _iterate = _wrapAsyncGenerator(function* (...args) {
-      // tslint:disable-next-line:no-this-assignment
-      let cursor = this;
-      if (!(cursor instanceof IDBCursor)) {
-        cursor = yield _awaitAsyncGenerator(cursor.openCursor(...args));
-      }
-      if (!cursor) return;
-      cursor = cursor;
-      const proxiedCursor = new Proxy(cursor, cursorIteratorTraps);
-      ittrProxiedCursorToOriginalProxy.set(proxiedCursor, cursor);
-      // Map this double-proxy back to the original, so other cursor methods work.
-      reverseTransformCache.set(proxiedCursor, unwrap(cursor));
-      while (cursor) {
-        yield proxiedCursor;
-        // If one of the advancing methods was not called, call continue().
-        cursor = yield _awaitAsyncGenerator(advanceResults.get(proxiedCursor) || cursor.continue());
-        advanceResults.delete(proxiedCursor);
-      }
-    });
-    return _iterate.apply(this, arguments);
-  }
-  function isIteratorProp(target, prop) {
-    return prop === Symbol.asyncIterator && instanceOfAny(target, [IDBIndex, IDBObjectStore, IDBCursor]) || prop === 'iterate' && instanceOfAny(target, [IDBIndex, IDBObjectStore]);
-  }
-  replaceTraps(oldTraps => _extends({}, oldTraps, {
-    get(target, prop, receiver) {
-      if (isIteratorProp(target, prop)) return iterate;
-      return oldTraps.get(target, prop, receiver);
-    },
-    has(target, prop) {
-      return isIteratorProp(target, prop) || oldTraps.has(target, prop);
-    }
-  }));
-  class DataRequest {
-    constructor(apiKey, apiPath, properties) {
-      this.apiKey = void 0;
-      this.apiPath = void 0;
-      this.properties = void 0;
-      this.tourStateDb = void 0;
-      if (!apiKey) {
-        throw new Error('Shepherd Pro: Missing required apiKey option.');
-      }
-      if (!apiPath) {
-        throw new Error('Shepherd Pro: Missing required apiPath option.');
-      }
-      this.apiKey = apiKey;
-      this.apiPath = apiPath;
-      this.properties = properties;
-    }
-
-    /**
-     * Gets a list of the state for all the tours associated with a given apiKey
-     */
-    async getTourState() {
-      try {
-        const response = await fetch(`${this.apiPath}/api/v1/state`, {
-          headers: {
-            Authorization: `ApiKey ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          method: 'GET'
-        });
-        if (!response.ok) {
-          throw new Error('Could not fetch state for tours 🐑');
-        }
-        const {
-          data
-        } = await response.json();
-        this.tourStateDb = await openDB('TourState', 1, {
-          upgrade(db) {
-            db.createObjectStore('tours', {
-              keyPath: 'uniqueId'
-            });
-          }
-        });
-        if (Array.isArray(data) && data.length) {
-          const tx = this.tourStateDb.transaction('tours', 'readwrite');
-          const tourAddTxs = data.map(tourState => {
-            return tx.store.put(tourState);
-          });
-          await Promise.all([...tourAddTxs, tx.done]);
-        }
-      } catch (error) {
-        throw new Error('Error fetching data: ' + (error instanceof Error ? error.message : 'Unknown error'));
-      }
-    }
-
-    /**
-     * Send events to the ShepherdPro API
-     * @param body The data to send for the event
-     */
-    async sendEvents(body) {
-      body.data['properties'] = this.properties;
-      try {
-        const response = await fetch(`${this.apiPath}/api/v1/actor`, {
-          headers: {
-            Authorization: `ApiKey ${this.apiKey}`,
-            'Content-Type': 'application/json'
-          },
-          method: 'POST',
-          body: JSON.stringify(body)
-        });
-        if (!response.ok) {
-          throw new Error('Could not create an event 🐑');
-        }
-        const {
-          data
-        } = await response.json();
-        return data;
-      } catch (error) {
-        throw new Error('Error fetching data: ' + (error instanceof Error ? error.message : 'Unknown error'));
-      }
     }
   }
 
@@ -5112,7 +4575,7 @@ a${topRight},${topRight},0,0,0-${topRight}-${topRight}\
 Z`;
   }
 
-  /* src/components/shepherd-modal.svelte generated by Svelte v4.2.15 */
+  /* src/components/shepherd-modal.svelte generated by Svelte v4.2.18 */
   function create_fragment(ctx) {
     let svg;
     let path;
@@ -5399,71 +4862,11 @@ Z`;
    * The options for the tour
    */
 
-  const SHEPHERD_DEFAULT_API = 'https://shepherdpro.com';
-  const SHEPHERD_USER_ID = 'shepherdPro:userId';
-  class ShepherdPro extends Evented {
-    constructor(...args) {
-      super(...args);
-      // Shepherd Pro fields
-      this.apiKey = void 0;
-      this.apiPath = void 0;
-      this.dataRequester = void 0;
-      this.isProEnabled = false;
-      /**
-       * Extra properties to pass to Shepherd Pro
-       */
-      this.properties = void 0;
-      // Vanilla Shepherd
+  class ShepherdBase extends Evented {
+    constructor() {
+      super();
       this.activeTour = void 0;
-    }
-    /**
-     * Call init to take full advantage of ShepherdPro functionality
-     * @param {string} apiKey The API key for your ShepherdPro account
-     * @param {string} apiPath
-     * @param {object} properties Extra properties to be passed to Shepherd Pro
-     */
-    async init(apiKey, apiPath, properties) {
-      if (!apiKey) {
-        throw new Error('Shepherd Pro: Missing required apiKey option.');
-      }
-      this.apiKey = apiKey;
-      this.apiPath = apiPath != null ? apiPath : SHEPHERD_DEFAULT_API;
-      this.properties = properties != null ? properties : {};
-      this.properties['context'] = getContext(window);
-      if (this.apiKey) {
-        this.dataRequester = new DataRequest(this.apiKey, this.apiPath, this.properties);
-        this.isProEnabled = true;
-        // Setup actor before first tour is loaded if none exists
-        const shepherdProId = localStorage.getItem(SHEPHERD_USER_ID);
-        const promises = [this.dataRequester.getTourState()];
-        if (!shepherdProId) {
-          promises.push(this.createNewActor());
-        }
-        await Promise.all(promises);
-      }
-    }
-    async createNewActor() {
-      if (!this.dataRequester) return;
-
-      // Setup type returns an actor
-      const response = await this.dataRequester.sendEvents({
-        data: {
-          currentUserId: null,
-          eventType: 'setup'
-        }
-      });
-      localStorage.setItem(SHEPHERD_USER_ID, String(response.actorId));
-    }
-
-    /**
-     * Checks if a given tour's id is enabled
-     * @param tourId A string denoting the id of the tour
-     */
-    async isTourEnabled(tourId) {
-      var _this$dataRequester$t, _tourState$isActive;
-      if (!this.dataRequester) return;
-      const tourState = await ((_this$dataRequester$t = this.dataRequester.tourStateDb) == null ? void 0 : _this$dataRequester$t.get('tours', tourId));
-      return (_tourState$isActive = tourState == null ? void 0 : tourState.isActive) != null ? _tourState$isActive : true;
+      autoBind(this);
     }
   }
 
@@ -5505,43 +4908,6 @@ Z`;
         })(event);
       });
       this._setTourID(options.id);
-      const {
-        dataRequester
-      } = Shepherd;
-      // If we have an API key, then setup Pro features
-      if (dataRequester) {
-        this.trackedEvents.forEach(event => this.on(event, opts => {
-          const {
-            tour
-          } = opts;
-          const {
-            id,
-            steps
-          } = tour;
-          let position;
-          if (event !== 'active') {
-            const {
-              step: currentStep
-            } = opts;
-            if (currentStep) {
-              position = steps.findIndex(step => step.id === currentStep.id) + 1;
-            }
-          }
-          const data = {
-            currentUserId: localStorage.getItem(SHEPHERD_USER_ID),
-            eventType: event,
-            journeyData: {
-              id,
-              currentStep: position,
-              numberOfSteps: steps.length,
-              tourOptions: tour.options
-            }
-          };
-          dataRequester.sendEvents({
-            data
-          });
-        }));
-      }
       return this;
     }
 
@@ -5721,10 +5087,6 @@ Z`;
      * Start the tour
      */
     async start() {
-      // Check if ShepherdPro is enabled, and if so check if the tour id is active or not.
-      if (Shepherd.isProEnabled && !(await Shepherd.isTourEnabled(this.options.id))) {
-        return;
-      }
       this.trigger('start');
 
       // Save the focused element before the tour opens
@@ -5840,7 +5202,7 @@ Z`;
   /**
    * @public
    */
-  const Shepherd = new ShepherdPro();
+  const Shepherd = new ShepherdBase();
   const isServerSide = typeof window === 'undefined';
   Shepherd.Step = isServerSide ? StepNoOp : Step;
   Shepherd.Tour = isServerSide ? TourNoOp : Tour$1;
@@ -5868,7 +5230,7 @@ Z`;
       style.appendChild(document.createTextNode(css));
     }
   }
-  var css_248z = ".shepherd-button{background:#3288e6;border:0;border-radius:3px;color:hsla(0,0%,100%,.75);cursor:pointer;margin-right:.5rem;padding:.5rem 1.5rem;transition:all .5s ease}.shepherd-button:not(:disabled):hover{background:#196fcc;color:hsla(0,0%,100%,.75)}.shepherd-button.shepherd-button-secondary{background:#f1f2f3;color:rgba(0,0,0,.75)}.shepherd-button.shepherd-button-secondary:not(:disabled):hover{background:#d6d9db;color:rgba(0,0,0,.75)}.shepherd-button:disabled{cursor:not-allowed}.shepherd-footer{border-bottom-left-radius:5px;border-bottom-right-radius:5px;display:flex;justify-content:flex-end;padding:0 .75rem .75rem}.shepherd-footer .shepherd-button:last-child{margin-right:0}.shepherd-cancel-icon{background:transparent;border:none;color:hsla(0,0%,50%,.75);cursor:pointer;font-size:2em;font-weight:400;margin:0;padding:0;transition:color .5s ease}.shepherd-cancel-icon:hover{color:rgba(0,0,0,.75)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:hsla(0,0%,50%,.75)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:rgba(0,0,0,.75)}.shepherd-title{color:rgba(0,0,0,.75);display:flex;flex:1 0 auto;font-size:1rem;font-weight:400;margin:0;padding:0}.shepherd-header{align-items:center;border-top-left-radius:5px;border-top-right-radius:5px;display:flex;justify-content:flex-end;line-height:2em;padding:.75rem .75rem 0}.shepherd-has-title .shepherd-content .shepherd-header{background:#e6e6e6;padding:1em}.shepherd-text{color:rgba(0,0,0,.75);font-size:1rem;line-height:1.3em;padding:.75em}.shepherd-text p{margin-top:0}.shepherd-text p:last-child{margin-bottom:0}.shepherd-content{border-radius:5px;outline:none;padding:0}.shepherd-element{background:#fff;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.2);max-width:400px;opacity:0;outline:none;transition:opacity .3s,visibility .3s;visibility:hidden;width:100%;z-index:9999}.shepherd-enabled.shepherd-element{opacity:1;visibility:visible}.shepherd-element[data-popper-reference-hidden]:not(.shepherd-centered){opacity:0;pointer-events:none;visibility:hidden}.shepherd-element,.shepherd-element *,.shepherd-element :after,.shepherd-element :before{box-sizing:border-box}.shepherd-arrow,.shepherd-arrow:before{height:16px;position:absolute;width:16px;z-index:-1}.shepherd-arrow:before{background:#fff;content:\"\";transform:rotate(45deg)}.shepherd-element[data-popper-placement^=top]>.shepherd-arrow{bottom:-8px}.shepherd-element[data-popper-placement^=bottom]>.shepherd-arrow{top:-8px}.shepherd-element[data-popper-placement^=left]>.shepherd-arrow{right:-8px}.shepherd-element[data-popper-placement^=right]>.shepherd-arrow{left:-8px}.shepherd-element.shepherd-centered>.shepherd-arrow{opacity:0}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:#e6e6e6}.shepherd-target-click-disabled.shepherd-enabled.shepherd-target,.shepherd-target-click-disabled.shepherd-enabled.shepherd-target *{pointer-events:none}.shepherd-modal-overlay-container{height:0;left:0;opacity:0;overflow:hidden;pointer-events:none;position:fixed;top:0;transition:all .3s ease-out,height 0ms .3s,opacity .3s 0ms;width:100vw;z-index:9997}.shepherd-modal-overlay-container.shepherd-modal-is-visible{height:100vh;opacity:.5;transform:translateZ(0);transition:all .3s ease-out,height 0s 0s,opacity .3s 0s}.shepherd-modal-overlay-container.shepherd-modal-is-visible path{pointer-events:all}.shepherd-element{border-width:1px;border-color:var(--color-background-tertiary);background-color:var(--color-background-primary);color:var(--color-text-primary);--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shepherd-element:is(.sp-theme-dark *){background-color:var(--color-background-secondary)}.shepherd-element {\r\n    z-index: 10005;\r\n}.shepherd-arrow:before{background-color:var(--color-background-primary)}.shepherd-arrow:is(.sp-theme-dark *):before{background-color:var(--color-background-secondary)}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,\r\n.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{border-bottom-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,\r\n.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{border-right-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{border-left-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{border-top-width:1px;border-color:var(--color-background-tertiary)}.shepherd-has-title .shepherd-content .shepherd-header{background-color:var(--color-background-tertiary);padding-left:1rem;padding-right:1rem;padding-top:0.5rem;padding-bottom:0.5rem}.shepherd-title{font-size:1.125rem;font-weight:700;color:var(--color-text-primary)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:var(--color-text-secondary);--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:var(--color-text-primary)}.shepherd-cancel-icon{font-size:1.5rem;font-weight:700}.shepherd-text{overflow:auto;color:var(--color-text-primary)}.shepherd-button{border-radius:0.25rem;background-color:var(--color-primary-800);color:var(--color-white, #fff)}.shepherd-button:not(:disabled):hover{background-color:var(--color-primary-900);color:var(--color-white, #fff)}\r\n";
+  var css_248z = ".shepherd-button{background:#3288e6;border:0;border-radius:3px;color:hsla(0,0%,100%,.75);cursor:pointer;margin-right:.5rem;padding:.5rem 1.5rem;transition:all .5s ease}.shepherd-button:not(:disabled):hover{background:#196fcc;color:hsla(0,0%,100%,.75)}.shepherd-button.shepherd-button-secondary{background:#f1f2f3;color:rgba(0,0,0,.75)}.shepherd-button.shepherd-button-secondary:not(:disabled):hover{background:#d6d9db;color:rgba(0,0,0,.75)}.shepherd-button:disabled{cursor:not-allowed}.shepherd-footer{border-bottom-left-radius:5px;border-bottom-right-radius:5px;display:flex;justify-content:flex-end;padding:0 .75rem .75rem}.shepherd-footer .shepherd-button:last-child{margin-right:0}.shepherd-cancel-icon{background:transparent;border:none;color:hsla(0,0%,50%,.75);cursor:pointer;font-size:2em;font-weight:400;margin:0;padding:0;transition:color .5s ease}.shepherd-cancel-icon:hover{color:rgba(0,0,0,.75)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:hsla(0,0%,50%,.75)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:rgba(0,0,0,.75)}.shepherd-title{color:rgba(0,0,0,.75);display:flex;flex:1 0 auto;font-size:1rem;font-weight:400;margin:0;padding:0}.shepherd-header{align-items:center;border-top-left-radius:5px;border-top-right-radius:5px;display:flex;justify-content:flex-end;line-height:2em;padding:.75rem .75rem 0}.shepherd-has-title .shepherd-content .shepherd-header{background:#e6e6e6;padding:1em}.shepherd-text{color:rgba(0,0,0,.75);font-size:1rem;line-height:1.3em;padding:.75em}.shepherd-text p{margin-top:0}.shepherd-text p:last-child{margin-bottom:0}.shepherd-content{border-radius:5px;outline:none;padding:0}.shepherd-element{background:#fff;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.2);max-width:400px;opacity:0;outline:none;transition:opacity .3s,visibility .3s;visibility:hidden;width:100%;z-index:9999}.shepherd-enabled.shepherd-element{opacity:1;visibility:visible}.shepherd-element[data-popper-reference-hidden]:not(.shepherd-centered){opacity:0;pointer-events:none;visibility:hidden}.shepherd-element,.shepherd-element *,.shepherd-element :after,.shepherd-element :before{box-sizing:border-box}.shepherd-arrow,.shepherd-arrow:before{height:16px;position:absolute;width:16px;z-index:-1}.shepherd-arrow:before{background:#fff;content:\"\";transform:rotate(45deg)}.shepherd-element[data-popper-placement^=top]>.shepherd-arrow{bottom:-8px}.shepherd-element[data-popper-placement^=bottom]>.shepherd-arrow{top:-8px}.shepherd-element[data-popper-placement^=left]>.shepherd-arrow{right:-8px}.shepherd-element[data-popper-placement^=right]>.shepherd-arrow{left:-8px}.shepherd-element.shepherd-centered>.shepherd-arrow{opacity:0}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:#e6e6e6}.shepherd-target-click-disabled.shepherd-enabled.shepherd-target,.shepherd-target-click-disabled.shepherd-enabled.shepherd-target *{pointer-events:none}.shepherd-modal-overlay-container{height:0;left:0;opacity:0;overflow:hidden;pointer-events:none;position:fixed;top:0;transition:all .3s ease-out,height 0ms .3s,opacity .3s 0ms;width:100vw;z-index:9997}.shepherd-modal-overlay-container.shepherd-modal-is-visible{height:100vh;opacity:.5;transform:translateZ(0);transition:all .3s ease-out,height 0s 0s,opacity .3s 0s}.shepherd-modal-overlay-container.shepherd-modal-is-visible path{pointer-events:all}.shepherd-element{border-width:1px;border-color:var(--color-background-tertiary);background-color:var(--color-background-primary);color:var(--color-text-primary);--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shepherd-element:is(.sp-theme-dark *){background-color:var(--color-background-secondary)}.shepherd-element {\r\n    z-index: 10005;\r\n}.shepherd-arrow:before{background-color:var(--color-background-primary)}.shepherd-arrow:is(.sp-theme-dark *):before{background-color:var(--color-background-secondary)}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,\r\n.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{border-bottom-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,\r\n.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{border-inline-end-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{border-inline-start-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{border-top-width:1px;border-color:var(--color-background-tertiary)}.shepherd-has-title .shepherd-content .shepherd-header{background-color:var(--color-background-tertiary);padding-left:1rem;padding-right:1rem;padding-top:0.5rem;padding-bottom:0.5rem}.shepherd-title{font-size:1.125rem;font-weight:700;color:var(--color-text-primary)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:var(--color-text-secondary);--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:var(--color-text-primary)}.shepherd-cancel-icon{font-size:1.5rem;font-weight:700}.shepherd-text{overflow:auto;color:var(--color-text-primary)}.shepherd-button{border-radius:0.25rem;background-color:var(--color-primary-800);color:var(--color-white, #fff)}.shepherd-button:not(:disabled):hover{background-color:var(--color-primary-900);color:var(--color-white, #fff)}\r\n";
   styleInject(css_248z);
 
   /**

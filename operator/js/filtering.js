@@ -187,9 +187,9 @@ Filtering.initialise = function () {
 $(function () {
   // Toggle filtering
   $('.sp-quick-actions').on('mousedown', 'button.sp-filter-results', function () {
-    // If we're toggling to show and it's currently empty, insert new condition
-    if ($('.sp-condition-group').parent().toggle().is(':visible') && !$('.sp-condition-group .condition:visible').length) {
-      $('.sp-condition-group .add-condition').trigger('click');
+    // If we're toggling to show and it's currently empty, insert new condition group
+    if ($('.sp-condition-group').parent().toggle().is(':visible') && !$('.sp-condition-group:not(.sp-hidden)').length) {
+      $('.add-conditiongroup').trigger('click');
     }
   });
   Filtering.initialise();

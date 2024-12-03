@@ -146,7 +146,7 @@ button.swal2-styled.swal2-confirm:hover {
 }
 
 .swal2-modal .sp-form-row > label {
-    @apply sp-w-auto sp-pt-0 sp-pr-0 sp-text-left;
+    @apply sp-w-auto sp-pt-0 sp-pe-0 sp-text-start;
 }
 
 .swal2-modal .sp-form-row > label:empty {

@@ -26,8 +26,8 @@
     // 16px from the last one.
     push: 'top',
     // Put new notifications above old.
-    maxOpen: 10,
-    maxStrategy: 'close',
+    maxOpen: 3,
+    maxStrategy: 'wait',
     modal: false,
     context: document.body
   });
@@ -42,7 +42,7 @@
   Notifications.configure = function (broadcaster, userId) {
     instance = broadcaster;
     Notifications.connector().private('App.Modules.User.Models.User.' + userId).notification(function (data) {
-      Notifications.showNotification(data.title, data.text, data.route);
+      Notifications.showNotification(data.uuid, data.title, data.text, data.route);
     });
     document.addEventListener('pollcast:request-error', function (e) {
       void 0;
@@ -102,16 +102,17 @@
   /**
    * Set the user a notification.
    *
+   * @param {string} uuid
    * @param {string} title
    * @param {string} text
    * @param {string} route
    */
-  Notifications.showNotification = function (title, text, route) {
+  Notifications.showNotification = function (uuid, title, text, route) {
     switch (Notifications.getType()) {
       case IN_BROWSER:
         return Notifications.showBrowserNotification(title, text);
       case IN_DESKTOP:
-        return Notifications.showDesktopNotification(title, text, route);
+        return Notifications.showDesktopNotification(uuid, title, text, route);
       default:
         return;
     }
@@ -143,11 +144,12 @@
   /**
    * Show a desktop notification.
    *
+   * @param {string} uuid
    * @param {string} title
    * @param {string} text
    * @param {string=} route
    */
-  Notifications.showDesktopNotification = function (title, text, route) {
+  Notifications.showDesktopNotification = function (uuid, title, text, route) {
     // Request permission for the browser to display notifications (a popup will show up).
     PNotifyDesktop.permission();
     var notice = PNotify.notice({
@@ -155,7 +157,7 @@
       text: $('<p>' + text + '</p>').text(),
       modules: new Map([[PNotifyDesktop, {
         icon: Notifications.getDesktopIcon(),
-        tag: text,
+        tag: uuid,
         fallback: false
       }]])
     });

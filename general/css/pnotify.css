@@ -7,7 +7,7 @@ body>.pnotify.pnotify-positioned {
 }
 
 [data-pnotify] .supportpal-container {
-    @apply sp-p-4 sp-bg-yellow-100 sp-border-l-2 sp-border-yellow-700 sp-rounded dark:sp-bg-yellow-700 dark:sp-border-0;
+    @apply sp-p-4 sp-bg-yellow-100 sp-border-s-2 sp-border-yellow-700 sp-rounded dark:sp-bg-yellow-700 dark:sp-border-0;
 }
 
 [data-pnotify] .supportpal-container.pnotify-shadow {
@@ -27,7 +27,7 @@ body>.pnotify.pnotify-positioned {
 }
 
 [data-pnotify] .supportpal-content {
-    @apply sp-pl-1;
+    @apply sp-ps-1;
 }
 
 [data-pnotify] .supportpal-title {
@@ -35,7 +35,7 @@ body>.pnotify.pnotify-positioned {
 }
 
 [data-pnotify] .supportpal-closer {
-    @apply sp-float-right;
+    @apply sp-float-end;
 }
 
 [data-pnotify] .supportpal-text {
