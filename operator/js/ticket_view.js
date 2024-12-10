@@ -252,9 +252,14 @@
     this.take = function () {
       run(laroute.route('ticket.operator.action.take'));
     };
+
+    /**
+     * @param {bool=} notify
+     */
     this.close = function (notify) {
+      var notifyParam = typeof notify === 'undefined' ? '1' : notify ? '1' : '0';
       run(laroute.route('ticket.operator.action.close', {
-        notify: notify || '1'
+        notify: notifyParam
       })).done(function () {
         window.location.href = ticket.parameters().ticketGridUrl;
       });
