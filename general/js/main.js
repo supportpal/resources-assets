@@ -485,12 +485,12 @@ $(function () {
     var position = element;
 
     // If it's codemirror, show/hide button, phone input, input group container, recaptcha, a checkbox or radio, add after parent
-    if (element.parent('.sp-editor-container').length || element.parent('.hideShowPassword-wrapper').length || element.parent('.iti').length || element.parent('.sp-input-group').length || element.parent().parent('.g-recaptcha').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
+    if (element.parent('.sp-editor-container').length || element.parent('.codemirror-box').length || element.parent('.hideShowPassword-wrapper').length || element.parent('.iti').length || element.parent('.sp-input-group').length || element.parent().parent('.g-recaptcha').length || element.prop('type') === 'checkbox' || element.prop('type') === 'radio') {
       position = element.parent();
     }
 
-    // If it's editor, selectize or codemirror (source code), add after sibling.
-    if (element.next().hasClass('tox-tinymce') || element.next().hasClass('selectize-control') || element.hasClass('source-code')) {
+    // If it's editor, selectize, add after sibling.
+    if (element.next().hasClass('tox-tinymce') || element.next().hasClass('selectize-control')) {
       position = element.next();
     }
 
@@ -542,11 +542,9 @@ $(function () {
     },
     // Custom submit handler.
     submitHandler: function (form) {
-      // CodeMirror saves when form submit events are fired. We need to manually trigger a save
+      // CodeMirror saves when form submit events are fired. We need to manually trigger an event to update it,
       // so that jquery-validation has the correct form data.
-      $(form).find('.CodeMirror').each(function (i, el) {
-        el.CodeMirror.save();
-      });
+      $(form).find('.sc-textarea').each((i, el) => el.sourcecode.save());
       $(form).find('input[type="submit"], button[type="submit"]').prop('disabled', true);
 
       // Validate the form.

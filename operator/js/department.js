@@ -203,7 +203,11 @@ jQuery(function ($) {
   $('.email-support').each(function () {
     $(this).trigger('change');
   });
-  $('#emailAccounts')
+  $('#emailAccounts').on('input', '[name$="[address]"]', function () {
+    const $piping = $(this).parents('.sp-form-row').siblings('.email-piping'),
+      input = $piping.find('input.pipe_path');
+    input.val(input.val().replace(/--address=.*/, '--address=' + $(this).val()));
+  })
   // Handle hiding delete downloaded option when POP3 is selected
   .on('change', '.email-protocol select', function () {
     if ($(this).val() == 0) {
@@ -245,10 +249,6 @@ jQuery(function ($) {
     });
     validateEmail(data, $parent);
   })
-  // Handle appending --address to piping command when using consume all.
-  .on('change', '.email-piping input[name$="[consume_all]"]', function () {
-    setPipingPath(this);
-  })
   // Auto configure the email download server details.
   .on('donetyping', 'input[name$="[address]"]', function () {
     var $email = $(this).parents('.departmentEmail');
@@ -279,11 +279,6 @@ jQuery(function ($) {
 
   // Run auth mechanism change code when page loads (to disable POP3 on OAuth emails).
   $('#emailAccounts').find('select[name$="[auth_mech]"]').trigger('change');
-
-  // Handle consume all already checked when the page loads.
-  $('.email-piping').find('input[name$="[consume_all]"]').each(function () {
-    setPipingPath(this);
-  });
 
   // Handle Disable User Replies.
   $('input[name="disable_user_email_replies"]').on('change', function () {
@@ -624,19 +619,4 @@ function updateDefaultAssignedTo(xhr, $default_assigned, group_ids, operator_ids
       }
     });
   });
-}
-
-/**
- * Add the consume all address to email piping command.
- *
- * @param context
- */
-function setPipingPath(context) {
-  var input = $(context).parents('.email-piping').find('input.pipe_path'),
-    address = $(context).parents('.departmentEmail').find('input[name$="[address]"]');
-  if ($(context).is(":checked")) {
-    input.val(input.val() + ' --address=' + address.val());
-  } else {
-    input.val(input.val().replace(/--address=.*/, '').trim());
-  }
 }

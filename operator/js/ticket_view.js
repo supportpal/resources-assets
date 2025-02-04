@@ -738,10 +738,7 @@
           break;
         case 2:
           App.TicketViewForm.showForwardForm().then(function (editor) {
-            if (editor.getContent({
-              format: 'text',
-              withoutCursorMarker: true
-            }).length > 0) {
+            if (editor.plugins.content.getText().length > 0) {
               return;
             }
             var selector = '#tabMessages .sp-message:not(.sp-note, .sp-forward)';

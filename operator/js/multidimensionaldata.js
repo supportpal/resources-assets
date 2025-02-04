@@ -108,11 +108,12 @@ $(document).ready(function () {
     if (Object.keys(selectize.options).length !== 0) {
       $selector.parents('.sp-form-container').show();
     }
-
-    // Remove editor.
-    var editor = tinymce.get($sectionItem.find('textarea.tox-editor').attr('id'));
-    if (editor) {
-      editor.remove();
+    if (typeof tinymce !== 'undefined') {
+      // Remove editor.
+      var editor = tinymce.get($sectionItem.find('textarea.tox-editor').attr('id'));
+      if (editor) {
+        editor.remove();
+      }
     }
 
     // Remove the template.

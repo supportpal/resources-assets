@@ -59,9 +59,7 @@ div.dt-container .dt-search input {
 
 div.dt-container .dt-length select,
 div.dt-container .dataTables_sort select,
-div.dt-container .dt-search input,
-div.dt-container .dt-paging .paginate_input,
-.dt-paging .paginate_input {
+div.dt-container .dt-search input {
     @apply sp-px-3 sp-py-1/2 sp-bg-secondary sp-border-2 sp-border-secondary sp-rounded;
     min-height: 2rem;
 }
@@ -96,9 +94,20 @@ div.dt-container .dt-info {
     @apply sp-leading-loose;
 }
 
-div.dt-container .dt-paging .paginate_input,
-.dt-paging .paginate_input {
-    @apply sp-w-16 sp-mx-2;
+.dt-paging.dt-inputpaging {
+    @apply sp-flex;
+}
+
+.dt-paging.dt-inputpaging.sp-hidden {
+    display: none !important;
+}
+
+.dt-paging .dt-paging-input {
+    @apply sp-mx-2;
+}
+
+.dt-paging .dt-paging-input input {
+    @apply sp-w-6 sp-min-h-[auto] sp-min-w-6 sp-box-content;
 }
 
 div.dt-container .dt-paging .dt-paging-button,
@@ -148,10 +157,6 @@ div.dt-container .dt-input:focus {
 
 div.dt-container .dt-input.md\:sp-rounded-e-none {
     @apply sp-rounded-e-none;
-}
-
-table.dataTable {
-    @apply sp-w-full !important;
 }
 
 table.dataTable.no-footer {
@@ -316,8 +321,8 @@ table.dataTable tbody td.all a:hover .fas {
     background: 0;
 }
 
-.sp-quick-actions .paginate_page,
-.sp-quick-actions .paginate_input,
+.sp-quick-actions .dt-paging-button,
+.sp-quick-actions .dt-paging-input,
 .sp-quick-actions .paginate_of {
     @apply sp-hidden;
 }
@@ -350,7 +355,8 @@ table.dataTable tbody td.all a:hover .fas {
         padding-inline-end: 0.75rem;
     }
 
-    .sp-quick-actions .paginate_page,
+    .sp-quick-actions .dt-paging-input,
+    .sp-quick-actions .dt-paging-button,
     .sp-quick-actions .paginate_of {
         @apply sp-inline;
     }
@@ -359,7 +365,7 @@ table.dataTable tbody td.all a:hover .fas {
         @apply sp-mx-3;
     }
 
-    .sp-quick-actions .paginate_input {
+    .sp-quick-actions .dt-paging-button {
         @apply sp-inline-block;
     }
 }
@@ -384,8 +390,8 @@ table.dataTable tbody td.all a:hover .fas {
         @apply sp-pt-3 sp-mt-0;
     }
 
-    div.dt-container .dt-paging .paginate_input,
-    .dt-paging .paginate_input {
+    div.dt-container .dt-paging .dt-paging-button,
+    .dt-paging .dt-paging-button {
         @apply sp-w-14 sp-px-2;
     }
 

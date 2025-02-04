@@ -120,10 +120,7 @@
       var textarea_id = $textarea.prop('id');
       if (tinymce.get(textarea_id)) {
         var editor = $textarea.editor(),
-          content = editor.getContent({
-            format: 'text',
-            withoutCursorMarker: true
-          }),
+          content = editor.plugins.content.getText(),
           message = null,
           isEmpty = content.length === 0,
           isTooLong = typeof editor.plugins.limiter !== "undefined" && editor.plugins.limiter.exceedsCharacterLimit();

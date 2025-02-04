@@ -145,9 +145,17 @@ $(document).ready(function () {
   }
 
   // Operator specific DataTable config.
-  $(document).on('preInit.dt', function () {
+  $(document).on('preInit.dt', function (e, settings) {
     // Hide filter from loading on page load
     $('div.dt-search').addClass('sp-hidden');
+    var $table = $(settings.nTable),
+      $wrapper = $table.parents('.dt-container');
+    if (!$table.hasClass('sp-with-actions')) {
+      return;
+    }
+
+    // Hide pagination initially, it will be moved to quick actions bar later.
+    $wrapper.find('.dt-inputpaging.dt-paging').addClass('sp-hidden');
   }).on('init.dt', function (e, settings) {
     var $table = $(settings.nTable),
       $wrapper = $table.parents('.dt-container');
@@ -159,7 +167,7 @@ $(document).ready(function () {
       $li = $('<li>');
     $quickActions.prepend($('<div>').addClass('sp-filter-grid sp-absolute sp-flex sp-w-full sp-bg-primary sp-px-3 sp--mx-3 sp-z-50 sp-hidden').append($wrapper.find('div.dt-search').removeClass('sp-hidden').addClass('sp-grow sp-inline-block sm:sp-flex-initial')).append($('<button>').addClass('sp-filter-results sp-px-2 sp-rounded-s-none').prop('title', Lang.get('general.filter_results')).append('<i class="fas fa-fw fa-caret-down"></i>')));
     $quickActions.find('.sp-filter-grid').find('input').addClass('sp-w-full sp-border-e-0 sp-rounded-e-none sm:sp-w-auto');
-    $ul.append($li.addClass('sp-action-group sp-inline-block sp-relative sp-float-end').append($('<div>').addClass('sp-grid-pagination sp-inline-block').append($wrapper.find('div.dt-paging'))));
+    $ul.append($li.addClass('sp-action-group sp-inline-block sp-relative sp-float-end').append($('<div>').addClass('sp-grid-pagination sp-inline-block').append($wrapper.find('div.dt-paging').removeClass('sp-hidden'))));
     $ul.trigger('dt.header.init', $li);
   });
 });
