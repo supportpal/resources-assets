@@ -23,8 +23,8 @@ $(document).ready(function () {
     $('div.sp-filter-results').insertAfter($("div.dt-search").parent('.sp-flex'));
 
     // Change filter row to include submit ticket and filter results buttons.
-    $("div.dt-search").removeClass('dt-search').addClass('sp-flex sp-mb-6 sp-ms-6').append($('<a>', {
-      class: 'sp-filter-results sp-button sp-rounded-s-none sp-hidden md:sp-inline-block',
+    $("div.dt-search").removeClass('dt-search').addClass('sp-flex !sp-mb-6 sp-ms-6 sp-mr-6 md:sp-mr-0').append($('<a>', {
+      class: 'sp-filter-results sp-button sp-rounded-s-none',
       title: Lang.get('general.filter_results')
     }).append($('<i>', {
       'class': 'fas fa-fw fa-filter'

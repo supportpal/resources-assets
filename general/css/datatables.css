@@ -82,10 +82,6 @@ div.dt-container .dt-paging {
     @apply sp-pt-6;
 }
 
-div.dt-container .dt-paging .ellipsis {
-    @apply sp-p-0;
-}
-
 div.dt-container .top .dt-info {
     @apply sp-px-0 sp-pt-1 sp-pb-5;
 }
@@ -95,7 +91,7 @@ div.dt-container .dt-info {
 }
 
 .dt-paging.dt-inputpaging {
-    @apply sp-flex;
+    @apply sp-flex sp-items-center sp-justify-center;
 }
 
 .dt-paging.dt-inputpaging.sp-hidden {
@@ -107,22 +103,12 @@ div.dt-container .dt-info {
 }
 
 .dt-paging .dt-paging-input input {
-    @apply sp-w-6 sp-min-h-[auto] sp-min-w-6 sp-box-content;
+    @apply sp-w-6 sp-min-h-[auto] sp-min-w-6 sp-border-0 sp-box-content;
 }
 
 div.dt-container .dt-paging .dt-paging-button,
 .dt-paging .dt-paging-button {
-    @apply sp-p-0 sp-ms-4 sp-border-0;
-    min-width: auto;
-}
-
-div.dt-container .dt-paging .ellipsis {
-    @apply sp-mx-4;
-}
-
-div.dt-container .dt-paging .dt-paging-button,
-.dt-paging .dt-paging-button {
-    @apply sp-px-3 sp-py-1 sp-ms-0 sp-rounded sp-shadow-none;
+    @apply sp-px-2 sp-py-1 sp-ms-0 sp-rounded sp-shadow-none;
     @apply sp-text-secondary !important;
 }
 
@@ -132,7 +118,6 @@ div.dt-container .dt-paging .dt-paging-button:active,
 .dt-paging .dt-paging-button:active {
     @apply sp-border-0 sp-shadow-inner sp-cursor-pointer;
     @apply sp-text-primary !important;
-
     background: var(--color-background-tertiary) !important;
 }
 
@@ -321,7 +306,6 @@ table.dataTable tbody td.all a:hover .fas {
     background: 0;
 }
 
-.sp-quick-actions .dt-paging-button,
 .sp-quick-actions .dt-paging-input,
 .sp-quick-actions .paginate_of {
     @apply sp-hidden;
@@ -356,22 +340,13 @@ table.dataTable tbody td.all a:hover .fas {
     }
 
     .sp-quick-actions .dt-paging-input,
-    .sp-quick-actions .dt-paging-button,
     .sp-quick-actions .paginate_of {
         @apply sp-inline;
-    }
-
-    .sp-quick-actions .ellipsis {
-        @apply sp-mx-3;
-    }
-
-    .sp-quick-actions .dt-paging-button {
-        @apply sp-inline-block;
     }
 }
 
 /* Medium (md) */
-@media screen and (max-width: 768px) {
+@media screen and (min-width: 768px) {
     div.dt-container .dt-length,
     div.dt-container .dataTables_sort {
         @apply sp-hidden;
@@ -392,7 +367,7 @@ table.dataTable tbody td.all a:hover .fas {
 
     div.dt-container .dt-paging .dt-paging-button,
     .dt-paging .dt-paging-button {
-        @apply sp-w-14 sp-px-2;
+        @apply sp-px-3;
     }
 
     table.dataTable thead th.md\:sp-pe-3,
@@ -458,6 +433,12 @@ table.dataTable > tbody > tr.child span.dtr-title {
 
 table.dataTable.sp-table-fixed colgroup:nth-child(2) {
     @apply sp-hidden;
+}
+
+@media screen and (max-width: 767px) {
+    div.dt-container div.dt-layout-row:not(.dt-layout-table) div.dt-layout-cell > * {
+        @apply sp-mx-6 sp-my-0;
+    }
 }
 
 /* yadcf */

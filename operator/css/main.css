@@ -13615,6 +13615,10 @@ ul.sp-attachments > li a div{
   margin-inline-start: -1.5rem !important;
 }
 
+.\!sp-mb-6{
+  margin-bottom: 1.5rem !important;
+}
+
 .sp--mb-6{
   margin-bottom: -1.5rem;
 }
@@ -13725,6 +13729,10 @@ ul.sp-attachments > li a div{
 
 .sp-mr-3{
   margin-right: 0.75rem;
+}
+
+.sp-mr-6{
+  margin-right: 1.5rem;
 }
 
 .sp-ms-1{
@@ -15035,6 +15043,10 @@ ul.sp-attachments > li a div{
 
   .md\:sp-mb-10{
     margin-bottom: 2.5rem;
+  }
+
+  .md\:sp-mr-0{
+    margin-right: 0px;
   }
 
   .md\:sp-mt-0{
