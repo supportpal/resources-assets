@@ -1,60 +1,10 @@
 (function () {
   var $tagSelectize, $assignSelectize;
+  App.extend('TicketEditor', new SpTicket.Editor());
   function Form() {
     var reply_selector = '#newMessage';
     var forward_selector = '#newForward';
-
-    /**
-     * Key, value pair of editors which have been initialised.
-     * Key is the text editor element ID. Value is bool (initialised or not).
-     *
-     * @type {{}}
-     */
-    var editors = {};
     var instance = this;
-    var isInitialised = function (selector) {
-      return editors.hasOwnProperty(selector) && editors[selector].hasOwnProperty('initialised') && editors[selector]['initialised'] === true;
-    };
-    var isFocused = function (selector) {
-      return editors.hasOwnProperty(selector) && editors[selector].hasOwnProperty('focused') && editors[selector]['focused'] === true;
-    };
-    var setEditor = function (selector, focus, editor) {
-      editors[selector] = {
-        'initialised': true,
-        'focused': focus,
-        'editor': editor
-      };
-    };
-    var initEditor = function (selector, $form, opts, focus) {
-      focus = typeof focus !== 'undefined' ? focus : true;
-      const dfd = $.Deferred();
-      if (isInitialised(selector)) {
-        // If it's loaded but not focused once and we want to.
-        if (focus && !isFocused(selector)) {
-          editors[selector]['editor'].focus();
-        }
-
-        // This helps reset the sticky toolbar which can sometimes get stuck when switching tabs.
-        editors[selector]['editor'].fire('ResizeWindow');
-        return dfd.resolve(editors[selector]['editor']).promise();
-      }
-      const editor = $(selector).editor($.extend({}, ticket.defaultEditorConfig(), {
-        setup: function (editor) {
-          editor.on('init', function () {
-            loadEditorContent(selector, $form, editor).then(function () {
-              if (focus && !isFocused(selector)) {
-                editor.focus();
-              }
-              setEditor(selector, focus, editor);
-              $(selector).trigger('loaded-editor-content', [selector, $form, editor]);
-              dfd.resolve(editor);
-            });
-          });
-        }
-      }, opts));
-      setEditor(selector, false, editor);
-      return dfd.promise();
-    };
     var initFileUploads = function ($form, name, params) {
       if (ticket.parameters()[name]) {
         return;
@@ -68,26 +18,6 @@
         }
       };
       ticket.setParameter(name, new FileUpload($.extend(true, {}, defaults, params)));
-    };
-    var loadEditorContent = function (selector, $form, editor) {
-      var deferred = new $.Deferred();
-      var route = $(selector).data('route');
-      if (typeof route !== 'string' || route === '') {
-        return deferred.resolve();
-      }
-      $form = $form.find('.reply-form');
-      $form.after('<div class="sp-editor-container"></div>');
-      var $container = $form.next('.sp-editor-container');
-      var $preview = $('<div class="sp-editor-preview sp-editor-content"></div>').hide();
-      $container.append($preview);
-      $preview.html('').css($form.position()).css('width', $form.outerWidth()).css('height', $form.outerHeight(true)).addClass('loadinggif').show();
-      $.get(route).done(function (json) {
-        editor.setContent(json.data.purified_text);
-        deferred.resolve();
-      }).always(function () {
-        $preview.hide();
-      });
-      return deferred.promise();
     };
     var hideAllForms = function () {
       $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
@@ -103,23 +33,19 @@
       ticket.scrollTo($form.position().top);
     };
     this.destroyReplyForm = function () {
-      if (!isInitialised(reply_selector)) {
-        return;
-      }
-      editors[reply_selector] = false;
-      $(reply_selector).editor().remove();
+      App.TicketEditor.destroy(reply_selector);
     };
     this.initReplyForm = function (opts, focus) {
       var $form = $('.message-form');
       initFileUploads($form, 'replyFileUpload');
-      return initEditor(reply_selector, $form, opts, focus);
+      return App.TicketEditor.initEditor(reply_selector, $form, $.extend({}, ticket.defaultEditorConfig(), opts), focus);
     };
     this.initNotesForm = function () {
       var $form = $('.notes-form');
       initFileUploads($form, 'notesFileUpload');
-      return initEditor('#newNote', $form, {
+      return App.TicketEditor.initEditor('#newNote', $form, $.extend({}, ticket.defaultEditorConfig(), {
         excludeInternalArticles: false
-      });
+      }));
     };
     this.initForwardForm = function () {
       var $form = $('.forward-form');
@@ -128,7 +54,7 @@
           cumulativeMaxFileSize: $form.data('cumulative-max-file-size')
         }
       });
-      return initEditor(forward_selector, $form, {});
+      return App.TicketEditor.initEditor(forward_selector, $form, ticket.defaultEditorConfig());
     };
     this.showReplyForm = function () {
       hideAllForms();
@@ -305,80 +231,6 @@
       run(laroute.route('ticket.operator.action.unmerge')).done(function () {
         window.location.href = ticket.parameters().ticketGridUrl;
       });
-    };
-    this.print = function () {
-      var $a = $('.sp-print-ticket a');
-      if ($a.length === 0) {
-        return;
-      }
-      window.open($a.attr('href'), '_blank');
-    };
-    this.addCollapsedMessageGroup = function () {
-      // Don't create if there's less than 2 messages, or a collapsed group already exists.
-      if ($('.sp-message.sp-message-collapsed').length <= 2 || $('.sp-collapsed-messages').length) {
-        return;
-      }
-
-      // Staff notes and ticket content regions of the screen
-      var regions = [".sp-messages-container[data-position='top']", ".sp-messages-container[data-position='inline']"];
-      for (var i = 0; i < regions.length; i++) {
-        // Build the basic selector
-        var basicSelector = $(regions[i] + ' > .sp-message.sp-message-collapsed');
-
-        // If this region of the screen has more than 2 collapsed messages, let's shrink it!
-        if (basicSelector.length > 2) {
-          // Group the middle section of messages and hide them
-          var items;
-          if (ticket.parameters().replyOrder == 'ASC') {
-            items = basicSelector.not(':first').not(':eq(-1)');
-          } else {
-            items = basicSelector.not(':last').not(':eq(0)');
-          }
-          items.wrapAll("<div class='sp-collapsed-messages'><span>" + Lang.get('ticket.older_messages', {
-            'count': items.length
-          }) + "</span></div>");
-        }
-      }
-      $('.sp-collapsed-messages').children().children().hide();
-    };
-    this.removeCollapsedMessageGroup = function () {
-      $('.sp-collapsed-messages').each(function () {
-        $(this).replaceWith(function () {
-          return $(this).find('.sp-message').show();
-        });
-      });
-    };
-    this.expand = function ($message) {
-      // AJAX load the message into the view.
-      ticket.loadMessage($message);
-      ticket.showMessage($message);
-    };
-    this.collapse = function ($message) {
-      // If we're collapsing and the edit view is showing, hide it and show the normal message view.
-      if ($message.hasClass('sp-message-collapsible') && $message.find('.sp-message-text-edit').is(':visible')) {
-        $message.find('.sp-message-text').show();
-        $message.find('.sp-message-text-edit').hide();
-      }
-
-      // Toggle between collapsed and collapsible mode
-      $message.find('.sp-message-text').children('.sp-message-text-original').addClass('sp-hidden');
-      $message.find('.sp-message-text').children('.sp-message-text-trimmed').removeClass('sp-hidden');
-      $message.addClass('sp-message-collapsed');
-      $message.removeClass('sp-message-collapsible');
-    };
-    this.expandAll = function () {
-      instance.removeCollapsedMessageGroup();
-      $('#tabMessages .sp-message-collapsed').each(function () {
-        instance.expand($(this));
-      });
-      $('.expand-messages, .collapse-messages').toggle();
-    };
-    this.collapseAll = function () {
-      $('#tabMessages .sp-message-collapsible').each(function () {
-        instance.collapse($(this));
-      });
-      instance.addCollapsedMessageGroup();
-      $('.expand-messages, .collapse-messages').toggle();
     };
   }
   var events = new TicketEvents();
@@ -732,6 +584,7 @@
 
     // Reply type
     $('.sp-reply-type .sp-action').on('click', function () {
+      $('.sp-tabs li#Messages').trigger('click');
       switch ($(this).data('type')) {
         case 1:
           App.TicketViewForm.showNotesForm();
@@ -750,6 +603,9 @@
           App.TicketViewForm.showReplyForm();
       }
     });
+
+    // Open print view when browser print button is clicked (or browser print shortcut).
+    $(window).beforeprint(() => App.TicketView.print());
 
     // Process take button
     $('.take-ticket').on('click', App.TicketViewAction.take);
@@ -1086,95 +942,6 @@
      */
 
     /*
-     * Scroll to message
-     */
-    var hash = window.location.hash.substring(1),
-      $message = ticket.getMessage(hash),
-      scrollToMessage = false;
-    if ($message !== false) {
-      // Remove the collapsed class if the URL wants to scroll to a specific message (/view/18#message-2).
-      scrollToMessage = true;
-
-      // Wait 1 seconds to start, due to page moving about
-      setTimeout(function () {
-        ticket.scrollToMessage($message);
-      }, 1000);
-    }
-
-    /*
-     * END Scroll to message
-     */
-
-    /*
-     * Toggle long tickets (>5 messages)
-     */
-
-    // Remove expandable from visible messages.
-    $('.sp-message-collapsible').each(function () {
-      ticket.removeExpandable($(this));
-
-      // DEV-2163, DEV-2069. By default, we only load 20 messages from the database for performance reasons.
-      // If the ticket has >20 messages and the operator hasn't read any of them then they're collapsible (visible)
-      // but have no content. We need to force load these messages.
-      //
-      // loadMessage already ensures that we don't reload a message where the content is already visible.
-      ticket.loadMessage($(this));
-    });
-
-    // Collapsing or opening message
-    $(document).on('click', '#tabMessages .sp-message-collapsed .sp-message-header-interactive, #tabMessages .sp-message-collapsible .sp-message-header .sp-message-header-interactive', function (e) {
-      e.stopPropagation();
-    });
-    $(document).on('click', '#tabMessages .sp-message-collapsed', function () {
-      App.TicketViewAction.expand($(this));
-    });
-    $(document).on('click', '#tabMessages .sp-message-collapsible .sp-message-header', function () {
-      App.TicketViewAction.collapse($(this).parents('.sp-message-collapsible'));
-    });
-
-    // Collapse tickets with more than 2 collapsed messages
-    if (!scrollToMessage) {
-      App.TicketViewAction.addCollapsedMessageGroup();
-
-      // Make the new hidden group displayable again
-      $('.sp-collapsed-messages').on('click', App.TicketViewAction.removeCollapsedMessageGroup);
-    }
-    /*
-     * END Toggle long tickets (>5 messages)
-     */
-
-    /*
-     * Expand/collapse all messages
-     */
-    // Show button that allows expanding all if more than 2 messages
-    if ($('.sp-message').length > 2) {
-      $('.expand-messages').show();
-    }
-
-    // Expand/collapse all messages on click
-    $('.expand-messages').on('click', App.TicketViewAction.expandAll);
-    $('.collapse-messages').on('click', App.TicketViewAction.collapseAll);
-    /*
-     * END Expand/collapse all messages
-     */
-
-    /*
-     * Show ticket attachment previews
-     */
-    ticket.loadAttachmentPreviews($('.sp-message.sp-message-collapsible'));
-    /*
-     * END Show ticket attachment previews
-     */
-
-    /*
-     * Show ticket attachment download all button
-     */
-    ticket.showDownloadAllButton();
-    /*
-     * END Show ticket attachment download all button
-     */
-
-    /*
      * Check ticket mentions for current user
      */
     ticket.highlightUserMentions($('.sp-message'));
@@ -1182,203 +949,7 @@
      * END Check ticket mentions for current user
      */
 
-    /*
-     * Saving drafts automatically
-     */
-    function saveDraft($form, type, useBeacon) {
-      var editor = $form.find('textarea:not(.CodeMirror textarea):eq(0)').editor(),
-        messageWithoutCursorMarker = editor.getContent({
-          withoutCursorMarker: true
-        }),
-        message = editor.getContent();
-
-      // Update draft message variable
-      if (type == '1') {
-        ticket.setNoteDraft(messageWithoutCursorMarker);
-      } else if (type == '2') {
-        ticket.setForwardDraft(messageWithoutCursorMarker);
-      } else {
-        ticket.setMessageDraft(messageWithoutCursorMarker);
-      }
-      var $usages = $form.find('input[name="cannedresponse_usage[]"]');
-      var data = {
-        _token: $('meta[name=csrf_token]').prop('content'),
-        ticket: [ticket.parameters().ticketId],
-        reply_type: type,
-        is_draft: 1,
-        text: message,
-        from_address: type == '2' ? $form.find('select[name="from_address"]').val() : null,
-        to_address: type == '2' ? $form.find('select[name="to_address[]"]').val() : null,
-        cc_address: type == '2' ? $form.find('select[name="cc_address[]"]').val() : null,
-        bcc_address: type == '2' ? $form.find('select[name="bcc_address[]"]').val() : null,
-        subject: type == '2' ? $form.find('input[name="subject"]').val() : null,
-        cannedresponse_usage: $usages.val()
-      };
-
-      // Remove them otherwise their usage will be counted twice (when the message is posted).
-      $usages.remove();
-
-      // Add attachments to AJAX data.
-      $($form.find('input[name^="attachment["]:not(:disabled)').serializeArray()).each(function (index, obj) {
-        data[obj.name] = obj.value;
-      });
-      if (useBeacon && "sendBeacon" in navigator) {
-        navigator.sendBeacon(laroute.route('ticket.operator.message.store'), new URLSearchParams($.param(data)));
-      } else {
-        // Call the ajax to save draft
-        $.ajax({
-          method: 'POST',
-          url: laroute.route('ticket.operator.message.store'),
-          data: data,
-          success: function (response) {
-            if (typeof response.status !== 'undefined' && response.status == 'success') {
-              // Show saved message
-              $form.find('.draft-success').text(response.message).show();
-              // Show discard button
-              $form.find('.discard-draft').show();
-              // Show draft icon in quick action
-              $('.sp-reply-type .sp-action[data-type=' + type + '] .sp-draft-icon').removeClass('sp-hidden');
-              // Add attachment-id data to each attachment.
-              var attachments = response.data.attachments;
-              for (var upload_hash in attachments) {
-                if (!attachments.hasOwnProperty(upload_hash)) {
-                  continue;
-                }
-                var id = attachments[upload_hash];
-                $form.find('.sp-delete-attachment').each(function () {
-                  if ($(this).data('hash') === upload_hash || $(this).prop('data-hash') === upload_hash) {
-                    $(this).data('attachment-id', id);
-                  }
-                });
-              }
-            }
-          },
-          dataType: "json"
-        });
-      }
-    }
-    var autoSaveDraftTimer,
-      autoSaveDraftTime = 30000;
-    function autoSaveDraft(useBeacon) {
-      if (autoSaveDraftTimer) {
-        clearTimeout(autoSaveDraftTimer);
-      }
-      var drafts = ticket.getDrafts();
-      for (var editorId in drafts) {
-        var $textarea = $('#' + editorId),
-          $form = $textarea.parents('form');
-
-        // Only if it's an editor (e.g. not for Twitter replies)
-        if ($form.find('.save-draft').length === 0 || !tinymce.get(editorId) || !drafts.hasOwnProperty(editorId) || $form.find('input[type="submit"]').prop('disabled')) {
-          continue;
-        }
-
-        // Get the draft message.
-        var draftMessage = drafts[editorId];
-
-        // Check if message has changed
-        var currentMessage = $textarea.editor().getContent({
-          withoutCursorMarker: true
-        });
-        if (draftMessage === null || !ticket.draftHasChanged(editorId, currentMessage)) {
-          continue;
-        }
-
-        // Disable button while saving
-        $form.find('.save-draft').prop('disabled', true);
-
-        // Save draft
-        saveDraft($form, $form.find('input[name="reply_type"]').val(), useBeacon);
-
-        // Re-enable button
-        $form.find('.save-draft').prop('disabled', false);
-      }
-
-      // Delay the next poll by 30 seconds
-      autoSaveDraftTimer = setTimeout(() => autoSaveDraft(), autoSaveDraftTime);
-    }
-
-    // Save the initial message.
-    autoSaveDraft();
-    $('#newMessage, #newNote').on('loaded-editor-content', function (e, selector, $form, editor) {
-      var editorId = $(selector).attr('id');
-      ticket.setDraft(editorId, editor.getContent({
-        withoutCursorMarker: true
-      }));
-    });
-
-    // Before closing/redirecting away, check if there's a draft that needs to be saved.
-    window.addEventListener('visibilitychange', function () {
-      if (document.visibilityState === 'hidden') {
-        autoSaveDraft(true);
-      }
-    });
-    /*
-     * END Saving drafts automatically
-     */
-
-    // Save draft button
-    $('.save-draft').on('click', function (e) {
-      var $form = $(this).parents('form'),
-        replyType = $form.find('input[name="reply_type"]').val();
-      saveDraft($form, replyType);
-    });
-
-    // Discard draft button
-    $('.discard-draft').on('click', function () {
-      // Post data to perform action
-      var $form = $(this).parents('form'),
-        replyType = $form.find('input[name="reply_type"]').val(),
-        params = {
-          ticket_id: ticket.parameters().ticketId,
-          reply_type: replyType
-        };
-
-      // Delete any attachments currently showing
-      $form.find('input[name="attachment[]"]:not(:first)').remove();
-      $form.find('.sp-attached-files li:not(:first) .sp-delete-attachment').attr('data-silent', true).trigger('click');
-      $.post(laroute.route('ticket.operator.message.discard'), params, function (response) {
-        if (response.status == 'success') {
-          $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
-
-          // Clear editor
-          if (replyType == 1) {
-            $('#newNote').editor().setContent('');
-            ticket.setNoteDraft($('#newNote').editor().getContent({
-              withoutCursorMarker: true
-            }));
-          } else if (replyType == 2) {
-            $('#newForward').editor().setContent('');
-            ticket.setForwardDraft($('#newForward').editor().getContent({
-              withoutCursorMarker: true
-            }));
-          } else {
-            $('#newMessage').editor().setContent(ticket.parameters().replyTemplate);
-            $('#newMessage').editor().focus();
-            ticket.setMessageDraft($('#newMessage').editor().getContent({
-              withoutCursorMarker: true
-            }));
-          }
-
-          // Remove draft icon in quick action
-          $('.sp-reply-type .sp-action[data-type=' + replyType + '] .sp-draft-icon').addClass('sp-hidden');
-
-          // Hide button
-          $form.find('.discard-draft, .draft-success').hide();
-        } else {
-          $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-        }
-      }, "json").fail(function () {
-        $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
-      });
-    });
     $('#tabMessages')
-    // Download all attachments.
-    .on('click', '.sp-download-all', function () {
-      var $attachments = $(this).parents('ul.sp-attachments').find('li');
-      var filename = $('.sp-ticket-subject').text();
-      new ZipFile().create($attachments, filename);
-    })
     // Show a draft message.
     .on('click', '.sp-draft-message-title', function () {
       var $draft = $(this).parent();
@@ -2336,9 +1907,9 @@
     }
     shortcutConfirmationPopup(Lang.get('core.shortcut_unmerge_ticket'), App.TicketViewAction.unmerge);
   });
-  App.KeyboardShortcuts.SHORTCUT_EXPAND_ALL.bind(App.TicketViewAction.expandAll);
-  App.KeyboardShortcuts.SHORTCUT_COLLAPSE_ALL.bind(App.TicketViewAction.collapseAll);
-  App.KeyboardShortcuts.SHORTCUT_PRINT_TICKET.bind(App.TicketViewAction.print);
+  App.KeyboardShortcuts.SHORTCUT_EXPAND_ALL.bind(() => App.TicketView.expandAll());
+  App.KeyboardShortcuts.SHORTCUT_COLLAPSE_ALL.bind(() => App.TicketView.collapseAll());
+  App.KeyboardShortcuts.SHORTCUT_PRINT_TICKET.bind(() => App.TicketView.print());
   var shortcutIsPermitted = function (className) {
     var $elm = $('.' + className);
     return !($elm.length === 0 || $elm.hasClass('sp-hidden'));

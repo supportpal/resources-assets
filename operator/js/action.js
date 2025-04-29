@@ -172,10 +172,8 @@ $(function () {
       if (typeof ticket !== 'undefined') {
         $.extend(true, opts, ticket.defaultEditorConfig());
       }
-      opts['mergeFields'] = {
-        tickets: true,
-        organisations: organisationsEnabled
-      };
+      opts['mergefields_tickets'] = true;
+      opts['mergefields_organisations'] = organisationsEnabled;
       var plugins = typeof opts['plugins'] !== 'undefined' ? opts['plugins'] : $.fn.editor.defaults.plugins;
       opts['plugins'] = plugins.concat(['mergefields', 'mentions']);
 

@@ -1,38 +1,4 @@
 $(document).ready(function () {
-  // isWindow was deprecated in jQuery 3.3.0
-  function isWindow(obj) {
-    return obj !== null && obj !== undefined && obj === obj.window;
-  }
-
-  //
-  // jQuery print event callback helpers.
-  //   - https://gist.github.com/shaliko/4110822#gistcomment-1543771
-  //   - https://www.tjvantoll.com/2012/06/15/detecting-print-requests-with-javascript/
-  $.fn.beforeprint = function (callback) {
-    return $(this).each(function () {
-      if (!isWindow(this)) {
-        return;
-      }
-      if (this.onbeforeprint !== undefined) {
-        $(this).on('beforeprint', callback);
-      } else if (this.matchMedia) {
-        this.matchMedia('print').addListener(callback);
-      }
-    });
-  };
-  $.fn.afterprint = function (callback) {
-    return $(this).each(function () {
-      if (!isWindow(this)) {
-        return;
-      }
-      if (this.onafterprint !== undefined) {
-        $(this).on('afterprint', callback);
-      } else if (this.matchMedia) {
-        $(this).one('mouseover', callback); // https://stackoverflow.com/a/15662720/2653593
-      }
-    });
-  };
-
   // Search - Don't submit if it's empty
   $('form[name=search_form]').on('submit', function (e) {
     if ($(this).find('input[name=query]').val() == '') {
@@ -52,7 +18,7 @@ $(document).ready(function () {
 
   // For opening collapsed form containers
   $(document.body).on('click', '.sp-form-container.sp-collapsed', function () {
-    $(this).removeClass('sp-collapsed');
+    $(this).removeClass('sp-collapsed').find('.sp-chevron').remove();
     $(this).find('.sp-hidden').not('.sp-translatable-modal').not('.sp-translatable-modal .sp-hidden').removeClass('sp-hidden');
   });
 

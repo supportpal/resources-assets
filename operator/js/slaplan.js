@@ -1,5 +1,7 @@
 var $select;
 $(function () {
+  $('select[name="run_as"]').selectize();
+
   // Handle schedule switching
   $('input[name="all_hours"]').on('change', function () {
     if ($(this).val() == 0) {

@@ -137,7 +137,7 @@
 /* Remove button and unremovable */
 
 .selectize-control.plugin-remove_button [data-value] {
-    @apply sp-pr-2 !important;
+    @apply sp-pe-2 !important;
 }
 
 .selectize-control.plugin-remove_button [data-value]:not([data-selectable]) {

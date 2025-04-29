@@ -690,7 +690,7 @@
     return getOppositeAxis(getSideAxis(placement));
   }
   function getAlignmentSides(placement, rects, rtl) {
-    if (rtl === undefined) {
+    if (rtl === void 0) {
       rtl = false;
     }
     const alignment = getAlignment(placement);
@@ -847,7 +847,7 @@
       platform
     } = config;
     const validMiddleware = middleware.filter(Boolean);
-    const rtl = await (platform.isRTL == null ? undefined : platform.isRTL(floating));
+    const rtl = await (platform.isRTL == null ? void 0 : platform.isRTL(floating));
     let rects = await platform.getElementRects({
       reference,
       floating,
@@ -929,7 +929,7 @@
    */
   async function detectOverflow(state, options) {
     var _await$platform$isEle;
-    if (options === undefined) {
+    if (options === void 0) {
       options = {};
     }
     const {
@@ -951,7 +951,7 @@
     const altContext = elementContext === 'floating' ? 'reference' : 'floating';
     const element = elements[altBoundary ? altContext : elementContext];
     const clippingClientRect = rectToClientRect(await platform.getClippingRect({
-      element: ((_await$platform$isEle = await (platform.isElement == null ? undefined : platform.isElement(element))) != null ? _await$platform$isEle : true) ? element : element.contextElement || (await (platform.getDocumentElement == null ? undefined : platform.getDocumentElement(elements.floating))),
+      element: ((_await$platform$isEle = await (platform.isElement == null ? void 0 : platform.isElement(element))) != null ? _await$platform$isEle : true) ? element : element.contextElement || (await (platform.getDocumentElement == null ? void 0 : platform.getDocumentElement(elements.floating))),
       boundary,
       rootBoundary,
       strategy
@@ -962,8 +962,8 @@
       width: rects.floating.width,
       height: rects.floating.height
     } : rects.reference;
-    const offsetParent = await (platform.getOffsetParent == null ? undefined : platform.getOffsetParent(elements.floating));
-    const offsetScale = (await (platform.isElement == null ? undefined : platform.isElement(offsetParent))) ? (await (platform.getScale == null ? undefined : platform.getScale(offsetParent))) || {
+    const offsetParent = await (platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(elements.floating));
+    const offsetScale = (await (platform.isElement == null ? void 0 : platform.isElement(offsetParent))) ? (await (platform.getScale == null ? void 0 : platform.getScale(offsetParent))) || {
       x: 1,
       y: 1
     } : {
@@ -1024,11 +1024,11 @@
       const clientProp = isYAxis ? 'clientHeight' : 'clientWidth';
       const endDiff = rects.reference[length] + rects.reference[axis] - coords[axis] - rects.floating[length];
       const startDiff = coords[axis] - rects.reference[axis];
-      const arrowOffsetParent = await (platform.getOffsetParent == null ? undefined : platform.getOffsetParent(element));
+      const arrowOffsetParent = await (platform.getOffsetParent == null ? void 0 : platform.getOffsetParent(element));
       let clientSize = arrowOffsetParent ? arrowOffsetParent[clientProp] : 0;
 
       // DOM platform can return `window` as the `offsetParent`.
-      if (!clientSize || !(await (platform.isElement == null ? undefined : platform.isElement(arrowOffsetParent)))) {
+      if (!clientSize || !(await (platform.isElement == null ? void 0 : platform.isElement(arrowOffsetParent)))) {
         clientSize = elements.floating[clientProp] || rects.floating[length];
       }
       const centerToReference = endDiff / 2 - startDiff / 2;
@@ -1072,7 +1072,7 @@
    * @see https://floating-ui.com/docs/flip
    */
   const flip$1 = function flip(options) {
-    if (options === undefined) {
+    if (options === void 0) {
       options = {};
     }
     return {
@@ -1109,7 +1109,7 @@
         const side = getSide(placement);
         const initialSideAxis = getSideAxis(initialPlacement);
         const isBasePlacement = getSide(initialPlacement) === initialPlacement;
-        const rtl = await (platform.isRTL == null ? undefined : platform.isRTL(elements.floating));
+        const rtl = await (platform.isRTL == null ? void 0 : platform.isRTL(elements.floating));
         const fallbackPlacements = specifiedFallbackPlacements || (isBasePlacement || !flipAlignment ? [getOppositePlacement(initialPlacement)] : getExpandedPlacements(initialPlacement));
         const hasFallbackAxisSideDirection = fallbackAxisSideDirection !== 'none';
         if (!specifiedFallbackPlacements && hasFallbackAxisSideDirection) {
@@ -1118,7 +1118,7 @@
         const placements = [initialPlacement, ...fallbackPlacements];
         const overflow = await detectOverflow(state, detectOverflowOptions);
         const overflows = [];
-        let overflowsData = ((_middlewareData$flip = middlewareData.flip) == null ? undefined : _middlewareData$flip.overflows) || [];
+        let overflowsData = ((_middlewareData$flip = middlewareData.flip) == null ? void 0 : _middlewareData$flip.overflows) || [];
         if (checkMainAxis) {
           overflows.push(overflow[side]);
         }
@@ -1134,7 +1134,7 @@
         // One or more sides is overflowing.
         if (!overflows.every(side => side <= 0)) {
           var _middlewareData$flip2, _overflowsData$filter;
-          const nextIndex = (((_middlewareData$flip2 = middlewareData.flip) == null ? undefined : _middlewareData$flip2.index) || 0) + 1;
+          const nextIndex = (((_middlewareData$flip2 = middlewareData.flip) == null ? void 0 : _middlewareData$flip2.index) || 0) + 1;
           const nextPlacement = placements[nextIndex];
           if (nextPlacement) {
             // Try next placement and re-run the lifecycle.
@@ -1151,7 +1151,7 @@
 
           // First, find the candidates that fit on the mainAxis side of overflow,
           // then find the placement that fits the best on the main crossAxis side.
-          let resetPlacement = (_overflowsData$filter = overflowsData.filter(d => d.overflows[0] <= 0).sort((a, b) => a.overflows[1] - b.overflows[1])[0]) == null ? undefined : _overflowsData$filter.placement;
+          let resetPlacement = (_overflowsData$filter = overflowsData.filter(d => d.overflows[0] <= 0).sort((a, b) => a.overflows[1] - b.overflows[1])[0]) == null ? void 0 : _overflowsData$filter.placement;
 
           // Otherwise fallback.
           if (!resetPlacement) {
@@ -1168,7 +1168,7 @@
                       currentSideAxis === 'y';
                     }
                     return true;
-                  }).map(d => [d.placement, d.overflows.filter(overflow => overflow > 0).reduce((acc, overflow) => acc + overflow, 0)]).sort((a, b) => a[1] - b[1])[0]) == null ? undefined : _overflowsData$filter2[0];
+                  }).map(d => [d.placement, d.overflows.filter(overflow => overflow > 0).reduce((acc, overflow) => acc + overflow, 0)]).sort((a, b) => a[1] - b[1])[0]) == null ? void 0 : _overflowsData$filter2[0];
                   if (placement) {
                     resetPlacement = placement;
                   }
@@ -1198,7 +1198,7 @@
    * @see https://floating-ui.com/docs/shift
    */
   const shift$1 = function shift(options) {
-    if (options === undefined) {
+    if (options === void 0) {
       options = {};
     }
     return {
@@ -1268,7 +1268,7 @@
    * Built-in `limiter` that will stop `shift()` at a certain point.
    */
   const limitShift$1 = function limitShift(options) {
-    if (options === undefined) {
+    if (options === void 0) {
       options = {};
     }
     return {
@@ -1316,8 +1316,8 @@
           var _middlewareData$offse, _middlewareData$offse2;
           const len = mainAxis === 'y' ? 'width' : 'height';
           const isOriginSide = ['top', 'left'].includes(getSide(placement));
-          const limitMin = rects.reference[crossAxis] - rects.floating[len] + (isOriginSide ? ((_middlewareData$offse = middlewareData.offset) == null ? undefined : _middlewareData$offse[crossAxis]) || 0 : 0) + (isOriginSide ? 0 : computedOffset.crossAxis);
-          const limitMax = rects.reference[crossAxis] + rects.reference[len] + (isOriginSide ? 0 : ((_middlewareData$offse2 = middlewareData.offset) == null ? undefined : _middlewareData$offse2[crossAxis]) || 0) - (isOriginSide ? computedOffset.crossAxis : 0);
+          const limitMin = rects.reference[crossAxis] - rects.floating[len] + (isOriginSide ? ((_middlewareData$offse = middlewareData.offset) == null ? void 0 : _middlewareData$offse[crossAxis]) || 0 : 0) + (isOriginSide ? 0 : computedOffset.crossAxis);
+          const limitMax = rects.reference[crossAxis] + rects.reference[len] + (isOriginSide ? 0 : ((_middlewareData$offse2 = middlewareData.offset) == null ? void 0 : _middlewareData$offse2[crossAxis]) || 0) - (isOriginSide ? computedOffset.crossAxis : 0);
           if (crossAxisCoord < limitMin) {
             crossAxisCoord = limitMin;
           } else if (crossAxisCoord > limitMax) {
@@ -1342,11 +1342,11 @@
   }
   function getWindow(node) {
     var _node$ownerDocument;
-    return (node == null || (_node$ownerDocument = node.ownerDocument) == null ? undefined : _node$ownerDocument.defaultView) || window;
+    return (node == null || (_node$ownerDocument = node.ownerDocument) == null ? void 0 : _node$ownerDocument.defaultView) || window;
   }
   function getDocumentElement(node) {
     var _ref;
-    return (_ref = (isNode(node) ? node.ownerDocument : node.document) || window.document) == null ? undefined : _ref.documentElement;
+    return (_ref = (isNode(node) ? node.ownerDocument : node.document) || window.document) == null ? void 0 : _ref.documentElement;
   }
   function isNode(value) {
     return value instanceof Node || value instanceof getWindow(value).Node;
@@ -1453,14 +1453,14 @@
   }
   function getOverflowAncestors(node, list, traverseIframes) {
     var _node$ownerDocument2;
-    if (list === undefined) {
+    if (list === void 0) {
       list = [];
     }
-    if (traverseIframes === undefined) {
+    if (traverseIframes === void 0) {
       traverseIframes = true;
     }
     const scrollableAncestor = getNearestOverflowAncestor(node);
-    const isBody = scrollableAncestor === ((_node$ownerDocument2 = node.ownerDocument) == null ? undefined : _node$ownerDocument2.body);
+    const isBody = scrollableAncestor === ((_node$ownerDocument2 = node.ownerDocument) == null ? void 0 : _node$ownerDocument2.body);
     const win = getWindow(scrollableAncestor);
     if (isBody) {
       return list.concat(win, win.visualViewport || [], isOverflowElement(scrollableAncestor) ? scrollableAncestor : [], win.frameElement && traverseIframes ? getOverflowAncestors(win.frameElement) : []);
@@ -1529,7 +1529,7 @@
     };
   }
   function shouldAddVisualOffsets(element, isFixed, floatingOffsetParent) {
-    if (isFixed === undefined) {
+    if (isFixed === void 0) {
       isFixed = false;
     }
     if (!floatingOffsetParent || isFixed && floatingOffsetParent !== getWindow(element)) {
@@ -1538,10 +1538,10 @@
     return isFixed;
   }
   function getBoundingClientRect(element, includeScale, isFixedStrategy, offsetParent) {
-    if (includeScale === undefined) {
+    if (includeScale === void 0) {
       includeScale = false;
     }
-    if (isFixedStrategy === undefined) {
+    if (isFixedStrategy === void 0) {
       isFixedStrategy = false;
     }
     const clientRect = element.getBoundingClientRect();
@@ -1906,10 +1906,10 @@
       io = null;
     }
     function refresh(skip, threshold) {
-      if (skip === undefined) {
+      if (skip === void 0) {
         skip = false;
       }
-      if (threshold === undefined) {
+      if (threshold === void 0) {
         threshold = 1;
       }
       cleanup();
@@ -1979,7 +1979,7 @@
    * @see https://floating-ui.com/docs/autoUpdate
    */
   function autoUpdate(reference, floating, update, options) {
-    if (options === undefined) {
+    if (options === void 0) {
       options = {};
     }
     const {
@@ -2232,7 +2232,7 @@
       }));
       if (arrowEl) {
         var _attachToOptions$on, _attachToOptions$on2;
-        const hasEdgeAlignment = (attachToOptions == null || (_attachToOptions$on = attachToOptions.on) == null ? undefined : _attachToOptions$on.includes('-start')) || (attachToOptions == null || (_attachToOptions$on2 = attachToOptions.on) == null ? undefined : _attachToOptions$on2.includes('-end'));
+        const hasEdgeAlignment = (attachToOptions == null || (_attachToOptions$on = attachToOptions.on) == null ? void 0 : _attachToOptions$on.includes('-start')) || (attachToOptions == null || (_attachToOptions$on2 = attachToOptions.on) == null ? void 0 : _attachToOptions$on2.includes('-end'));
         options.middleware.push(arrow({
           element: arrowEl,
           padding: hasEdgeAlignment ? 4 : 0
@@ -2713,7 +2713,7 @@
   // general each functions:
 
   function ensure_array_like(array_like_or_iterator) {
-    return (array_like_or_iterator == null ? undefined : array_like_or_iterator.length) !== undefined ? array_like_or_iterator : Array.from(array_like_or_iterator);
+    return (array_like_or_iterator == null ? void 0 : array_like_or_iterator.length) !== undefined ? array_like_or_iterator : Array.from(array_like_or_iterator);
   }
 
   /** @returns {{}} */
@@ -4182,11 +4182,11 @@
   class Step extends Evented {
     constructor(tour, options = {}) {
       super();
-      this._resolvedAttachTo = undefined;
-      this.classPrefix = undefined;
-      this.el = undefined;
-      this.target = undefined;
-      this.tour = undefined;
+      this._resolvedAttachTo = void 0;
+      this.classPrefix = void 0;
+      this.el = void 0;
+      this.target = void 0;
+      this.tour = void 0;
       this.tour = tour;
       this.classPrefix = this.tour.options ? normalizePrefix(this.tour.options.classPrefix) : '';
       // @ts-expect-error TODO: investigate where styles comes from
@@ -4651,7 +4651,7 @@ Z`;
     let targetWindow = element.ownerDocument.defaultView;
     while (targetWindow !== window.top) {
       var _targetWindow;
-      const targetIframe = (_targetWindow = targetWindow) == null ? undefined : _targetWindow.frameElement;
+      const targetIframe = (_targetWindow = targetWindow) == null ? void 0 : _targetWindow.frameElement;
       if (targetIframe) {
         var _targetIframeRect$scr, _targetIframeRect$scr2;
         const targetIframeRect = targetIframe.getBoundingClientRect();
@@ -4865,7 +4865,7 @@ Z`;
   class ShepherdBase extends Evented {
     constructor() {
       super();
-      this.activeTour = undefined;
+      this.activeTour = void 0;
       autoBind(this);
     }
   }
@@ -4878,14 +4878,14 @@ Z`;
     constructor(options = {}) {
       super();
       this.trackedEvents = ['active', 'cancel', 'complete', 'show'];
-      this.classPrefix = undefined;
-      this.currentStep = undefined;
-      this.focusedElBeforeOpen = undefined;
-      this.id = undefined;
+      this.classPrefix = void 0;
+      this.currentStep = void 0;
+      this.focusedElBeforeOpen = void 0;
+      this.id = void 0;
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      this.modal = undefined;
-      this.options = undefined;
-      this.steps = undefined;
+      this.modal = void 0;
+      this.options = void 0;
+      this.steps = void 0;
       autoBind(this);
       const defaultTourOptions = {
         exitOnEsc: true,
@@ -5207,7 +5207,7 @@ Z`;
   Shepherd.Step = isServerSide ? StepNoOp : Step;
   Shepherd.Tour = isServerSide ? TourNoOp : Tour$1;
   function styleInject(css, ref) {
-    if (ref === undefined) ref = {};
+    if (ref === void 0) ref = {};
     var insertAt = ref.insertAt;
     if (typeof document === 'undefined') {
       return;

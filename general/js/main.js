@@ -96,6 +96,39 @@ $.fn.timepicker = function (options) {
   });
 };
 
+// isWindow was deprecated in jQuery 3.3.0
+function isWindow(obj) {
+  return obj !== null && obj !== undefined && obj === obj.window;
+}
+
+// jQuery print event callback helpers.
+//   - https://gist.github.com/shaliko/4110822#gistcomment-1543771
+//   - https://www.tjvantoll.com/2012/06/15/detecting-print-requests-with-javascript/
+$.fn.beforeprint = function (callback) {
+  return $(this).each(function () {
+    if (!isWindow(this)) {
+      return;
+    }
+    if (this.onbeforeprint !== undefined) {
+      $(this).on('beforeprint', callback);
+    } else if (this.matchMedia) {
+      this.matchMedia('print').addListener(callback);
+    }
+  });
+};
+$.fn.afterprint = function (callback) {
+  return $(this).each(function () {
+    if (!isWindow(this)) {
+      return;
+    }
+    if (this.onafterprint !== undefined) {
+      $(this).on('afterprint', callback);
+    } else if (this.matchMedia) {
+      $(this).one('mouseover', callback); // https://stackoverflow.com/a/15662720/2653593
+    }
+  });
+};
+
 // Polyfill for matches, closest and find (IE11), needed for tippy.js
 // https://developer.mozilla.org/en-US/docs/Web/API/Element/matches#Polyfill
 if (!Element.prototype.matches) {

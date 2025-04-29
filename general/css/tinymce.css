@@ -436,7 +436,7 @@
 }
 
 .tox-button-separator {
-    @apply sp-px-0 sp-py-2 sp-mx-3/2 sp-inline sp-border-s sp-border-tertiary sp-align-middle;
+    @apply sp-mx-3/2 sp-border-s sp-border-tertiary;
 }
 
 .tox-sp-avatar {

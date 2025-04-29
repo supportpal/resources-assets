@@ -8320,7 +8320,7 @@ readers do not read off random characters that represent icons */
   font-style: normal;
   font-weight: 400;
   font-display: block;
-  src: url("../../general/webfonts/../webfonts/fa-brands-400.woff2") format("woff2"), url("../../general/webfonts/../webfonts/fa-brands-400.ttf") format("truetype");
+  src: url("../../general/webfonts/../../general/webfonts/../webfonts/fa-brands-400.woff2") format("woff2"), url("../../general/webfonts/../webfonts/fa-brands-400.ttf") format("truetype");
 }
 
 .fab,
@@ -12504,6 +12504,7 @@ input.sp-toggle + label{
   padding-right: 2rem;
   padding-top: 0.5rem;
   padding-bottom: 0.5rem;
+  line-height: 2.25rem;
   transition-property: all;
   transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
   transition-duration: 500ms;
@@ -12729,16 +12730,89 @@ button.as-link.active:is(.sp-theme-dark *){
     padding-top: 0;
 }
 
+.sp-form-container + .sp-form-row,
+.sp-form-row + .sp-form-container{
+  margin-top: 1.5rem;
+}
+
+.sp-form-container .sp-form-container + .sp-form-row,
+.sp-form-container .sp-form-row + .sp-form-container{
+  margin-top: 0.75rem;
+}
+
 .sp-form-container.sp-collapsed{
+  position: relative;
   cursor: pointer;
   background-color: var(--color-background-secondary);
   padding-left: 1.5rem;
   padding-right: 1.5rem;
 }
 
+.sp-form-container.sp-collapsed *{
+  cursor: pointer;
+}
+
+.sp-form-container.sp-collapsed > .sp-form-row{
+  margin-inline-end: 1.5rem;
+}
+
+.sp-form-container.sp-collapsed > .sp-chevron{
+  position: absolute;
+  top: calc(50% - 0.75rem);
+  inset-inline-end: 1.5rem;
+}
+
 .sp-form-container.sp-collapsed div.sp-description{
   margin: 0px;
-  padding-inline-end: 1rem;
+}
+
+.sp-form-container:not(.sp-collapsed) > .sp-chevron{
+  display: none;
+}
+
+.sp-collapsible + .sp-form-container:not(.sp-collapsed) > .sp-chevron{
+  margin-top: 1.5rem;
+}
+
+
+.sp-form-container:not(.sp-form-container:not(.sp-collapsed) > .sp-chevron) + .sp-form-container{
+  border-top-width: 0px;
+}
+
+.sp-dropdown-container .sp-dropdown ul li.sp-form-container:not(.sp-collapsed) > .sp-chevron {
+    display: none;
+}
+
+.sp-dropdown-container .sp-dropdown ul li a.sp-form-container:not(.sp-collapsed) > .sp-chevron,
+.sp-dropdown-container .sp-dropdown ul li.sp-dropdown-item.sp-form-container:not(.sp-collapsed) > .sp-chevron {
+    display: none;
+}
+
+ul.sp-attached-files li.sp-form-container:not(.sp-collapsed) > .sp-chevron + li{
+  margin-top: 1rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-form-container:not(.sp-collapsed) > .sp-chevron):first-child{
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-form-container:not(.sp-collapsed) > .sp-chevron):last-child{
+  border-bottom-right-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-width: 1px;
+  border-color: var(--color-background-tertiary);
+}
+
+ul.sp-attached-files li.sp-form-container:not(.sp-collapsed) > .sp-chevron + li .sp-delete-attachment,
+ul.sp-attached-files li:not(.sp-form-container:not(.sp-collapsed) > .sp-chevron):first-child .sp-delete-attachment{
+  border-start-end-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-form-container:not(.sp-collapsed) > .sp-chevron):last-child .sp-delete-attachment{
+  border-end-end-radius: 0.25rem;
 }
 
 /* Tables */
@@ -12780,6 +12854,20 @@ table.sp-table-grid td:last-child{
 
 table.sp-table-grid input[type="checkbox"]{
   margin: 0px;
+}
+
+table.sp-table-grid.sp-table-inline{
+  border-collapse: separate;
+  --tw-border-spacing-x: 0px;
+  --tw-border-spacing-y: 0px;
+  border-spacing: var(--tw-border-spacing-x) var(--tw-border-spacing-y);
+  border-radius: 0.25rem;
+  border-width: 1px;
+  border-color: var(--color-background-tertiary);
+}
+
+table.sp-table-grid.sp-table-inline tr:last-of-type td{
+  border-width: 0px;
 }
 
 table.sp-organisation-users td.sp-name,
@@ -13154,6 +13242,7 @@ ul.sp-article-comments .sp-comment-score{
   border-radius: 0.25rem;
   border-width: 1px;
   border-color: var(--color-background-secondary);
+  background-color: var(--color-background-primary);
   padding: 1rem;
 }
 
@@ -13241,9 +13330,181 @@ ul.sp-article-comments .sp-comment-score{
   }
 }
 
+.sp-message.sp-message-collapsed{
+  color: var(--color-text-secondary);
+  opacity: 0.5;
+}
+
+.sp-message.sp-message-collapsed,
+.sp-message.sp-message-collapsible .sp-message-header{
+  cursor: pointer;
+}
+
+.sp-message.sp-message-collapsed .sp-message-text{
+  display: block;
+}
+
+.sp-message.sp-message-collapsed .sp-message-text-edit,
+.sp-message.sp-message-collapsed .sp-attachments{
+  display: none;
+}
+
+.sp-collapsible + .sp-message.sp-message-collapsed .sp-message-text-edit,.sp-collapsible + 
+.sp-message.sp-message-collapsed .sp-attachments{
+  margin-top: 1.5rem;
+}
+
+
+.sp-form-container:not(.sp-message.sp-message-collapsed .sp-message-text-edit) + .sp-form-container,
+.sp-form-container:not(
+.sp-message.sp-message-collapsed .sp-attachments) + .sp-form-container{
+  border-top-width: 0px;
+}
+
+.sp-dropdown-container .sp-dropdown ul li.sp-message.sp-message-collapsed .sp-message-text-edit,.sp-dropdown-container .sp-dropdown ul li
+.sp-message.sp-message-collapsed .sp-attachments {
+    display: none;
+}
+
+.sp-dropdown-container .sp-dropdown ul li a.sp-message.sp-message-collapsed .sp-message-text-edit,
+.sp-dropdown-container .sp-dropdown ul li.sp-dropdown-item.sp-message.sp-message-collapsed .sp-message-text-edit,.sp-dropdown-container .sp-dropdown ul li a
+.sp-message.sp-message-collapsed .sp-attachments,
+.sp-dropdown-container .sp-dropdown ul li.sp-dropdown-item
+.sp-message.sp-message-collapsed .sp-attachments {
+    display: none;
+}
+
+ul.sp-attached-files li.sp-message.sp-message-collapsed .sp-message-text-edit + li,ul.sp-attached-files li
+.sp-message.sp-message-collapsed .sp-attachments + li{
+  margin-top: 1rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-message.sp-message-collapsed .sp-message-text-edit):first-child,ul.sp-attached-files li:not(
+.sp-message.sp-message-collapsed .sp-attachments):first-child{
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-message.sp-message-collapsed .sp-message-text-edit):last-child,ul.sp-attached-files li:not(
+.sp-message.sp-message-collapsed .sp-attachments):last-child{
+  border-bottom-right-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-width: 1px;
+  border-color: var(--color-background-tertiary);
+}
+
+ul.sp-attached-files li.sp-message.sp-message-collapsed .sp-message-text-edit + li .sp-delete-attachment,
+ul.sp-attached-files li:not(.sp-message.sp-message-collapsed .sp-message-text-edit):first-child .sp-delete-attachment,ul.sp-attached-files li
+.sp-message.sp-message-collapsed .sp-attachments + li .sp-delete-attachment,
+ul.sp-attached-files li:not(
+.sp-message.sp-message-collapsed .sp-attachments):first-child .sp-delete-attachment{
+  border-start-end-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-message.sp-message-collapsed .sp-message-text-edit):last-child .sp-delete-attachment,ul.sp-attached-files li:not(
+.sp-message.sp-message-collapsed .sp-attachments):last-child .sp-delete-attachment{
+  border-end-end-radius: 0.25rem;
+}
+
+.sp-message div.expandable:before{
+  margin-top: 0.75rem;
+  margin-bottom: 0.75rem;
+  display: inline-block;
+  height: 1rem;
+  border-radius: 0.25rem;
+  border-width: 1px;
+  border-color: var(--color-background-tertiary);
+  background-color: var(--color-background-secondary);
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+    content: '...';
+    line-height: 0.375rem;
+}
+
+.sp-message div.expandable:hover:before{
+  cursor: pointer;
+  background-color: var(--color-background-tertiary);
+}
+
+.sp-message div.expandable + div.supportpal_quote{
+  display: none;
+  color: var(--color-text-tertiary);
+}
+
+.sp-collapsible + .sp-message div.expandable + div.supportpal_quote{
+  margin-top: 1.5rem;
+}
+
+
+.sp-form-container:not(.sp-message div.expandable + div.supportpal_quote) + .sp-form-container{
+  border-top-width: 0px;
+}
+
+.sp-dropdown-container .sp-dropdown ul li.sp-message div.expandable + div.supportpal_quote {
+    display: none;
+}
+
+.sp-dropdown-container .sp-dropdown ul li a.sp-message div.expandable + div.supportpal_quote,
+.sp-dropdown-container .sp-dropdown ul li.sp-dropdown-item.sp-message div.expandable + div.supportpal_quote {
+    display: none;
+}
+
+ul.sp-attached-files li.sp-message div.expandable + div.supportpal_quote + li{
+  margin-top: 1rem;
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-message div.expandable + div.supportpal_quote):first-child{
+  border-top-left-radius: 0.25rem;
+  border-top-right-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-message div.expandable + div.supportpal_quote):last-child{
+  border-bottom-right-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+  border-bottom-width: 1px;
+  border-color: var(--color-background-tertiary);
+}
+
+ul.sp-attached-files li.sp-message div.expandable + div.supportpal_quote + li .sp-delete-attachment,
+ul.sp-attached-files li:not(.sp-message div.expandable + div.supportpal_quote):first-child .sp-delete-attachment{
+  border-start-end-radius: 0.25rem;
+}
+
+ul.sp-attached-files li:not(.sp-message div.expandable + div.supportpal_quote):last-child .sp-delete-attachment{
+  border-end-end-radius: 0.25rem;
+}
+
+div.sp-collapsed-messages{
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+  cursor: pointer;
+  padding: 0.25rem;
+  text-align: center;
+  color: var(--color-text-secondary);
+    background: linear-gradient(to bottom, var(--color-background-primary), var(--color-background-primary) 90%, var(--color-background-secondary) 10%, var(--color-background-secondary));
+    background-size: 100% 11px;
+}
+
+div.sp-collapsed-messages span{
+  background-color: var(--color-background-primary);
+  padding-left: 0.75rem;
+  padding-right: 0.75rem;
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+div.sp-collapsed-messages + .sp-message{
+  margin-top: 0px;
+}
+
 /* Attachments */
 
 .sp-file-upload{
+  visibility: hidden;
   position: absolute;
   top: 0px;
   inset-inline-start: 0px;
@@ -13615,8 +13876,8 @@ ul.sp-attachments > li a div{
   margin-inline-start: -1.5rem !important;
 }
 
-.\!sp-mb-6{
-  margin-bottom: 1.5rem !important;
+.\!sp-mb-4{
+  margin-bottom: 1rem !important;
 }
 
 .sp--mb-6{
@@ -13717,22 +13978,6 @@ ul.sp-attachments > li a div{
 
 .sp-me-6{
   margin-inline-end: 1.5rem;
-}
-
-.sp-ml-3{
-  margin-left: 0.75rem;
-}
-
-.sp-mr-1{
-  margin-right: 0.25rem;
-}
-
-.sp-mr-3{
-  margin-right: 0.75rem;
-}
-
-.sp-mr-6{
-  margin-right: 1.5rem;
 }
 
 .sp-ms-1{
@@ -13889,6 +14134,10 @@ ul.sp-attachments > li a div{
 
 .sp-h-full{
   height: 100%;
+}
+
+.sp-min-h-\[auto\]{
+  min-height: auto;
 }
 
 .sp-min-h-full{
@@ -14087,6 +14336,10 @@ ul.sp-attachments > li a div{
   align-items: center;
 }
 
+.sp-items-stretch{
+  align-items: stretch;
+}
+
 .sp-justify-end{
   justify-content: flex-end;
 }
@@ -14195,6 +14448,10 @@ ul.sp-attachments > li a div{
   border-width: 2px;
 }
 
+.\!sp-border-b-0{
+  border-bottom-width: 0px !important;
+}
+
 .sp-border-b{
   border-bottom-width: 1px;
 }
@@ -14221,6 +14478,10 @@ ul.sp-attachments > li a div{
 
 .sp-border-dotted{
   border-style: dotted;
+}
+
+.\!sp-border-secondary{
+  border-color: var(--color-background-secondary) !important;
 }
 
 .sp-border-primary{
@@ -14368,6 +14629,11 @@ ul.sp-attachments > li a div{
   padding-right: 1.5rem;
 }
 
+.sp-py-0{
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
 .sp-py-1{
   padding-top: 0.25rem;
   padding-bottom: 0.25rem;
@@ -14398,12 +14664,20 @@ ul.sp-attachments > li a div{
   padding-bottom: 1.5rem;
 }
 
+.\!sp-pb-0{
+  padding-bottom: 0px !important;
+}
+
 .\!sp-pe-6{
   padding-inline-end: 1.5rem !important;
 }
 
 .sp-pb-0{
   padding-bottom: 0px;
+}
+
+.sp-pb-1{
+  padding-bottom: 0.25rem;
 }
 
 .sp-pb-10{
@@ -14460,6 +14734,10 @@ ul.sp-attachments > li a div{
 
 .sp-pt-3\/2{
   padding-top: 0.375rem;
+}
+
+.sp-pt-6{
+  padding-top: 1.5rem;
 }
 
 .sp-text-center{
@@ -14878,6 +15156,10 @@ ul.sp-attachments > li a div{
     margin-inline-end: 0.5rem;
   }
 
+  .sm\:sp-ml-4{
+    margin-left: 1rem;
+  }
+
   .sm\:sp-ms-0{
     margin-inline-start: 0px;
   }
@@ -14978,6 +15260,10 @@ ul.sp-attachments > li a div{
     flex-grow: 1;
   }
 
+  .sm\:sp-flex-nowrap{
+    flex-wrap: nowrap;
+  }
+
   .sm\:sp-rounded{
     border-radius: 0.25rem;
   }
@@ -15003,10 +15289,6 @@ ul.sp-attachments > li a div{
 
   .sm\:sp-pe-3{
     padding-inline-end: 0.75rem;
-  }
-
-  .sm\:sp-pt-3\/2{
-    padding-top: 0.375rem;
   }
 
   .sm\:sp-text-start{
@@ -15045,8 +15327,8 @@ ul.sp-attachments > li a div{
     margin-bottom: 2.5rem;
   }
 
-  .md\:sp-mr-0{
-    margin-right: 0px;
+  .md\:sp-me-0{
+    margin-inline-end: 0px;
   }
 
   .md\:sp-mt-0{
@@ -15110,8 +15392,8 @@ ul.sp-attachments > li a div{
     border-width: 1px;
   }
 
-  .md\:sp-border-b-0{
-    border-bottom-width: 0px;
+  .md\:sp-border-0{
+    border-width: 0px;
   }
 
   .md\:sp-border-secondary{
@@ -15124,6 +15406,10 @@ ul.sp-attachments > li a div{
 
   .md\:sp-pb-0{
     padding-bottom: 0px;
+  }
+
+  .md\:sp-ps-0{
+    padding-inline-start: 0px;
   }
 
   .md\:sp-text-start{

@@ -14,42 +14,24 @@ $(document).ready(function () {
   }, {
     column_number: 2,
     filter_container_id: "filter_department"
+  }, {
+    column_number: 3,
+    filter_container_id: "filter_status"
   }]);
   var $table = $('#ticketGridTable').DataTable();
 
   // DataTable events.
-  $table.on('init.dt', function (settings, json) {
+  $table.on('init.dt', function (e, settings, json) {
     // Move filter results to after the filter row in datatables.
     $('div.sp-filter-results').insertAfter($("div.dt-search").parent('.sp-flex'));
 
     // Change filter row to include submit ticket and filter results buttons.
-    $("div.dt-search").removeClass('dt-search').addClass('sp-flex !sp-mb-6 sp-ms-6 sp-mr-6 md:sp-mr-0').append($('<a>', {
+    $("div.dt-search").removeClass('dt-search').addClass('sp-flex !sp-mb-4 sp-ms-6 sp-me-6 md:sp-me-0').append($('<a>', {
       class: 'sp-filter-results sp-button sp-rounded-s-none',
       title: Lang.get('general.filter_results')
     }).append($('<i>', {
       'class': 'fas fa-fw fa-filter'
     }))).find('input').addClass('sp-w-full md:sp-rounded-e-none');
-
-    // Add status dropdown to right of search area.
-    $("div.dataTables_status").addClass('sp-ms-6 sp-hidden md:sp-inline-block').append($('<span>', {
-      class: 'sp-me-2',
-      text: Lang.choice('general.status', 1)
-    })).append($('<select>', {
-      name: 'status'
-    }).append($('<option>', {
-      value: '-1',
-      text: Lang.get('general.any')
-    })).append($('<option>', {
-      value: '-2',
-      text: Lang.get('ticket.unresolved')
-    })).append($('<option>', {
-      value: '-3',
-      text: Lang.get('ticket.resolved')
-    }))).parent().append($('<a>', {
-      href: laroute.route('ticket.frontend.ticket.createStep1'),
-      class: 'sp-button sp-button-submit sp-flex-none sp-ms-6 sp-hidden lg:sp-inline-block',
-      text: Lang.get('core.submit_ticket')
-    }));
   });
   $(document).on('change', 'div.dataTables_status select', function () {
     $('.dataTable').DataTable().columns(3).search($(this).val()).draw();

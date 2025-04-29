@@ -7,7 +7,8 @@ var sideBar = function () {
   "use strict";
 
   var storageName = 'sidebarData',
-    storageExpiry = 3600000;
+    storageExpiry = 3600000,
+    isRequestInProgress = false;
   var initJQueryListeners = function () {
     $('select[name="search_tag"]').selectize({
       valueField: 'id',
@@ -123,8 +124,12 @@ var sideBar = function () {
      * Fetch the latest sidebar data.
      */
     refresh: function () {
+      if (isRequestInProgress) {
+        return;
+      }
+      isRequestInProgress = true;
       $.get(laroute.route('ticket.operator.ticket.sidebar')).done(function (response) {
-        if (response.status == 'success') {
+        if (response.status === 'success') {
           // Update the sidebar
           updateSidebar(response.data);
 
@@ -134,7 +139,7 @@ var sideBar = function () {
             expires: new Date().getTime() + storageExpiry
           }));
         }
-      });
+      }).always(() => isRequestInProgress = false);
     }
   };
 }();

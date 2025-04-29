@@ -1,4 +1,4 @@
-div.dt-container {
+div.dt-container:not(.dt-container-normal-margin) {
     @apply sp--mx-6;
 }
 
@@ -27,6 +27,15 @@ div.dt-container .dataTables_sort {
     @apply sp-mx-6 sp-text-primary;
 }
 
+div.dt-container.dt-container-normal-margin .dt-length,
+div.dt-container.dt-container-normal-margin .dt-search,
+div.dt-container.dt-container-normal-margin .dt-info,
+div.dt-container.dt-container-normal-margin .dt-processing,
+div.dt-container.dt-container-normal-margin .dt-paging,
+div.dt-container.dt-container-normal-margin .dataTables_sort {
+    @apply sp-mx-0;
+}
+
 @media print {
     div.dt-container,
     div.dt-container .dt-length,
@@ -46,6 +55,11 @@ div.dt-container .dt-processing {
 
 div.dt-processing > div:last-child > div {
     @apply sp-h-2 sp-w-2;
+}
+
+div.dt-container .dt-length,
+div.dt-container .dt-info {
+    @apply sp-hidden;
 }
 
 .dt-length,
@@ -79,7 +93,7 @@ div.dt-container .dataTables_sort {
 
 div.dt-container .dt-info,
 div.dt-container .dt-paging {
-    @apply sp-pt-6;
+    @apply sp-pt-4;
 }
 
 div.dt-container .top .dt-info {
@@ -99,7 +113,7 @@ div.dt-container .dt-info {
 }
 
 .dt-paging .dt-paging-input {
-    @apply sp-mx-2;
+    @apply sp-mx-3;
 }
 
 .dt-paging .dt-paging-input input {
@@ -108,7 +122,7 @@ div.dt-container .dt-info {
 
 div.dt-container .dt-paging .dt-paging-button,
 .dt-paging .dt-paging-button {
-    @apply sp-px-2 sp-py-1 sp-ms-0 sp-rounded sp-shadow-none;
+    @apply sp-px-2 sp-py-1 sp-ms-0 sp-border-0 sp-rounded sp-shadow-none;
     @apply sp-text-secondary !important;
 }
 
@@ -127,7 +141,7 @@ div.dt-container .dt-paging .dt-paging-button.disabled:active,
 .dt-paging .dt-paging-button.disabled,
 .dt-paging .dt-paging-button.disabled:hover,
 .dt-paging .dt-paging-button.disabled:active {
-    @apply sp-shadow-none sp-cursor-auto sp-opacity-25;
+    @apply sp-border-0 sp-shadow-none sp-cursor-auto sp-opacity-25;
     @apply sp-text-secondary !important;
     background: 0;
 }
@@ -148,13 +162,13 @@ table.dataTable.no-footer {
     @apply sp-border-b-0;
 }
 
-table.dataTable thead td,
-table.dataTable thead th {
+table.dataTable:not(.sp-table-inline) thead td,
+table.dataTable:not(.sp-table-inline) thead th {
     @apply sp-sticky !important;
     @apply sp-top-0 sp-bg-primary sp-overflow-hidden sp-text-ellipsis sp-whitespace-nowrap sp-z-10;
 }
 
-table.dataTable thead th.sp-relative {
+table.dataTable thead:not(.sp-table-inline) th.sp-relative {
     @apply sp-sticky;
 }
 
@@ -266,12 +280,16 @@ table.dataTable > tbody > tr:first-child > * {
     @apply sp-border-t-0;
 }
 
-table.dataTable > tbody > tr:last-child > * {
+table.dataTable:not(.sp-table-inline) > tbody > tr:last-child > * {
     @apply sp-border-b sp-border-tertiary sp-border-solid;
 }
 
 div.dt-container.dt-empty-footer tbody > tr:last-child > * {
     @apply sp-border-b-tertiary;
+}
+
+div.dt-container.dt-empty-footer table.dataTable.sp-table-inline tbody > tr:last-child > * {
+    @apply sp-border-b-0;
 }
 
 table.dataTable tbody tr.selected {
@@ -348,8 +366,8 @@ table.dataTable tbody td.all a:hover .fas {
 /* Medium (md) */
 @media screen and (min-width: 768px) {
     div.dt-container .dt-length,
-    div.dt-container .dataTables_sort {
-        @apply sp-hidden;
+    div.dt-container .dt-info {
+        @apply sp-block;
     }
 
     div.dt-container .dt-search {
@@ -359,10 +377,6 @@ table.dataTable tbody td.all a:hover .fas {
     div.dt-container .dt-search input {
         @apply sp-w-full;
         width: 100%;
-    }
-
-    div.dt-container .dt-paging {
-        @apply sp-pt-3 sp-mt-0;
     }
 
     div.dt-container .dt-paging .dt-paging-button,

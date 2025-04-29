@@ -3,8 +3,8 @@
   'use strict';
 
   var DISABLED = 0,
-    IN_BROWSER = 1,
-    IN_DESKTOP = 2;
+    IN_APP = 1,
+    DESKTOP = 2;
   var options = {
     type: DISABLED,
     icon: null
@@ -32,6 +32,9 @@
     context: document.body
   });
   function Notifications() {}
+  function uuid() {
+    return "10000000-1000-4000-8000-100000000000".replace(/[018]/g, c => (+c ^ crypto.getRandomValues(new Uint8Array(1))[0] & 15 >> +c / 4).toString(16));
+  }
 
   /**
    * Configure the notifications instance.
@@ -109,9 +112,9 @@
    */
   Notifications.showNotification = function (uuid, title, text, route) {
     switch (Notifications.getType()) {
-      case IN_BROWSER:
-        return Notifications.showBrowserNotification(title, text);
-      case IN_DESKTOP:
+      case IN_APP:
+        return Notifications.showInAppNotification(title, text);
+      case DESKTOP:
         return Notifications.showDesktopNotification(uuid, title, text, route);
       default:
         return;
@@ -119,12 +122,12 @@
   };
 
   /**
-   * Show a browser notification.
+   * Show an in-app notification.
    *
    * @param {string} title
    * @param {string} text
    */
-  Notifications.showBrowserNotification = function (title, text) {
+  Notifications.showInAppNotification = function (title, text) {
     PNotify.alert({
       title: title,
       titleTrusted: true,
@@ -170,6 +173,23 @@
       if (typeof route !== 'undefined') {
         window.open(route, '_blank');
       }
+    });
+  };
+  Notifications.registerPreviewHandlers = function () {
+    // Show example in-app notification
+    $('.preview-in-app-notification').on('click', function () {
+      Notifications.showInAppNotification(Lang.get('notification.new_ticket'), Lang.get('notification.new_ticket_text', {
+        'item': '<a href="#">' + Math.floor(100000 + Math.random() * 900000) + '</a>',
+        'name': 'Joe Bloggs'
+      }));
+    });
+
+    // Show example desktop notification
+    $('.preview-desktop-notification').on('click', function () {
+      Notifications.showDesktopNotification(uuid(), Lang.get('notification.new_ticket'), Lang.get('notification.new_ticket_text', {
+        'item': Math.floor(100000 + Math.random() * 900000),
+        'name': 'Joe Bloggs'
+      }));
     });
   };
   App.extend('Notifications', Notifications);

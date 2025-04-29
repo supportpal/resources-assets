@@ -27,14 +27,6 @@
     };
 
     /**
-     * Copy Link message identifiers.
-     *
-     * @type {string}
-     */
-    var NOTES_PLACEHOLDER = $('meta[name="notes-url-id"]').prop('content'),
-      MESSAGE_PLACEHOLDER = $('meta[name="messages-url-id"]').prop('content');
-
-    /**
      * Message drafts.
      *
      * @type {{newMessage: null, newNote: null, newForward: null}}
@@ -61,13 +53,6 @@
      * @type {string[]}
      */
     var selectizePlugins = ['restore_on_backspace', 'remove_button', 'max_items'];
-
-    /**
-     * Queue to load messages synchronously, non blocking.
-     */
-    var messageDfd = $.Deferred(),
-      messageDfdNext = messageDfd;
-    messageDfd.resolve();
 
     /**
      * Show a success / failure message for a short period.
@@ -212,13 +197,7 @@
      * @param message
      */
     this.showMessage = function (message) {
-      // Make the message visible.
-      message.removeClass('sp-message-collapsed').addClass('sp-message-collapsible');
-      message.find('.sp-message-text').children('.sp-message-text-trimmed').addClass('sp-hidden');
-      message.find('.sp-message-text').children('.sp-message-text-original').removeClass('sp-hidden');
-
-      // Remove expandable if appropriate.
-      instance.removeExpandable(message);
+      App.OperatorTicketView.showMessage(message);
     };
 
     /**
@@ -400,64 +379,14 @@
      * @param successCallback
      */
     this.loadMessage = function ($messageContainer, successCallback) {
-      // This holds the trimmed and original versions of the message.
-      var $text = $messageContainer.find('.sp-message-text');
-
-      // If we're not currently in the processing of loading the message, and the message has not previously
-      // been fetched then fire an AJAX request to load the message into the DOM.
-      if (!$messageContainer.hasClass('sp-message-text-loading') && !$text.children('.sp-message-text-original').hasClass('sp-message-text-loaded')) {
-        $messageContainer.find('.sp-message-text').append('<span class="sp-loading sp-description">' + '<i class="fas fa-spinner fa-pulse"></i>&nbsp; ' + Lang.get('general.loading') + '...' + '</span>');
-        $messageContainer.addClass('sp-message-text-loading');
-        messageDfdNext = messageDfdNext.then(function () {
-          return $.get(laroute.route('ticket.operator.message.showJson', {
-            id: $messageContainer.data('id')
-          })).done(function (ajax) {
-            // Load the message in, it should already be sanitized.
-            $text.children('.sp-message-text-original').html(ajax.data.purified_text).addClass('sp-message-text-loaded');
-
-            // Remove expandable - ONLY when expanding a message.
-            // We must do this after the content has been made visible to the user!
-            instance.removeExpandable($messageContainer);
-
-            // Load attachment previews if needed.
-            instance.loadAttachmentPreviews($messageContainer);
-
-            // If a callback exists, run it.
-            typeof successCallback === 'function' && successCallback();
-          }).fail(function () {
-            Swal.fire(Lang.get('messages.error'), Lang.get('messages.error_loading_message'), 'error');
-          }).always(function () {
-            // Unset loading icon.
-            $messageContainer.removeClass('sp-message-text-loading');
-            $messageContainer.find('.sp-message-text .sp-loading').remove();
-          });
-        });
-        return messageDfdNext;
-      } else {
-        // Message has already been loaded.
-
-        // Remove expandable if there's no other text visible.
-        instance.removeExpandable($messageContainer);
-
-        // Load attachment previews if needed.
-        instance.loadAttachmentPreviews($messageContainer);
-
-        // Run success callback if exists.
-        typeof successCallback === 'function' && successCallback();
-      }
+      return App.OperatorTicketView.loadMessage($messageContainer, successCallback);
     };
 
     /**
      * If the browser supports, it enable the download all attachments function.
      */
     this.showDownloadAllButton = function () {
-      if (ZipFile.isSupported()) {
-        $('#tabMessages').find('ul.sp-attachments').each(function () {
-          if ($(this).find('li').length > 1) {
-            $(this).find('.sp-download-all').show();
-          }
-        });
-      }
+      App.OperatorTicketView.showDownloadAllButton();
     };
 
     /**
@@ -482,25 +411,7 @@
      * @param $message
      */
     this.scrollToMessage = function ($message) {
-      // Uncollapse messages first
-      App.TicketViewAction.removeCollapsedMessageGroup();
-
-      // AJAX load the message into the view.
-      instance.loadMessage($message);
-
-      // Toggle collapsed state.
-      if ($message.hasClass('sp-message-collapsed')) {
-        $message.toggleClass('sp-message-collapsible sp-message-collapsed').find('.sp-message-text').children('.sp-message-text-original, .sp-message-text-trimmed').toggle();
-      }
-
-      // Special effects, set as blue for 3 seconds.
-      $message.addClass('sp-new-message');
-      setTimeout(function () {
-        $message.removeClass('sp-new-message');
-      }, 3000);
-
-      // Scroll to it.
-      instance.scrollTo($message.position().top);
+      App.OperatorTicketView.scrollToMessage($message);
     };
 
     /**
@@ -779,21 +690,7 @@
      * @returns {boolean}
      */
     this.getMessage = function (id) {
-      // id should be in the format notes-%ID% so we need to split it into those two components.
-      var components = id.split('-');
-      if (components.length !== 2 || !/^\d+$/.test(components[1])) {
-        return false;
-      }
-
-      // Check whether a note (displayed at the top) or a message has been requested.
-      var notesOnly = components[0].toUpperCase() === NOTES_PLACEHOLDER.replace('-%ID%', '').toUpperCase();
-
-      // Get messages.
-      var messages = $('.sp-message-' + components[1]).filter(function () {
-        var isInline = instance.getMessagePosition($(this)) === "inline";
-        return notesOnly ? !isInline : isInline;
-      });
-      return messages.length >= 1 ? messages.first() : false;
+      return App.OperatorTicketView.getMessage(id);
     };
 
     /**
@@ -803,10 +700,7 @@
      * @returns {string}
      */
     this.getMessagePosition = function ($message) {
-      if ($message.parents(".sp-messages-container[data-position='top']").length) {
-        return "top";
-      }
-      return "inline";
+      return App.OperatorTicketView.getMessagePosition($message);
     };
 
     /**
@@ -816,13 +710,7 @@
      * @returns {string}
      */
     this.getId = function ($message) {
-      // If the .messages-header doesn't exist in the previous siblings then we've been given
-      // a note that's displayed at the top of the page.
-      if (instance.getMessagePosition($message) === "top") {
-        return NOTES_PLACEHOLDER.replace('%ID%', $message.data('id'));
-      } else {
-        return MESSAGE_PLACEHOLDER.replace('%ID%', $message.data('id'));
-      }
+      return App.OperatorTicketView.getId($message);
     };
 
     /**
@@ -831,17 +719,7 @@
      * @param $message
      */
     this.removeExpandable = function ($message) {
-      var $quote = $message.find('.supportpal_quote:first');
-      if ($quote.length === 0) {
-        return;
-      }
-      var text = $message.children('.sp-message-text').children('.sp-message-text-original').text();
-
-      // Check if there is any text before the quoted text.
-      if (!text.substring(0, text.indexOf($quote.text())).trim().length) {
-        $quote.removeClass('supportpal_quote');
-        $quote.prev('.expandable').remove();
-      }
+      App.OperatorTicketView.removeExpandable($message);
     };
 
     /**
@@ -851,7 +729,7 @@
      */
     this.forwardFrom = function ($message) {
       // Uncollapse messages first
-      App.TicketViewAction.removeCollapsedMessageGroup();
+      SpTicket.TicketView.removeCollapsedMessageGroup();
 
       // Fetch the list of messages from this one based on the reply order, we always want latest first
       // like you would get in an email client.
@@ -1117,17 +995,6 @@
         }
       })
 
-      // Expand quoted areas
-      .on('click', '.expandable', function () {
-        $(this).next().toggle();
-      })
-
-      // Open links in a new window/tab. Needs rel="noopener" due to
-      // https://www.jitbit.com/alexblog/256-targetblank---the-most-underestimated-vulnerability-ever/
-      .on('click', '.sp-message .sp-message-text a', function () {
-        $(this).attr('target', '_blank').attr('rel', 'noopener');
-      })
-
       // Handle message actions button to show dropdown.
       .on('click', '.sp-message .sp-dropdown-container .sp-action', function (e) {
         var $message = $(this).parents('.sp-message');
@@ -1313,31 +1180,6 @@
             }
           }
         });
-      });
-    };
-
-    /**
-     * Print the entire ticket.
-     */
-    this.print = function () {
-      var deferred = [];
-      $('.sp-message').each(function (index, message) {
-        deferred.push(instance.loadMessage($(message)));
-      });
-
-      // Lock the interface and show a waiting spinner (this may take a while on a large ticket).
-      Swal.fire({
-        title: Lang.get('general.loading'),
-        allowOutsideClick: false,
-        didClose: function () {
-          window.print();
-        }
-      });
-      Swal.showLoading();
-
-      // Can't pass a literal array, so use apply.
-      $.when.apply($, deferred).then(function () {
-        Swal.close();
       });
     };
 
