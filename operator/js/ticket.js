@@ -27,17 +27,6 @@
     };
 
     /**
-     * Message drafts.
-     *
-     * @type {{newMessage: null, newNote: null, newForward: null}}
-     */
-    var drafts = {
-      'newMessage': null,
-      'newNote': null,
-      'newForward': null
-    };
-
-    /**
      * If the Datatables have been loaded
      *
      * @type {object}
@@ -477,7 +466,7 @@
      * @returns {string}
      */
     this.normaliseMessage = function (str) {
-      return str.replace('<p></p>', '<p>&nbsp;</p>');
+      return SpTicket.OperatorDraftMessage.normaliseMessage(str);
     };
 
     /**
@@ -486,7 +475,7 @@
      * @returns {{newMessage: null, newNote: null}}
      */
     this.getDrafts = function () {
-      return drafts;
+      return App.OperatorDraftMessage.getDrafts();
     };
 
     /**
@@ -496,7 +485,7 @@
      * @param value
      */
     this.setDraft = function (key, value) {
-      drafts[key] = value;
+      App.OperatorDraftMessage.setDraft(key, value);
     };
 
     /**
@@ -507,8 +496,7 @@
      * @returns {boolean}
      */
     this.draftHasChanged = function (key, new_value) {
-      new_value = this.normaliseMessage(new_value);
-      return this.normaliseMessage(drafts[key]) !== new_value && new_value !== '';
+      return App.OperatorDraftMessage.draftHasChanged(key, new_value);
     };
 
     /**
@@ -527,7 +515,7 @@
      * @param message
      */
     this.setMessageDraft = function (message) {
-      drafts.newMessage = message;
+      App.OperatorDraftMessage.setMessageDraft(message);
     };
 
     /**
@@ -536,7 +524,7 @@
      * @returns {string}
      */
     this.getMessageDraft = function () {
-      return drafts.newMessage;
+      return App.OperatorDraftMessage.getMessageDraft();
     };
 
     /**
@@ -555,7 +543,7 @@
      * @param message
      */
     this.setNoteDraft = function (message) {
-      drafts.newNote = message;
+      App.OperatorDraftMessage.setNoteDraft(message);
     };
 
     /**
@@ -564,7 +552,7 @@
      * @returns {string}
      */
     this.getNoteDraft = function () {
-      return drafts.newNote;
+      return App.OperatorDraftMessage.getNoteDraft();
     };
 
     /**
@@ -583,7 +571,7 @@
      * @param message
      */
     this.setForwardDraft = function (message) {
-      drafts.newForward = message;
+      App.OperatorDraftMessage.setForwardDraft(message);
     };
 
     /**
@@ -592,7 +580,7 @@
      * @returns {string}
      */
     this.getForwardDraft = function () {
-      return drafts.newForward;
+      return App.OperatorDraftMessage.getForwardDraft();
     };
 
     /**

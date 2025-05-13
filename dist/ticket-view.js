@@ -649,14 +649,11 @@
     __extends(OperatorDraftMessage, _super);
     function OperatorDraftMessage(replyTemplate) {
       var _this = _super.call(this) || this;
-      _this.messageId = 'newMessage';
-      _this.noteId = 'newNote';
-      _this.forwardId = 'newForward';
       _this.replyTemplate = replyTemplate;
       return _this;
     }
     OperatorDraftMessage.prototype.getTextEditors = function () {
-      return [this.messageId, this.noteId, this.forwardId];
+      return [OperatorDraftMessage.messageId, OperatorDraftMessage.noteId, OperatorDraftMessage.forwardId];
     };
     OperatorDraftMessage.prototype.getStoreRoute = function () {
       return laroute.route('ticket.operator.message.store');
@@ -672,13 +669,13 @@
       };
     };
     OperatorDraftMessage.prototype.setMessageDraft = function (value) {
-      this.setDraft(this.messageId, value);
+      this.setDraft(OperatorDraftMessage.messageId, value);
     };
     OperatorDraftMessage.prototype.setNoteDraft = function (value) {
-      this.setDraft(this.noteId, value);
+      this.setDraft(OperatorDraftMessage.noteId, value);
     };
     OperatorDraftMessage.prototype.setForwardDraft = function (value) {
-      this.setDraft(this.forwardId, value);
+      this.setDraft(OperatorDraftMessage.forwardId, value);
     };
     OperatorDraftMessage.prototype.saveDraft = function ($form, useBeacon) {
       var editor = $form.find('textarea:not(.CodeMirror textarea):eq(0)').editor(),
@@ -751,6 +748,9 @@
         return response;
       });
     };
+    OperatorDraftMessage.messageId = 'newMessage';
+    OperatorDraftMessage.noteId = 'newNote';
+    OperatorDraftMessage.forwardId = 'newForward';
     return OperatorDraftMessage;
   }(DraftMessage);
   var OperatorTicket = /** @class */function (_super) {
