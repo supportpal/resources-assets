@@ -230,7 +230,7 @@ $(document).ready(function () {
   function showMessage(message) {
     // Show new message
     if (descReplyOrder) {
-      message = $(message).prependTo($('.sp-message-block'));
+      message = $(message).prependTo($('.sp-messages-container'));
     } else {
       message = $(message).insertAfter($('.sp-message').last());
     }

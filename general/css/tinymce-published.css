@@ -1,71 +1,105 @@
+/* Do not use Tailwind CSS classes in this file, as it is in emails and CSS variables are not available. */
+
 .sp-editor-content h1,
 .sp-editor-content h2,
 .sp-editor-content h3,
 .sp-editor-content h4,
 .sp-editor-content h5,
 .sp-editor-content h6 {
-    @apply sp-mt-0 sp-mb-6 sp-font-display sp-font-bold sp-text-primary;
+    margin-bottom: 1.5rem;
+    margin-top: 0;
+    font-family: 'Inter', 'Segoe UI', Arial, sans-serif;
+    font-weight: bold;
+    color: #2d3748;
 }
 
 .sp-editor-content h1 {
-    @apply sp-text-3xl;
+    font-size: 1.875rem; /* 3xl */
 }
 
 .sp-editor-content h2 {
-    @apply sp-text-2xl;
+    font-size: 1.5rem; /* 2xl */
 }
 
 .sp-editor-content h3 {
-    @apply sp-text-xl;
+    font-size: 1.25rem; /* xl */
 }
 
 .sp-editor-content h4 {
-    @apply sp-text-lg;
+    font-size: 1.125rem; /* lg */
 }
 
 .sp-editor-content h5,
 .sp-editor-content h6 {
-    @apply sp-text-base;
+    font-size: 1rem; /* base */
 }
 
 .sp-editor-content h6 {
-    @apply sp-font-semibold;
+    font-weight: 600;
 }
 
 .sp-editor-content p {
-    @apply sp-m-0;
+    margin: 0;
 }
 
 .sp-editor-content ol,
 .sp-editor-content ul {
-    @apply sp-ps-6 sp-list-decimal sp-my-4;
+    padding-left: 1.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    list-style-type: decimal;
 }
 
 .sp-editor-content ul {
-    @apply sp-list-disc;
+    list-style-type: disc;
 }
 
 .sp-editor-content ul ul {
-    @apply sp-list-circle;
+    list-style-type: circle;
 }
 
 .sp-editor-content blockquote {
-    @apply sp-ps-3 sp-ms-2 sp-my-4 sp-border-0 sp-border-s-4 sp-border-solid sp-border-tertiary;
+    padding-left: 0.75rem;
+    margin-left: 0.5rem;
+    margin-top: 1rem;
+    margin-bottom: 1rem;
+    border-left: 4px solid #e2e8f0;
+    border-top: 0;
+    border-bottom: 0;
+    border-right: 0;
 }
 
 .sp-editor-content pre:not(.moz-signature),
 .sp-editor-content code {
-    @apply sp-font-code;
+    font-family: 'Fira Mono', 'Menlo', 'Monaco', 'Consolas', monospace;
 }
 
 .sp-editor-content pre:not(.moz-signature) {
-    @apply sp-p-4 sp-m-0 sp-bg-secondary sp-shadow sp-rounded sp-overflow-auto sp-whitespace-pre-wrap;
+    padding: 1rem;
+    margin: 0;
+    background: #edf2f7;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+    border-radius: 0.5rem;
+    overflow: auto;
+    white-space: pre-wrap;
+}
+
+.sp-theme-dark .sp-editor-content pre:not(.moz-signature),
+.sp-editor-content.sp-theme-dark pre:not(.moz-signature) {
+    background: #37474f;
 }
 
 .sp-editor-content code[class*=language-],
 .sp-editor-content pre[class*=language-] {
-    @apply sp-text-primary;
+    color: #2d3748;
     text-shadow: none;
+}
+
+.sp-theme-dark .sp-editor-content code[class*=language-],
+.sp-editor-content.sp-theme-dark code[class*=language-],
+.sp-theme-dark .sp-editor-content pre[class*=language-],
+.sp-editor-content.sp-theme-dark pre[class*=language-] {
+    color: #e2f1f8;
 }
 
 .sp-editor-content table tbody,
@@ -76,10 +110,29 @@
 }
 
 .sp-editor-content .sp-mention {
-    @apply sp-inline-flex sp-items-center sp-px-1 sp-py-1/2 sp-rounded sp-text-sm;
-    @apply sp-bg-tertiary sp-text-secondary dark:sp-bg-tertiary !important;
+    display: inline-flex;
+    align-items: center;
+    padding-left: 0.25rem;
+    padding-right: 0.25rem;
+    padding-top: 0.125rem;
+    padding-bottom: 0.125rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    background: #e2e8f0;
+    color: #718096;
+}
+
+.sp-theme-dark .sp-editor-content .sp-mention,
+.sp-editor-content.sp-theme-dark .sp-mention {
+    background: #455a64;
+    color: #c1d5e0;
 }
 
 .sp-editor-content .sp-mention.sp-current-user {
-    @apply sp-bg-primary-100 dark:sp-bg-primary-800 !important;
+    background: #bbdefb;
+}
+
+.sp-theme-dark .sp-editor-content .sp-mention.sp-current-user,
+.sp-editor-content.sp-theme-dark .sp-mention.sp-current-user {
+    background: #102027;
 }

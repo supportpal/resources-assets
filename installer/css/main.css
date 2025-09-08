@@ -13314,6 +13314,14 @@ ul.sp-article-comments .sp-comment-score{
   background-color: var(--color-background-secondary) !important;
 }
 
+.sp-message .sp-message-text .sp-mention:is(.sp-theme-dark *){
+  background-color: var(--color-background-secondary) !important;
+}
+
+.sp-message .sp-message-text .sp-mention.sp-current-user:is(.sp-theme-dark *){
+  background-color: var(--color-primary-800) !important;
+}
+
 .sp-message ul.sp-attachments > li{
   max-width: 16rem;
 }

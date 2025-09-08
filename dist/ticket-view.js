@@ -621,7 +621,7 @@
       return $('meta[name="ticket-subject"]').prop('content');
     };
     FrontendTicket.prototype.getMessagesContainer = function () {
-      return $('.sp-message-block');
+      return $('.sp-messages-container');
     };
     FrontendTicket.prototype.getMessage = function (hash) {
       // id should be in the format notes-%ID% so we need to split it into those two components.
@@ -762,7 +762,7 @@
       return $('.sp-ticket-subject').text();
     };
     OperatorTicket.prototype.getMessagesContainer = function () {
-      return $('#tabMessages');
+      return $('.sp-messages-container');
     };
     OperatorTicket.prototype.getMessage = function (hash) {
       // id should be in the format notes-%ID% so we need to split it into those two components.
