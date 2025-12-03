@@ -13,6 +13,21 @@
     color: #2d3748;
 }
 
+.sp-theme-dark .sp-editor-content h1,
+.sp-editor-content.sp-theme-dark h1,
+.sp-theme-dark .sp-editor-content h2,
+.sp-editor-content.sp-theme-dark h2,
+.sp-theme-dark .sp-editor-content h3,
+.sp-editor-content.sp-theme-dark h3,
+.sp-theme-dark .sp-editor-content h4,
+.sp-editor-content.sp-theme-dark h4,
+.sp-theme-dark .sp-editor-content h5,
+.sp-editor-content.sp-theme-dark h5,
+.sp-theme-dark .sp-editor-content h6,
+.sp-editor-content.sp-theme-dark h6 {
+    color: #e2f1f8;
+}
+
 .sp-editor-content h1 {
     font-size: 1.875rem; /* 3xl */
 }
@@ -67,6 +82,11 @@
     border-top: 0;
     border-bottom: 0;
     border-right: 0;
+}
+
+.sp-theme-dark .sp-editor-content blockquote,
+.sp-editor-content.sp-theme-dark blockquote {
+    border-left-color: #455a64;
 }
 
 .sp-editor-content pre:not(.moz-signature),

@@ -52,7 +52,7 @@ $(document).ready(function () {
         return '<div class="item">' + '<img class="sp-avatar sp-max-w-2xs" src=" ' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.email ? ' <span class="sp-description">' + escape('<' + item.email + '>') + '</span>' : '') + '</div>';
       },
       option: function (item, escape) {
-        return '<div>' + '<img <img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.email ? ' <span class="sp-description">' + escape('<' + item.email + '>') + '</span>' : '') + '</div>';
+        return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.email ? ' <span class="sp-description">' + escape('<' + item.email + '>') + '</span>' : '') + '</div>';
       }
     },
     load: function (query, callback) {
