@@ -33,7 +33,7 @@ jQuery(function ($) {
    */
   $("#sortable").sortable({
     draggable: '.option',
-    ghostClass: 'sp-opacity-50',
+    ghostClass: 'sp:opacity-50',
     handle: '.sp-sortable-handle'
   });
 
@@ -53,12 +53,12 @@ jQuery(function ($) {
 
     // Hide encrypt and regex fields if not password, text or textarea
     if ($(this).val() == '6' || $(this).val() == '8' || $(this).val() == '9') {
-      $('.encrypt-field').removeClass('sp-hidden');
-      $('.customfield-regex').removeClass('sp-hidden');
+      $('.encrypt-field').removeClass('sp:hidden');
+      $('.customfield-regex').removeClass('sp:hidden');
     } else {
       $('.encrypt-field').find('input').prop('checked', false);
-      $('.encrypt-field').addClass('sp-hidden');
-      $('.customfield-regex').addClass('sp-hidden');
+      $('.encrypt-field').addClass('sp:hidden');
+      $('.customfield-regex').addClass('sp:hidden');
     }
   });
 
@@ -73,7 +73,7 @@ jQuery(function ($) {
   $select_dependentField = $('select[name="depends_on_field_id"]').selectize({
     allowEmptyOption: true,
     onChange: function (value) {
-      var routeName = this.$input.data('route');
+      var routeName = $(this.input).data('route');
 
       // The field depends on another field, so hide the visibility options.
       if (value !== "") {

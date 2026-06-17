@@ -1,19 +1,25 @@
-.tippy-box {
-    @apply sp-text-center dark:sp-bg-primary-100 dark:sp-text-primary-900 dark:sp-text-center;
-}
+@import "../../../../node_modules/tippy.js/dist/tippy.css" layer(components);
 
-.tippy-box[data-placement^=top] > .tippy-arrow::before {
-    @apply dark:sp-border-t-[var(--color-primary-100)];
-}
+@reference '#tailwind-base';
 
-.tippy-box[data-placement^=bottom] > .tippy-arrow::before {
-    @apply dark:sp-border-b-[var(--color-primary-100)];
-}
+@layer components {
+  .tippy-box {
+    @apply sp:text-center sp:dark:bg-primary-100 sp:dark:text-primary-900 sp:dark:text-center;
+  }
 
-.tippy-box[data-placement^=left] > .tippy-arrow::before {
-    @apply dark:sp-border-s-[var(--color-primary-100)];
-}
+  .tippy-box[data-placement^=top] > .tippy-arrow {
+    @apply sp:dark:before:border-t-primary-100;
+  }
 
-.tippy-box[data-placement^=right] > .tippy-arrow::before {
-    @apply dark:sp-border-e-[var(--color-primary-100)];
+  .tippy-box[data-placement^=bottom] > .tippy-arrow {
+    @apply sp:dark:before:border-b-primary-100;
+  }
+
+  .tippy-box[data-placement^=left] > .tippy-arrow {
+    @apply sp:dark:before:border-s-primary-100;
+  }
+
+  .tippy-box[data-placement^=right] > .tippy-arrow {
+    @apply sp:dark:before:border-e-primary-100;
+  }
 }

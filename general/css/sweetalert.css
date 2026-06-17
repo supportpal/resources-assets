@@ -1,154 +1,159 @@
-body.swal2-height-auto {
-    @apply sp-h-full !important;
-}
+@import "../../../../node_modules/@supportpal/sweetalert2/dist/sweetalert2.css" layer(components);
 
-.swal2-container {
+@reference '#tailwind-base';
+
+@layer components {
+  body.swal2-height-auto {
+    @apply sp:h-full!;
+  }
+
+  .swal2-container {
     z-index: 10050;
-}
+  }
 
-.swal2-modal {
-    @apply dark:sp-bg-primary dark:sp-shadow-md;
+  .swal2-modal {
+    @apply sp:dark:bg-primary sp:dark:shadow-md;
     font-family: inherit;
-}
+  }
 
-.swal2-popup {
-    @apply sp-p-6;
-}
+  .swal2-popup {
+    @apply sp:p-6;
+  }
 
-.swal2-title {
-    @apply sp-p-0 sp-mb-3 sp-text-primary;
-}
+  .swal2-title {
+    @apply sp:p-0 sp:mb-3 sp:text-primary;
+  }
 
-.swal2-html-container {
-    @apply sp-text-base sp-text-primary sp-leading-normal sp-overflow-visible sp-z-10;
-}
+  .swal2-html-container {
+    @apply sp:text-base sp:text-primary sp:leading-normal sp:overflow-visible sp:z-10;
+  }
 
-.swal2-modal hr {
-    @apply sp-mx-0 sp-my-2;
-}
+  .swal2-modal hr {
+    @apply sp:mx-0 sp:my-2;
+  }
 
-.swal2-icon::before {
-    @apply sp-flex-col;
-}
+  .swal2-icon::before {
+    @apply sp:flex-col;
+  }
 
-.swal2-icon.swal2-info,
-.swal2-icon.swal2-question {
-    @apply sp-border-blue-500 sp-text-blue-800;
-}
+  .swal2-icon.swal2-info,
+  .swal2-icon.swal2-question {
+    @apply sp:border-blue-500 sp:text-blue-800;
+  }
 
-.swal2-icon.swal2-error {
-    @apply sp-border-red-500;
-}
+  .swal2-icon.swal2-error {
+    @apply sp:border-red-500;
+  }
 
-.swal2-icon.swal2-error [class^=swal2-x-mark-line] {
-    @apply sp-bg-red-500;
-}
+  .swal2-icon.swal2-error [class^=swal2-x-mark-line] {
+    @apply sp:bg-red-500;
+  }
 
-.swal2-icon.swal2-success,
-.swal2-icon.swal2-success .swal2-success-ring {
-    @apply sp-border-green-500;
-}
+  .swal2-icon.swal2-success,
+  .swal2-icon.swal2-success .swal2-success-ring {
+    @apply sp:border-green-500;
+  }
 
-.swal2-icon.swal2-success [class^=swal2-success-line] {
-    @apply sp-bg-green-500;
-}
+  .swal2-icon.swal2-success [class^=swal2-success-line] {
+    @apply sp:bg-green-500;
+  }
 
-.swal2-icon.swal2-warning {
-    @apply sp-border-yellow-500 sp-text-yellow-800;
-}
+  .swal2-icon.swal2-warning {
+    @apply sp:border-yellow-500 sp:text-yellow-800;
+  }
 
-.swal2-modal button {
-    @apply sp-h-auto;
-}
+  .swal2-modal button {
+    @apply sp:h-auto;
+  }
 
-.swal2-styled:focus {
-    @apply sp-shadow-none !important;
-}
+  .swal2-styled:focus {
+    @apply sp:shadow-none!;
+  }
 
-.swal2-file,
-.swal2-input,
-.swal2-textarea {
-    @apply sp-text-base sp-text-primary sp-leading-normal sp-z-10;
-}
+  .swal2-file,
+  .swal2-input,
+  .swal2-textarea {
+    @apply sp:text-base sp:text-primary sp:leading-normal sp:z-10;
+  }
 
-.swal2-file,
-.swal2-input,
-.swal2-textarea,
-.swal2-file:focus,
-.swal2-input:focus,
-.swal2-textarea:focus {
-    @apply sp-border-2 sp-border-secondary sp-shadow-none;
-}
+  .swal2-file,
+  .swal2-input,
+  .swal2-textarea,
+  .swal2-file:focus,
+  .swal2-input:focus,
+  .swal2-textarea:focus {
+    @apply sp:border-2 sp:border-secondary sp:shadow-none;
+  }
 
-.swal2-actions:not(.swal2-loading) .swal2-styled:active,
-.swal2-actions:not(.swal2-loading) .swal2-styled:hover {
-    @apply sp-bg-none dark:sp-text-white;
-}
+  .swal2-actions:not(.swal2-loading) .swal2-styled:active,
+  .swal2-actions:not(.swal2-loading) .swal2-styled:hover {
+    @apply sp:bg-none sp:dark:text-white;
+  }
 
-.swal2-actions:not(.swal2-loading) .swal2-styled[style*="background-color"]:not(.swal2-cancel):hover {
-    background-image: linear-gradient(rgba(0,0,0,.2),rgba(0,0,0,.2));
-}
+  .swal2-actions:not(.swal2-loading) .swal2-styled[style*="background-color"]:not(.swal2-cancel):hover {
+    background-image: linear-gradient(rgba(0, 0, 0, .2), rgba(0, 0, 0, .2));
+  }
 
-.swal2-styled.swal2-confirm {
-    @apply sp-bg-primary-800;
-}
+  .swal2-styled.swal2-confirm {
+    @apply sp:bg-primary-800;
+  }
 
-.swal2-styled.swal2-confirm:hover {
-    @apply sp-bg-primary-900;
-}
+  .swal2-styled.swal2-confirm:hover {
+    @apply sp:bg-primary-900;
+  }
 
-button.swal2-styled.swal2-confirm:hover {
-    @apply sp-text-white;
-}
+  button.swal2-styled.swal2-confirm:hover {
+    @apply sp:text-white;
+  }
 
-.swal2-styled.swal2-cancel {
-    @apply sp-bg-secondary sp-text-primary;
-}
+  .swal2-styled.swal2-cancel {
+    @apply sp:bg-secondary sp:text-primary;
+  }
 
-.swal2-styled.swal2-cancel:hover {
-    @apply sp-bg-tertiary;
-}
+  .swal2-styled.swal2-cancel:hover {
+    @apply sp:bg-tertiary;
+  }
 
-.swal2-actions.swal2-loading .swal2-styled.swal2-confirm {
-    @apply sp-m-3/2;
-}
+  .swal2-actions.swal2-loading .swal2-styled.swal2-confirm {
+    @apply sp:m-1.5;
+  }
 
-.swal2-file.swal2-inputerror,
-.swal2-input.swal2-inputerror,
-.swal2-textarea.swal2-inputerror {
-    @apply sp-border-red-500 sp-shadow-none !important;
-}
+  .swal2-file.swal2-inputerror,
+  .swal2-input.swal2-inputerror,
+  .swal2-textarea.swal2-inputerror {
+    @apply sp:border-red-500! sp:shadow-none!;
+  }
 
-.swal2-validation-message {
-    @apply sp-mt-6 sp-bg-secondary sp-text-secondary;
-}
+  .swal2-validation-message {
+    @apply sp:mt-6 sp:bg-secondary sp:text-secondary;
+  }
 
-.swal2-validation-message::before {
-    @apply sp-bg-red-500;
-}
+  .swal2-validation-message::before {
+    @apply sp:bg-red-500;
+  }
 
-.swal2-close {
-    @apply sp-shadow-none;
-}
+  .swal2-close {
+    @apply sp:shadow-none;
+  }
 
-.swal2-close:hover {
-    @apply sp-bg-transparent !important;
-}
+  .swal2-close:hover {
+    @apply sp:bg-transparent sp:text-white;
+  }
 
-/* Modal form inputs */
+  /* Modal form inputs */
+  .swal2-modal .sp-form-row {
+    @apply sp:block;
+  }
 
-.swal2-modal .sp-form-row {
-    @apply sp-block;
-}
+  .swal2-modal .sp-form-row:last-child {
+    @apply sp:mb-0;
+  }
 
-.swal2-modal .sp-form-row:last-child {
-    @apply sp-mb-0;
-}
+  .swal2-modal .sp-form-row > label {
+    @apply sp:w-auto sp:pt-0 sp:pe-0 sp:text-start;
+  }
 
-.swal2-modal .sp-form-row > label {
-    @apply sp-w-auto sp-pt-0 sp-pe-0 sp-text-start;
-}
-
-.swal2-modal .sp-form-row > label:empty {
-    @apply sp-p-0;
+  .swal2-modal .sp-form-row > label:empty {
+    @apply sp:p-0;
+  }
 }

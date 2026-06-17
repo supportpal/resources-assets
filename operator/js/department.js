@@ -11,7 +11,7 @@ jQuery(function ($) {
    */
   var xhr;
   var $parent = $('select[name=parent]').selectize({
-    plugins: ['disableDelete'],
+    plugins: ['disable_delete'],
     valueField: 'id',
     labelField: 'name',
     searchField: 'name',
@@ -103,10 +103,10 @@ jQuery(function ($) {
     placeholder: Lang.get('user.select_groups'),
     render: {
       item: function (item, escape) {
-        return '<div class="item">' + '<i class="fas fa-circle" style="color: ' + escape(item.colour) + ';"></i> &nbsp;' + escape(item.name) + '</div>';
+        return '<div class="item">' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + ';"></i> &nbsp;' + escape(item.name) + '</div>';
       },
       option: function (item, escape) {
-        return '<div>' + '<i class="fas fa-circle" style="color: ' + escape(item.colour) + ';"></i> &nbsp;' + escape(item.name) + '</div>';
+        return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + ';"></i> &nbsp;' + escape(item.name) + '</div>';
       }
     },
     onChange: function (values) {
@@ -128,10 +128,10 @@ jQuery(function ($) {
     placeholder: Lang.get('user.select_operators'),
     render: {
       item: function (item, escape) {
-        return '<div class="item">' + '<img class="sp-avatar sp-max-w-3xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+        return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
       },
       option: function (item, escape) {
-        return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+        return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
       }
     },
     onChange: function (values) {
@@ -148,10 +148,10 @@ jQuery(function ($) {
     maxItems: null,
     render: {
       item: function (item, escape) {
-        return '<div class="item">' + '<img class="sp-avatar sp-max-w-3xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+        return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
       },
       option: function (item, escape) {
-        return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+        return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
       }
     }
   });
@@ -211,14 +211,14 @@ jQuery(function ($) {
   // Handle hiding delete downloaded option when POP3 is selected
   .on('change', '.email-protocol select', function () {
     if ($(this).val() == 0) {
-      $(this).parents('.email-download').find('.delete-downloaded').removeClass('sp-hidden');
+      $(this).parents('.email-download').find('.delete-downloaded').removeClass('sp:hidden');
     } else {
-      $(this).parents('.email-download').find('.delete-downloaded').addClass('sp-hidden');
+      $(this).parents('.email-download').find('.delete-downloaded').addClass('sp:hidden');
     }
   })
   // Show manual config options and hide button.
   .on('click', '.sp-configure-email-button button', function () {
-    $(this).parents('.email-download').find('div.sp-configure-email').removeClass('sp-hidden');
+    $(this).parents('.email-download').find('div.sp-configure-email').removeClass('sp:hidden');
     $(this).parent('div.sp-configure-email-button').remove();
   })
   // Get / Reset Access Token
@@ -267,8 +267,8 @@ jQuery(function ($) {
   .on('change', 'select[name$="[auth_mech]"]', function () {
     var $email = $(this).parents('.departmentEmail'),
       isOAuth = $(this).val() == 'oauth';
-    $email.find(isOAuth ? '.password-form' : '.oauth-form').addClass('sp-hidden');
-    $email.find(isOAuth ? '.oauth-form' : '.password-form').removeClass('sp-hidden');
+    $email.find(isOAuth ? '.password-form' : '.oauth-form').addClass('sp:hidden');
+    $email.find(isOAuth ? '.oauth-form' : '.password-form').removeClass('sp:hidden');
 
     // If OAuth, disable the POP3 option and select IMAP.
     $email.find('select[name$="[protocol]"] option[value=1]').prop('disabled', isOAuth);
@@ -282,17 +282,17 @@ jQuery(function ($) {
 
   // Handle Disable User Replies.
   $('input[name="disable_user_email_replies"]').on('change', function () {
-    $('#disableRepliesTemplate').toggleClass('sp-hidden');
+    $('#disableRepliesTemplate').toggleClass('sp:hidden');
   });
 
   // Handle Registered Users Only.
   $('input[name="registered_only"]').on('change', function () {
-    $('#registeredOnlyTemplate').toggleClass('sp-hidden');
+    $('#registeredOnlyTemplate').toggleClass('sp:hidden');
   });
 
   // Convert email template dropdowns to use selectize.
   $('.department-templates').find('select').selectize({
-    plugins: ['disableDelete']
+    plugins: ['disable_delete']
   });
 
   /**
@@ -333,7 +333,7 @@ jQuery(function ($) {
     }).catch(function () {
       // Error - reset to default and require manual set up.
       configureDefault($email);
-      $email.find('.sp-configure-email-button button').click();
+      $email.find('.sp-configure-email-button button').trigger('click');
     });
   }
 
@@ -531,7 +531,7 @@ function updateEmailBrands(context, values) {
   var options = [];
   for (var i = 0; i < values.length; i++) {
     options.push({
-      'text': context.getItem(values[i]).data('name'),
+      'text': $(context.getItem(values[i])).data('name'),
       'value': values[i]
     });
   }

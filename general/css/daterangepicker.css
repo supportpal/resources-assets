@@ -1,89 +1,95 @@
-.daterangepicker * {
-    @apply sp-text-sm !important;
-}
+@import "../../../../node_modules/daterangepicker/daterangepicker.css" layer(components);
 
-.daterangepicker {
-    @apply sp-bg-primary sp-border-tertiary sp-overflow-auto;
-    max-height: calc(100% - 7rem);
-}
+@reference '#tailwind-base';
 
-.daterangepicker:before {
-    border-bottom-color: var(--color-background-tertiary);
-}
-.daterangepicker:after {
-    border-bottom-color: var(--color-background-primary);
-}
+@layer components {
+  .daterangepicker * {
+    @apply sp:text-sm!;
+  }
 
-.daterangepicker.opensright:before {
-    inset-inline-start: 15px;
-}
-.daterangepicker.opensright:after {
-    @apply sp-start-4;
-}
+  .daterangepicker {
+    @apply sp:max-h-[calc(100%-7rem)] sp:bg-primary sp:border-tertiary sp:overflow-auto;
+  }
 
-.daterangepicker.show-ranges.ltr .drp-calendar.left {
-    border-left-color: var(--color-background-tertiary);
-}
+  .daterangepicker:before {
+    @apply sp:border-b-tertiary;
+  }
 
-.daterangepicker .drp-buttons {
-    border-top-color: var(--color-background-tertiary);
-}
+  .daterangepicker:after {
+    @apply sp:border-b-primary;
+  }
 
-.daterangepicker .ranges li:hover {
-    @apply sp-bg-secondary;
-}
+  .daterangepicker.opensright:before {
+    @apply sp:start-4;
+  }
 
-.daterangepicker .calendar-table {
-    @apply sp-bg-primary sp-border-0;
-}
+  .daterangepicker.opensright:after {
+    @apply sp:start-4;
+  }
 
-.daterangepicker .calendar-table .next span,
-.daterangepicker .calendar-table .prev span {
-    border-color: var(--color-text-primary);
-}
+  .daterangepicker.show-ranges.ltr .drp-calendar.left {
+    @apply sp:border-l-tertiary;
+  }
 
-.daterangepicker .calendar-table .next span {
-    margin-inline-end: 3px;
-}
+  .daterangepicker .drp-buttons {
+    @apply sp:border-t-tertiary;
+  }
 
-.daterangepicker .calendar-table .prev span {
-    @apply sp-ms-1/2;
-}
+  .daterangepicker .ranges li:hover {
+    @apply sp:bg-secondary;
+  }
 
-.daterangepicker select.monthselect,
-.daterangepicker select.yearselect {
-    @apply sp-w-auto sp-px-2 sp-py-1 sp-pe-7;
-    min-height: auto;
-}
+  .daterangepicker .calendar-table {
+    @apply sp:bg-primary sp:border-0;
+  }
 
-.daterangepicker td.active,
-.daterangepicker td.active:hover,
-.daterangepicker .ranges li.active,
-.daterangepicker td.active.in-range,
-.daterangepicker td.active.available:hover,
-.daterangepicker td.active.in-range.available:hover {
-    @apply sp-bg-primary-900 sp-text-white sp-font-bold;
-}
+  .daterangepicker .calendar-table .next span,
+  .daterangepicker .calendar-table .prev span {
+    @apply sp:border-(--color-text-primary);
+  }
 
-.daterangepicker td.in-range,
-.daterangepicker td.in-range.available:hover {
-    @apply sp-bg-tertiary sp-text-primary;
-}
+  .daterangepicker .calendar-table .next span {
+    @apply sp:me-0.5;
+  }
 
-.daterangepicker td.available:hover,
-.daterangepicker th.available:hover {
-    @apply sp-bg-secondary;
-}
+  .daterangepicker .calendar-table .prev span {
+    @apply sp:ms-0.5;
+  }
 
-.daterangepicker td:not(.available),
-.daterangepicker th:not(.available) {
-    @apply sp-cursor-auto;
-}
+  .daterangepicker select.monthselect,
+  .daterangepicker select.yearselect {
+    @apply sp:w-auto sp:min-h-auto sp:px-2 sp:py-1 sp:pe-7;
+  }
 
-.daterangepicker td.off,
-.daterangepicker td.off.in-range,
-.daterangepicker td.off.start-date,
-.daterangepicker td.off.end-date,
-.daterangepicker td.off.available:hover {
-    @apply sp-bg-transparent sp-text-tertiary;
+  .daterangepicker td.active,
+  .daterangepicker td.active:hover,
+  .daterangepicker .ranges li.active,
+  .daterangepicker td.active.in-range,
+  .daterangepicker td.active.available:hover,
+  .daterangepicker td.active.in-range.available:hover {
+    @apply sp:bg-primary-900 sp:text-white sp:font-bold;
+  }
+
+  .daterangepicker td.in-range,
+  .daterangepicker td.in-range.available:hover {
+    @apply sp:bg-tertiary sp:text-primary;
+  }
+
+  .daterangepicker td.available:hover,
+  .daterangepicker th.available:hover {
+    @apply sp:bg-secondary;
+  }
+
+  .daterangepicker td:not(.available),
+  .daterangepicker th:not(.available) {
+    @apply sp:cursor-auto;
+  }
+
+  .daterangepicker td.off,
+  .daterangepicker td.off.in-range,
+  .daterangepicker td.off.start-date,
+  .daterangepicker td.off.end-date,
+  .daterangepicker td.off.available:hover {
+    @apply sp:bg-transparent sp:text-tertiary;
+  }
 }

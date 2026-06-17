@@ -12,7 +12,7 @@ $(document).ready(function () {
     if (selected.length) {
       // Show the field that depends on the selected option.
       var $element = $('[data-depends-on-option="' + selected + '"]');
-      $element.removeClass('sp-hidden');
+      $element.removeClass('sp:hidden');
       resetForm($element, $element.data('locked') === 1);
 
       // Check whether the field has a value selected, if so we can want to show any dependent fields.
@@ -28,7 +28,7 @@ $(document).ready(function () {
     if (children && children.length > 0) {
       $.each(children, function (index, value) {
         var $element = $('[data-field="' + value + '"]');
-        $element.addClass('sp-hidden');
+        $element.addClass('sp:hidden');
         resetForm($element, true);
       });
     }

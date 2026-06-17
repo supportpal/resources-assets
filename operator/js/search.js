@@ -1,57 +1,18 @@
 $(document.body).ready(function () {
-  // Show a No Results message if the server returns no data.
-  Selectize.define('no_results', function (options) {
-    var self = this;
-    options = $.extend({
-      message: Lang.get('messages.no_results'),
-      html: function (data) {
-        return '<div class="selectize-dropdown ' + data.classNames + ' dropdown-empty-message">' + '<div class="selectize-dropdown-content sp-p-3">' + data.message + '</div>' + '</div>';
-      }
-    }, options);
-    self.displayEmptyResultsMessage = function () {
-      this.$empty_results_container.css('top', this.$control.outerHeight());
-      this.$empty_results_container.css('width', this.$control.outerWidth());
-      this.$empty_results_container.show();
-    };
-    self.onKeyDown = function () {
-      var original = self.onKeyDown;
-      return function (e) {
-        original.apply(self, arguments);
-        this.$empty_results_container.hide();
-      };
-    }();
-    self.onBlur = function () {
-      var original = self.onBlur;
-      return function () {
-        original.apply(self, arguments);
-        this.$empty_results_container.hide();
-      };
-    }();
-    self.setup = function () {
-      var original = self.setup;
-      return function () {
-        original.apply(self, arguments);
-        self.$empty_results_container = $(options.html($.extend({
-          classNames: self.$input.attr('class')
-        }, options)));
-        self.$empty_results_container.insertBefore(self.$dropdown);
-        self.$empty_results_container.hide();
-      };
-    }();
-  });
   var xhr,
     options = [];
-  function initializeSelectize() {
-    var $selectize = $('.search-form .search').selectize({
-      // This is arbitrary and only used by Selectize internally (a user/ticket/organisation may share the same DB id).
+  function initializeSearch() {
+    // Make search input editable (set to readonly initially to prevent input being used before tom-select is initialised).
+    $('.search-form .search').attr('readonly', false);
+    var $search = $('.search-form .search').selectize({
+      // This is arbitrary and only used by tom-select internally (a user/ticket/organisation may share the same DB id).
       valueField: 'uniqid',
       labelField: 'label',
-      // Selectize has internal filtering based on searchField which we don't want. So in order to get it to display
+      // Tom-select has internal filtering based on searchField which we don't want. So in order to get it to display
       // all the data returned from the server we're passing a 'search' property for each option which is the term
       // that we've searched for...
       searchField: ['search'],
       lockOptgroupOrder: true,
-      plugins: ['no_results'],
       create: false,
       onInitialize: function () {
         var $this = this;
@@ -68,32 +29,33 @@ $(document.body).ready(function () {
       },
       onFocus: function () {
         // Set search box to be large width in desktop mode.
-        $('#header .search-form').parent('.sp-grow').addClass('lg:sp-w-128 xl:sp-w-128').removeClass('xl:sp-w-64');
-        $('#header .search-form .sp-search-shortcut').addClass('sp-hidden xl:sp-hidden');
+        $('#header .search-form').parent('.sp\\:grow').addClass('sp:lg:w-128 sp:xl:w-128').removeClass('sp:xl:w-64');
+        $('#header .search-form .sp-search-shortcut').addClass('sp:hidden sp:xl:hidden');
       },
       onBlur: function () {
         // Keep value on losing focus.
         this.setTextboxValue(this.currentResults.query);
-        $('#header .search-form').parent('.sp-grow').removeClass('lg:sp-w-128 xl:sp-w-128').addClass('xl:sp-w-64');
-        $('#header .search-form .sp-search-shortcut').removeClass('sp-hidden xl:sp-hidden');
+        $('#header .search-form').parent('.sp\\:grow').removeClass('sp:lg:w-128 sp:xl:w-128').addClass('sp:xl:w-64');
+        $('#header .search-form .sp-search-shortcut').removeClass('sp:hidden sp:xl:hidden');
       },
       onChange: function (value) {
         // Clear set value.
         this.setValue(null, true);
         this.refreshOptions(false);
-        const $elm = $('.search-form .selectize-dropdown-content div[data-value="' + value + '"] a');
+        const $elm = $('.search-form .ts-dropdown-content div[data-value="' + value + '"] a');
         if ($elm.length) {
           window.location.href = $elm.attr('href');
         }
       },
-      onDropdownOpen: function ($dropdown) {
-        var $this = this;
+      onDropdownOpen: function (dropdown) {
+        var $this = this,
+          $dropdown = $(dropdown);
 
-        // Make dropdown bigger than normal selectize dropdown.
+        // Make dropdown bigger than normal dropdown.
         $dropdown.css('max-height', $(window).height() * 0.75);
         $dropdown.css('overflow-y', 'auto');
 
-        // Remove Selectize onOptionSelected event handler so that you can click
+        // Remove onOptionSelected event handler so that you can click
         // on a[href] inside dropdown options and it opens a new window.
         $dropdown.off('mousedown click');
         $dropdown.on('mousedown click', 'a', function (e) {
@@ -132,8 +94,9 @@ $(document.body).ready(function () {
             // Keep the dropdown open.
             return false;
           }
-          $this.setTextboxValue($(this).find('div.sp-search-term').text());
-          $this.onSearchChange($(this).find('div.sp-search-term').text());
+          var term = $(this).find('div.sp-search-term').text();
+          $this.setTextboxValue(term);
+          $this.load(term);
 
           // Keep the dropdown open.
           return false;
@@ -145,9 +108,9 @@ $(document.body).ready(function () {
         },
         option: function (item, escape) {
           if (item.optgroup === 'history') {
-            return "<div class='sp-search-history'>" + "<div class='sp-flex sp-px-3 sp-py-1'>" + "<div class='sp-flex-initial sp-me-3 sp-text-tertiary'>" + "<i class='fa-solid fa-clock fa-fw'></i>" + "</div>" + "<div class='sp-search-term sp-flex-grow'>" + escape(item.label) + "</div>" + "<div class='sp-search-history-clear sp-flex-initial sp-ms-3 sp-text-tertiary sp-text-sm'>" + "<i class='fa-solid fa-xmark fa-fw'></i>" + "</div>" + "</div>" + "</div>";
+            return "<div class='sp-search-history'>" + "<div class='sp:flex sp:px-3 sp:py-1'>" + "<div class='sp:flex-initial sp:me-3 sp:text-tertiary'>" + "<i class='fa-solid fa-clock'></i>" + "</div>" + "<div class='sp-search-term sp:grow'>" + escape(item.label) + "</div>" + "<div class='sp-search-history-clear sp:flex-initial sp:ms-3 sp:text-tertiary sp:text-sm'>" + "<i class='fa-solid fa-xmark'></i>" + "</div>" + "</div>" + "</div>";
           } else if (item.optgroup === 'showall') {
-            return "<div>" + "<a class='sp-block sp-px-3 sp-py-1' href='" + escape(item.link) + "'>" + "<div class='sp-inline-block sp-me-3 sp-text-tertiary'>" + "<i class='fa-solid fa-magnifying-glass fa-fw'></i>" + "</div>" + "<span class='sp-text-sm sp-text-secondary'>" + escape(item.label) + "</span>" + "</a>" + "</div>";
+            return "<div>" + "<a class='sp:block sp:px-3 sp:py-1' href='" + escape(item.link) + "'>" + "<div class='sp:inline-block sp:me-3 sp:text-tertiary'>" + "<i class='fa-solid fa-magnifying-glass'></i>" + "</div>" + "<span class='sp:text-sm sp:text-secondary'>" + escape(item.label) + "</span>" + "</a>" + "</div>";
           } else if (item.id !== 0 && item.id !== '') {
             var icon,
               badge = false;
@@ -166,7 +129,7 @@ $(document.body).ready(function () {
                 icon = 'fa-file-lines';
                 break;
             }
-            return "<div>" + "<a class='sp-flex sp-items-center sp-px-3 sp-py-1' href='" + escape(item.link) + "'>" + "<div class='sp-flex-initial sp-me-3 sp-text-tertiary'>" + "<i class='fa-solid " + icon + " fa-fw'></i>" + "</div>" + "<div class='sp-flex-grow sp-truncate sp-leading-snug'>" + (badge ? "<span class='result-id sp-tag sp-bg-primary-800 sp-text-white'>" + escape("#" + item.id.toString()) + "</span>" : "") + "<span class='result-name'>" + item.label + "</span><br />" + "<span class='result-secondary sp-description'>" + item.secondary + "</span>" + "</div>" + "</a>" + "</div>";
+            return "<div>" + "<a class='sp:flex sp:items-center sp:px-3 sp:py-1' href='" + escape(item.link) + "'>" + "<div class='sp:flex-initial sp:me-3 sp:text-tertiary'>" + "<i class='fa-solid " + icon + "'></i>" + "</div>" + "<div class='sp:grow sp:truncate sp:leading-snug'>" + (badge ? "<span class='result-id sp-tag sp:bg-primary-800 sp:text-white'>" + escape("#" + item.id.toString()) + "</span>" : "") + "<span class='result-name'>" + item.label + "</span><br />" + "<span class='result-secondary sp-description'>" + item.secondary + "</span>" + "</div>" + "</a>" + "</div>";
           } else {
             return "<div>" + item.label + "</div>";
           }
@@ -174,7 +137,7 @@ $(document.body).ready(function () {
       },
       loadThrottle: 500,
       load: function (query, callback) {
-        $('.sp-search-clear').addClass('sp-hidden').removeClass('sp-inline-block lg:sp-hidden xl:sp-inline-block');
+        $('.sp-search-clear').addClass('sp:hidden').removeClass('sp:inline-block sp:lg:hidden sp:xl:inline-block');
         if (!query.length) {
           return callback();
         }
@@ -212,14 +175,14 @@ $(document.body).ready(function () {
           if (res.data.length === 0) {
             self.displayEmptyResultsMessage();
           }
-          $('.sp-search-clear').removeClass('sp-hidden').addClass('sp-inline-block lg:sp-hidden xl:sp-inline-block');
+          $('.sp-search-clear').removeClass('sp:hidden').addClass('sp:inline-block sp:lg:hidden sp:xl:inline-block');
         }).fail(function () {
           callback();
         });
       }
     });
     function focusSearch() {
-      $selectize[0].selectize.focus();
+      $search[0].selectize.focus();
     }
 
     // Focus now.
@@ -230,21 +193,21 @@ $(document.body).ready(function () {
 
     // Clear search and reset to search history options only.
     $('.search-form .sp-search-clear').on('click', function () {
-      $(this).addClass('sp-hidden').removeClass('sp-inline-block lg:sp-hidden xl:sp-inline-block');
-      $selectize[0].selectize.setTextboxValue('');
-      $selectize[0].selectize.clearOptions();
+      $(this).addClass('sp:hidden').removeClass('sp:inline-block sp:lg:hidden sp:xl:inline-block');
+      $search[0].selectize.setTextboxValue('');
+      $search[0].selectize.clearOptions();
       $.each(options, function (index, value) {
-        $selectize[0].selectize.addOption(value);
+        $search[0].selectize.addOption(value);
       });
     });
   }
 
-  // Initialise selectize on first click of search.
-  $('.search-form').one('click', initializeSelectize);
+  // Initialise tom-select on first click of search.
+  $('.search-form').one('click', initializeSearch);
 
   // Register keyboard shortcut.
   App.KeyboardShortcuts.SHORTCUT_SEARCH.bind(function () {
-    $('.search-form, .search-form .selectize-control').click();
+    $('.search-form, .search-form .ts-control').trigger('click');
 
     // Disable browsers built-in shortcut.
     return false;

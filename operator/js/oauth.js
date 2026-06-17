@@ -62,21 +62,21 @@
      */
     this.start = function () {
       var dfd = $.Deferred(),
-        child = openPopup(),
-        interval,
-        callbackHasRan = false;
-
-      // The popup window will call this callback when it's completed the oAuth flow.
-      window.spOAuthCallback = function (data) {
-        callbackHasRan = true;
-        parameters.$oauthData.val(data);
-      };
-      interval = setInterval(function () {
-        if (child.closed) {
-          clearInterval(interval);
-          !callbackHasRan ? dfd.reject() : dfd.resolve();
+        channel = new BroadcastChannel('sp_oauth_channel');
+      channel.onmessage = function (event) {
+        if (!event.data) {
+          return;
         }
-      }, 100);
+        if (event.data.type === 'spOAuthCallback') {
+          parameters.$oauthData.val(event.data.data);
+          channel.close();
+          dfd.resolve();
+        } else if (event.data.type === 'spOAuthError') {
+          channel.close();
+          dfd.reject();
+        }
+      };
+      openPopup();
       return dfd.promise();
     };
   }

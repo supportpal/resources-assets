@@ -2962,7 +2962,7 @@
       c() {
         button = element("button");
         attr(button, "aria-label", button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null);
-        attr(button, "class", button_class_value = `${/*classes*/ctx[1] || ''} shepherd-button ${/*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`);
+        attr(button, "class", button_class_value = `${ /*classes*/ctx[1] || ''} shepherd-button ${ /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`);
         button.disabled = /*disabled*/ctx[2];
         attr(button, "tabindex", "0");
         attr(button, "type", "button");
@@ -2972,7 +2972,7 @@
         button.innerHTML = /*text*/ctx[5];
         if (!mounted) {
           dispose = listen(button, "click", function () {
-            if (is_function( /*action*/ctx[0])) /*action*/ctx[0].apply(this, arguments);
+            if (is_function(/*action*/ctx[0])) /*action*/ctx[0].apply(this, arguments);
           });
           mounted = true;
         }
@@ -2983,7 +2983,7 @@
         if (dirty & /*label*/8 && button_aria_label_value !== (button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null)) {
           attr(button, "aria-label", button_aria_label_value);
         }
-        if (dirty & /*classes, secondary*/18 && button_class_value !== (button_class_value = `${/*classes*/ctx[1] || ''} shepherd-button ${/*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`)) {
+        if (dirty & /*classes, secondary*/18 && button_class_value !== (button_class_value = `${ /*classes*/ctx[1] || ''} shepherd-button ${ /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`)) {
           attr(button, "class", button_class_value);
         }
         if (dirty & /*disabled*/4) {
@@ -3052,7 +3052,7 @@
   function create_if_block$3(ctx) {
     let each_1_anchor;
     let current;
-    let each_value = ensure_array_like( /*buttons*/ctx[1]);
+    let each_value = ensure_array_like(/*buttons*/ctx[1]);
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
       each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
@@ -3078,7 +3078,7 @@
       },
       p(ctx, dirty) {
         if (dirty & /*buttons, step*/3) {
-          each_value = ensure_array_like( /*buttons*/ctx[1]);
+          each_value = ensure_array_like(/*buttons*/ctx[1]);
           let i;
           for (i = 0; i < each_value.length; i += 1) {
             const child_ctx = get_each_context(ctx, each_value, i);
@@ -3176,7 +3176,7 @@
         current = true;
       },
       p(ctx, [dirty]) {
-        if ( /*buttons*/ctx[1]) {
+        if (/*buttons*/ctx[1]) {
           if (if_block) {
             if_block.p(ctx, dirty);
             if (dirty & /*buttons*/2) {
@@ -3473,7 +3473,7 @@
         current = true;
       },
       p(ctx, [dirty]) {
-        if ( /*title*/ctx[2]) {
+        if (/*title*/ctx[2]) {
           if (if_block0) {
             if_block0.p(ctx, dirty);
             if (dirty & /*title*/4) {
@@ -3492,7 +3492,7 @@
           });
           check_outros();
         }
-        if ( /*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled) {
+        if (/*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled) {
           if (if_block1) {
             if_block1.p(ctx, dirty);
             if (dirty & /*cancelIcon*/8) {
@@ -3752,11 +3752,11 @@
   }
   function create_fragment$2(ctx) {
     let div;
-    let show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
+    let show_if_2 = !isUndefined(/*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
     let t0;
-    let show_if_1 = !isUndefined( /*step*/ctx[2].options.text);
+    let show_if_1 = !isUndefined(/*step*/ctx[2].options.text);
     let t1;
-    let show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
+    let show_if = Array.isArray(/*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
     let current;
     let if_block0 = show_if_2 && create_if_block_2(ctx);
     let if_block1 = show_if_1 && create_if_block_1(ctx);
@@ -3781,7 +3781,7 @@
         current = true;
       },
       p(ctx, [dirty]) {
-        if (dirty & /*step*/4) show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
+        if (dirty & /*step*/4) show_if_2 = !isUndefined(/*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
         if (show_if_2) {
           if (if_block0) {
             if_block0.p(ctx, dirty);
@@ -3801,7 +3801,7 @@
           });
           check_outros();
         }
-        if (dirty & /*step*/4) show_if_1 = !isUndefined( /*step*/ctx[2].options.text);
+        if (dirty & /*step*/4) show_if_1 = !isUndefined(/*step*/ctx[2].options.text);
         if (show_if_1) {
           if (if_block1) {
             if_block1.p(ctx, dirty);
@@ -3821,7 +3821,7 @@
           });
           check_outros();
         }
-        if (dirty & /*step*/4) show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
+        if (dirty & /*step*/4) show_if = Array.isArray(/*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
         if (show_if) {
           if (if_block2) {
             if_block2.p(ctx, dirty);
@@ -3926,7 +3926,7 @@
       }
     });
     let div_levels = [{
-      "aria-describedby": div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null
+      "aria-describedby": div_aria_describedby_value = !isUndefined(/*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null
     }, {
       "aria-labelledby": div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null
     }, /*dataStepId*/ctx[1], {
@@ -3963,7 +3963,7 @@
         }
       },
       p(ctx, [dirty]) {
-        if ( /*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on) {
+        if (/*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on) {
           if (if_block) ;else {
             if_block = create_if_block();
             if_block.c();
@@ -3978,7 +3978,7 @@
         if (dirty & /*labelId*/8) shepherdcontent_changes.labelId = /*labelId*/ctx[3];
         if (dirty & /*step*/16) shepherdcontent_changes.step = /*step*/ctx[4];
         shepherdcontent.$set(shepherdcontent_changes);
-        set_attributes(div, div_data = get_spread_update(div_levels, [(!current || dirty & /*step, descriptionId*/20 && div_aria_describedby_value !== (div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null)) && {
+        set_attributes(div, div_data = get_spread_update(div_levels, [(!current || dirty & /*step, descriptionId*/20 && div_aria_describedby_value !== (div_aria_describedby_value = !isUndefined(/*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null)) && {
           "aria-describedby": div_aria_describedby_value
         }, (!current || dirty & /*step, labelId*/24 && div_aria_labelledby_value !== (div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null)) && {
           "aria-labelledby": div_aria_labelledby_value
@@ -4587,7 +4587,7 @@ Z`;
         svg = svg_element("svg");
         path = svg_element("path");
         attr(path, "d", /*pathDefinition*/ctx[2]);
-        attr(svg, "class", svg_class_value = `${/*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`);
+        attr(svg, "class", svg_class_value = `${ /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`);
       },
       m(target, anchor) {
         insert(target, svg, anchor);
@@ -4603,7 +4603,7 @@ Z`;
         if (dirty & /*pathDefinition*/4) {
           attr(path, "d", /*pathDefinition*/ctx[2]);
         }
-        if (dirty & /*modalIsVisible*/2 && svg_class_value !== (svg_class_value = `${/*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`)) {
+        if (dirty & /*modalIsVisible*/2 && svg_class_value !== (svg_class_value = `${ /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`)) {
           attr(svg, "class", svg_class_value);
         }
       },
@@ -5230,7 +5230,7 @@ Z`;
       style.appendChild(document.createTextNode(css));
     }
   }
-  var css_248z = ".shepherd-button{background:#3288e6;border:0;border-radius:3px;color:hsla(0,0%,100%,.75);cursor:pointer;margin-right:.5rem;padding:.5rem 1.5rem;transition:all .5s ease}.shepherd-button:not(:disabled):hover{background:#196fcc;color:hsla(0,0%,100%,.75)}.shepherd-button.shepherd-button-secondary{background:#f1f2f3;color:rgba(0,0,0,.75)}.shepherd-button.shepherd-button-secondary:not(:disabled):hover{background:#d6d9db;color:rgba(0,0,0,.75)}.shepherd-button:disabled{cursor:not-allowed}.shepherd-footer{border-bottom-left-radius:5px;border-bottom-right-radius:5px;display:flex;justify-content:flex-end;padding:0 .75rem .75rem}.shepherd-footer .shepherd-button:last-child{margin-right:0}.shepherd-cancel-icon{background:transparent;border:none;color:hsla(0,0%,50%,.75);cursor:pointer;font-size:2em;font-weight:400;margin:0;padding:0;transition:color .5s ease}.shepherd-cancel-icon:hover{color:rgba(0,0,0,.75)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:hsla(0,0%,50%,.75)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:rgba(0,0,0,.75)}.shepherd-title{color:rgba(0,0,0,.75);display:flex;flex:1 0 auto;font-size:1rem;font-weight:400;margin:0;padding:0}.shepherd-header{align-items:center;border-top-left-radius:5px;border-top-right-radius:5px;display:flex;justify-content:flex-end;line-height:2em;padding:.75rem .75rem 0}.shepherd-has-title .shepherd-content .shepherd-header{background:#e6e6e6;padding:1em}.shepherd-text{color:rgba(0,0,0,.75);font-size:1rem;line-height:1.3em;padding:.75em}.shepherd-text p{margin-top:0}.shepherd-text p:last-child{margin-bottom:0}.shepherd-content{border-radius:5px;outline:none;padding:0}.shepherd-element{background:#fff;border-radius:5px;box-shadow:0 1px 4px rgba(0,0,0,.2);max-width:400px;opacity:0;outline:none;transition:opacity .3s,visibility .3s;visibility:hidden;width:100%;z-index:9999}.shepherd-enabled.shepherd-element{opacity:1;visibility:visible}.shepherd-element[data-popper-reference-hidden]:not(.shepherd-centered){opacity:0;pointer-events:none;visibility:hidden}.shepherd-element,.shepherd-element *,.shepherd-element :after,.shepherd-element :before{box-sizing:border-box}.shepherd-arrow,.shepherd-arrow:before{height:16px;position:absolute;width:16px;z-index:-1}.shepherd-arrow:before{background:#fff;content:\"\";transform:rotate(45deg)}.shepherd-element[data-popper-placement^=top]>.shepherd-arrow{bottom:-8px}.shepherd-element[data-popper-placement^=bottom]>.shepherd-arrow{top:-8px}.shepherd-element[data-popper-placement^=left]>.shepherd-arrow{right:-8px}.shepherd-element[data-popper-placement^=right]>.shepherd-arrow{left:-8px}.shepherd-element.shepherd-centered>.shepherd-arrow{opacity:0}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:#e6e6e6}.shepherd-target-click-disabled.shepherd-enabled.shepherd-target,.shepherd-target-click-disabled.shepherd-enabled.shepherd-target *{pointer-events:none}.shepherd-modal-overlay-container{height:0;left:0;opacity:0;overflow:hidden;pointer-events:none;position:fixed;top:0;transition:all .3s ease-out,height 0ms .3s,opacity .3s 0ms;width:100vw;z-index:9997}.shepherd-modal-overlay-container.shepherd-modal-is-visible{height:100vh;opacity:.5;transform:translateZ(0);transition:all .3s ease-out,height 0s 0s,opacity .3s 0s}.shepherd-modal-overlay-container.shepherd-modal-is-visible path{pointer-events:all}.shepherd-element{border-width:1px;border-color:var(--color-background-tertiary);background-color:var(--color-background-primary);color:var(--color-text-primary);--tw-shadow:0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);--tw-shadow-colored:0 4px 6px -1px var(--tw-shadow-color), 0 2px 4px -2px var(--tw-shadow-color);box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shepherd-element:is(.sp-theme-dark *){background-color:var(--color-background-secondary)}.shepherd-element {\n    z-index: 10005;\n}.shepherd-arrow:before{background-color:var(--color-background-primary)}.shepherd-arrow:is(.sp-theme-dark *):before{background-color:var(--color-background-secondary)}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,\n.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{border-bottom-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,\n.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{border-inline-end-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{border-inline-start-width:1px;border-color:var(--color-background-tertiary)}.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{border-top-width:1px;border-color:var(--color-background-tertiary)}.shepherd-has-title .shepherd-content .shepherd-header{background-color:var(--color-background-tertiary);padding-left:1rem;padding-right:1rem;padding-top:0.5rem;padding-bottom:0.5rem}.shepherd-title{font-size:1.125rem;font-weight:700;color:var(--color-text-primary)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:var(--color-text-secondary);--tw-shadow:0 0 #0000;--tw-shadow-colored:0 0 #0000;box-shadow:var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:var(--color-text-primary)}.shepherd-cancel-icon{font-size:1.5rem;font-weight:700}.shepherd-text{overflow:auto;color:var(--color-text-primary)}.shepherd-button{border-radius:0.25rem;background-color:var(--color-primary-800);color:var(--color-white, #fff)}.shepherd-button:not(:disabled):hover{background-color:var(--color-primary-900);color:var(--color-white, #fff)}\n";
+  var css_248z = "/*! tailwindcss v4.3.1 | MIT License | https://tailwindcss.com */\n@layer properties{@supports ((-webkit-hyphens:none) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-border-style:solid;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-content:\"\";--tw-font-weight:initial}}}@layer components{.shepherd-button{color:#ffffffbf;cursor:pointer;background:#3288e6;border:0;border-radius:3px;margin-right:.5rem;padding:.5rem 1.5rem;transition:all .5s}.shepherd-button:not(:disabled):hover{color:#ffffffbf;background:#196fcc}.shepherd-button.shepherd-button-secondary{color:#000000bf;background:#f1f2f3}.shepherd-button.shepherd-button-secondary:not(:disabled):hover{color:#000000bf;background:#d6d9db}.shepherd-button:disabled{cursor:not-allowed}.shepherd-footer{border-bottom-right-radius:5px;border-bottom-left-radius:5px;justify-content:flex-end;padding:0 .75rem .75rem;display:flex}.shepherd-footer .shepherd-button:last-child{margin-right:0}.shepherd-cancel-icon{color:#808080bf;cursor:pointer;background:0 0;border:none;margin:0;padding:0;font-size:2em;font-weight:400;transition:color .5s}.shepherd-cancel-icon:hover{color:#000000bf}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:#808080bf}.shepherd-title{color:#000000bf;flex:1 0 auto;margin:0;padding:0;font-size:1rem;font-weight:400;display:flex}.shepherd-header{border-top-left-radius:5px;border-top-right-radius:5px;justify-content:flex-end;align-items:center;padding:.75rem .75rem 0;line-height:2em;display:flex}.shepherd-has-title .shepherd-content .shepherd-header{background:#e6e6e6;padding:1em}.shepherd-text{color:#000000bf;padding:.75em;font-size:1rem;line-height:1.3em}.shepherd-text p{margin-top:0}.shepherd-text p:last-child{margin-bottom:0}.shepherd-content{border-radius:5px;outline:none;padding:0}.shepherd-element{opacity:0;visibility:hidden;z-index:9999;background:#fff;border-radius:5px;outline:none;width:100%;max-width:400px;transition:opacity .3s,visibility .3s;box-shadow:0 1px 4px #0003}.shepherd-enabled.shepherd-element{opacity:1;visibility:visible}.shepherd-element[data-popper-reference-hidden]:not(.shepherd-centered){opacity:0;pointer-events:none;visibility:hidden}.shepherd-element,.shepherd-element *,.shepherd-element :after,.shepherd-element :before{box-sizing:border-box}.shepherd-arrow,.shepherd-arrow:before{z-index:-1;width:16px;height:16px;position:absolute}.shepherd-arrow:before{content:\"\";background:#fff;transform:rotate(45deg)}.shepherd-element[data-popper-placement^=top]>.shepherd-arrow{bottom:-8px}.shepherd-element[data-popper-placement^=bottom]>.shepherd-arrow{top:-8px}.shepherd-element[data-popper-placement^=left]>.shepherd-arrow{right:-8px}.shepherd-element[data-popper-placement^=right]>.shepherd-arrow{left:-8px}.shepherd-element.shepherd-centered>.shepherd-arrow{opacity:0}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{background-color:#e6e6e6}.shepherd-target-click-disabled.shepherd-enabled.shepherd-target,.shepherd-target-click-disabled.shepherd-enabled.shepherd-target *{pointer-events:none}.shepherd-modal-overlay-container{opacity:0;pointer-events:none;z-index:9997;width:100vw;height:0;transition:all .3s ease-out,height 0s .3s,opacity .3s;position:fixed;top:0;left:0;overflow:hidden}.shepherd-modal-overlay-container.shepherd-modal-is-visible{opacity:.5;height:100vh;transition:all .3s ease-out,height,opacity .3s;transform:translateZ(0)}.shepherd-modal-overlay-container.shepherd-modal-is-visible path{pointer-events:all}.shepherd-element{z-index:10005;border-style:var(--tw-border-style);border-width:1px;border-color:var(--sp-color-tertiary,var(--color-background-tertiary));background-color:var(--sp-color-primary,var(--color-background-primary));color:var(--sp-text-color-primary,var(--color-text-primary));--tw-shadow:0 4px 6px -1px var(--tw-shadow-color,#0000001a), 0 2px 4px -2px var(--tw-shadow-color,#0000001a);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.shepherd-element:where(.sp-theme-dark,.sp-theme-dark *){background-color:var(--sp-color-secondary,var(--color-background-secondary))}.shepherd-arrow:before{content:var(--tw-content);background-color:var(--sp-color-primary,var(--color-background-primary))}.shepherd-arrow:where(.sp-theme-dark,.sp-theme-dark *):before{content:var(--tw-content);background-color:var(--sp-color-secondary,var(--color-background-secondary))}.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before{content:var(--tw-content);background-color:var(--sp-color-tertiary,var(--color-background-tertiary))}:is(.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow,.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow):before{content:var(--tw-content);border-bottom-style:var(--tw-border-style);content:var(--tw-content);border-bottom-width:1px;border-color:var(--sp-color-tertiary,var(--color-background-tertiary))}:is(.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow,.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow):before{content:var(--tw-content);border-inline-end-style:var(--tw-border-style);content:var(--tw-content);border-inline-end-width:1px;border-color:var(--sp-color-tertiary,var(--color-background-tertiary))}.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before{content:var(--tw-content);border-inline-start-style:var(--tw-border-style);content:var(--tw-content);border-inline-start-width:1px;border-color:var(--sp-color-tertiary,var(--color-background-tertiary))}.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{content:var(--tw-content);border-top-style:var(--tw-border-style);content:var(--tw-content);border-top-width:1px;border-color:var(--sp-color-tertiary,var(--color-background-tertiary))}.shepherd-has-title .shepherd-content .shepherd-header{background-color:var(--sp-color-tertiary,var(--color-background-tertiary));padding-inline:calc(var(--sp-spacing,.25rem) * 4);padding-block:calc(var(--sp-spacing,.25rem) * 2)}.shepherd-title{font-size:var(--sp-text-lg,1.125rem);line-height:var(--tw-leading,var(--sp-text-lg--line-height,calc(1.75 / 1.125)));--tw-font-weight:var(--sp-font-weight-bold,700);font-weight:var(--sp-font-weight-bold,700);color:var(--sp-text-color-primary,var(--color-text-primary))}.shepherd-has-title .shepherd-content .shepherd-cancel-icon{color:var(--sp-text-color-secondary,var(--color-text-secondary));--tw-shadow:0 0 #0000;box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow)}.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover{color:var(--sp-text-color-primary,var(--color-text-primary))}.shepherd-cancel-icon{font-size:var(--sp-text-2xl,1.5rem);line-height:var(--tw-leading,var(--sp-text-2xl--line-height,calc(2 / 1.5)));--tw-font-weight:var(--sp-font-weight-bold,700);font-weight:var(--sp-font-weight-bold,700)}.shepherd-text{color:var(--sp-text-color-primary,var(--color-text-primary));overflow:auto}.shepherd-button{background-color:var(--sp-color-primary-800,var(--color-primary-800));color:var(--sp-color-white,#fff);border-radius:.25rem}.shepherd-button:not(:disabled):hover{background-color:var(--sp-color-primary-900,var(--color-primary-900));color:var(--sp-color-white,#fff)}}@property --tw-border-style{syntax:\"*\";inherits:false;initial-value:solid}@property --tw-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:\"*\";inherits:false}@property --tw-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:\"*\";inherits:false}@property --tw-inset-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:\"*\";inherits:false}@property --tw-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:\"*\";inherits:false}@property --tw-inset-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:\"*\";inherits:false}@property --tw-ring-offset-width{syntax:\"<length>\";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:\"*\";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-content{syntax:\"*\";inherits:false;initial-value:\"\"}@property --tw-font-weight{syntax:\"*\";inherits:false}\n";
   styleInject(css_248z);
 
   /**

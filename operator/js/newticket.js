@@ -83,10 +83,10 @@ $(document).ready(function () {
         placeholder: Lang.get('user.search_for_user'),
         render: {
           item: function (item, escape) {
-            return '<div class="item">' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? ' <span class="sp-description">' + escape('<' + item.email + '>' || '') + '</span>' : '') + '</div>';
+            return '<div class="item">' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? ' <span class="sp-description">' + escape('<' + item.email + '>' || '') + '</span>' : '') + '</div>';
           },
           option: function (item, escape) {
-            return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
+            return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
           }
         },
         load: function (query, callback) {
@@ -144,7 +144,7 @@ $(document).ready(function () {
       },
       onChange: function (value) {
         // We want to set a separate input if they enter an existing organisation.
-        if (value.length > 0 && value !== this.getOption(value)[0].textContent) {
+        if (value.length > 0 && value !== this.getOption(value).textContent) {
           $('input[name="user_organisation_id"]').val(value);
         } else {
           $('input[name="user_organisation_id"]').val("");
@@ -209,7 +209,7 @@ $(document).ready(function () {
           return '<div class="item" style="background-color: ' + escape(item.colour) + '; color: ' + item.colour_text + '">' + escape(item.name) + '</div>';
         },
         option: function (item, escape) {
-          return '<div>' + '<i class="fas fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
+          return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
         }
       }
     });
@@ -225,21 +225,21 @@ $(document).ready(function () {
       placeholder: Lang.get('user.select_operators'),
       render: {
         item: function (item, escape) {
-          return '<div class="item">' + '<img class="sp-avatar sp-max-w-3xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+          return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
         },
         option: function (item, escape) {
-          return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+          return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
         }
       },
       onChange: function (value) {
         if ($.isEmptyObject(value)) {
           // None assigned, show all
-          $('ul.sp-recipients-list li').removeClass('sp-hidden');
+          $('ul.sp-recipients-list li').removeClass('sp:hidden');
         } else {
           // Only show those assigned
-          $('ul.sp-recipients-list li.operator').addClass('sp-hidden');
+          $('ul.sp-recipients-list li.operator').addClass('sp:hidden');
           $.each(value, function (index, value) {
-            $('ul.sp-recipients-list li.operator-' + value).removeClass('sp-hidden');
+            $('ul.sp-recipients-list li.operator-' + value).removeClass('sp:hidden');
           });
         }
       }
@@ -249,7 +249,7 @@ $(document).ready(function () {
     $('select[name="department_email"]').selectize({
       persist: false,
       dropdownParent: 'body',
-      plugins: ['disableDelete']
+      plugins: ['disable_delete']
     });
 
     // CC email input
@@ -260,7 +260,7 @@ $(document).ready(function () {
           return '<div class="item' + (item.unremovable ? ' unremovable' : '') + '">' + escape(item.value) + '</div>';
         },
         option: function (item, escape) {
-          return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" />&nbsp;' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
+          return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp;' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
         }
       },
       load: function (query, callback) {
@@ -301,9 +301,9 @@ $(document).ready(function () {
       }
     }));
 
-    // Expand recipients list to full form for editing
-    $('.sp-simplified-recipients').on('click', function () {
-      $('.sp-simplified-recipients, .sp-full-recipients').toggleClass('sp-hidden');
+    // Toggle between short and full recipients form.
+    $('.sp-simplified-recipients, .sp-full-recipients .sp\\:table-row > .sp\\:table-cell:first-child').on('click', function () {
+      $('.sp-simplified-recipients, .sp-full-recipients').toggleClass('sp:hidden');
     });
 
     // Send email options, uncheck and show tooltip if disabled

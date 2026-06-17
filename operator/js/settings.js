@@ -38,7 +38,7 @@ $(function () {
     });
   });
   $('select[name="smtp_auth_mech"]').on('change', function () {
-    $(this).parents('form').find('.password-form, .oauth-form').toggleClass('sp-hidden');
+    $(this).parents('form').find('.password-form, .oauth-form').toggleClass('sp:hidden');
   });
 
   // On page load, if the radio is checked, show the sections...

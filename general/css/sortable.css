@@ -1,3 +1,7 @@
-.sp-sortable-handle:hover {
-    @apply sp-cursor-move;
+@reference '#tailwind-base';
+
+@layer components {
+  .sp-sortable-handle:hover {
+    @apply sp:cursor-move;
+  }
 }

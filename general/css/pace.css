@@ -1,18 +1,21 @@
-.pace {
-    @apply sp-pointer-events-none sp-select-none;
-}
+@reference '#tailwind-base';
 
-.pace-inactive {
-    @apply sp-hidden;
-}
+@layer components {
+  .pace {
+    @apply sp:pointer-events-none sp:select-none;
+  }
 
-.pace .pace-progress {
-    @apply sp-fixed sp-h-0.5 sp-w-full sp-end-full sp-bg-primary-800;
-    z-index: 10005;
-}
+  .pace-inactive {
+    @apply sp:hidden;
+  }
 
-@media print {
+  .pace .pace-progress {
+    @apply sp:fixed sp:h-0.5 sp:w-full sp:end-full sp:bg-primary-800 sp:z-10005;
+  }
+
+  @media print {
     .pace {
-        @apply sp-hidden;
+      @apply sp:hidden;
     }
+  }
 }

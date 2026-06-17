@@ -55,7 +55,7 @@ $(document).ready(function () {
       verifyRoute = $this.data('verify-route');
     Swal.fire({
       title: Lang.get('user.verify_phone_number'),
-      html: Lang.get('user.verify_phone_method') + '<br /><br /><span class="sp-button-group sp-justify-center">' + '<button class="sp-verify-phone-method" data-value="sms"><i class="fa-solid fa-fw fa-comment-sms"></i>&nbsp; SMS</button>' + '<button class="sp-verify-phone-method" data-value="call"><i class="fa-solid fa-fw fa-phone"></i>&nbsp; Call</button>' + '</span>',
+      html: Lang.get('user.verify_phone_method') + '<br /><br /><span class="sp-button-group sp:justify-center">' + '<button class="sp-verify-phone-method" data-value="sms"><i class="fa-solid fa-comment-sms"></i>&nbsp; SMS</button>' + '<button class="sp-verify-phone-method" data-value="call"><i class="fa-solid fa-phone"></i>&nbsp; Call</button>' + '</span>',
       showConfirmButton: false,
       showCancelButton: true
     });

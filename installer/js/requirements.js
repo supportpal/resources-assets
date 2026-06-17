@@ -1,7 +1,7 @@
 $(function () {
   $('a.show-details').on('click', function (e) {
     e.preventDefault();
-    $(this).parent().next('div.sp-hidden').toggle();
+    $(this).parent().next('div.sp\\:hidden').toggle();
     $(this).children('button').toggle();
   });
 });
@@ -26,10 +26,10 @@ function AllowedMethods(parameters) {
     var expected = 'method is allowed.',
       $td = $elem.find('.' + method.toLowerCase() + '-request').find('td');
     if (data === expected) {
-      $td.html('<i class="fas fa-check sp-text-green-600" aria-hidden="true"></i>&nbsp;' + LANG.success);
+      $td.html('<i class="fa-solid fa-check sp:text-green-600" aria-hidden="true"></i>&nbsp;' + LANG.success);
       return true;
     } else {
-      $td.html('<i class="fas fa-times sp-text-red-600" aria-hidden="true"></i>&nbsp;' + LANG.notAvailable);
+      $td.html('<i class="fa-solid fa-times sp:text-red-600" aria-hidden="true"></i>&nbsp;' + LANG.notAvailable);
       return false;
     }
   };
@@ -66,7 +66,7 @@ function AllowedMethods(parameters) {
    * @returns {number}
    */
   var countRequiredSuccess = function () {
-    return $elem.find('.sp-hidden').find('table.required-methods .sp-text-green-600').length;
+    return $elem.find('.sp\\:hidden').find('table.required-methods .sp\\:text-green-600').length;
   };
 
   /**
@@ -75,7 +75,7 @@ function AllowedMethods(parameters) {
    * @returns {number}
    */
   var totalRequired = function () {
-    return $elem.find('.sp-hidden').find('table.required-methods tr').length;
+    return $elem.find('.sp\\:hidden').find('table.required-methods tr').length;
   };
 
   /**
@@ -84,7 +84,7 @@ function AllowedMethods(parameters) {
    * @returns {number}
    */
   var countOptionalSuccess = function () {
-    return $elem.find('.sp-hidden').find('table.optional-methods .sp-text-green-600').length;
+    return $elem.find('.sp\\:hidden').find('table.optional-methods .sp\\:text-green-600').length;
   };
 
   /**
@@ -93,7 +93,7 @@ function AllowedMethods(parameters) {
    * @returns {number}
    */
   var totalOptional = function () {
-    return $elem.find('.sp-hidden').find('table.optional-methods tr').length;
+    return $elem.find('.sp\\:hidden').find('table.optional-methods tr').length;
   };
 
   /**
@@ -126,12 +126,12 @@ function AllowedMethods(parameters) {
       $elem.find('.sp-is-valid').html(LANG.requirements.replace(':required_count', countRequiredSuccess()).replace(':total_required', totalRequired()).replace(':optional_count', countOptionalSuccess()).replace(':total_optional', totalOptional()));
 
       // Show success/error icon.
-      $elem.find('.sp-requirement-status').find('.sp-text-green-600, .sp-text-orange-600, .sp-text-red-600').hide();
+      $elem.find('.sp-requirement-status').find('.sp\\:text-green-600, .sp\\:text-orange-600, .sp\\:text-red-600').hide();
       if (requiredValid()) {
-        $elem.find('.sp-requirement-status').find(optionalValid() ? '.sp-text-green-600' : '.sp-text-orange-600').show();
+        $elem.find('.sp-requirement-status').find(optionalValid() ? '.sp\\:text-green-600' : '.sp\\:text-orange-600').show();
       } else {
         $form.find('input[name="_valid"]').val("0");
-        $elem.find('.sp-requirement-status').find('.sp-text-red-600').show();
+        $elem.find('.sp-requirement-status').find('.sp\\:text-red-600').show();
       }
 
       // Determine where the form should submit to.

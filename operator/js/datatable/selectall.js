@@ -8,13 +8,13 @@ $(function () {
    */
   function toggleActionButtons() {
     if ($('tr.selected').length) {
-      $('.sp-grid-actions').removeClass('sp-hidden');
+      $('.sp-grid-actions').removeClass('sp:hidden');
       $('.sp-grid-actions :input').prop('disabled', false);
-      $('.sp-action-group:not(.sp-grid-actions)').addClass('sp-hidden');
+      $('.sp-action-group:not(.sp-grid-actions)').addClass('sp:hidden');
     } else {
-      $('.sp-grid-actions').addClass('sp-hidden');
+      $('.sp-grid-actions').addClass('sp:hidden');
       $('.sp-grid-actions :input').prop('disabled', true);
-      $('.sp-action-group:not(.sp-grid-actions)').removeClass('sp-hidden');
+      $('.sp-action-group:not(.sp-grid-actions)').removeClass('sp:hidden');
     }
   }
 

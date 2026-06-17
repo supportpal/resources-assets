@@ -1,11 +1,17 @@
-.minicolors-theme-default .minicolors-swatch {
-    @apply sp-h-6 sp-w-6 sp-top-2 sp-start-2 sp-border sp-border-primary;
-}
+@import "../../../../node_modules/@claviska/jquery-minicolors/jquery.minicolors.css" layer(components);
 
-.minicolors-theme-default .minicolors-input {
-    @apply sp-h-auto sp-ps-10;
-}
+@reference '#tailwind-base';
 
-.minicolors-panel {
-    @apply sp-border-0;
+@layer components {
+  .minicolors-theme-default .minicolors-swatch {
+    @apply sp:h-6 sp:w-6 sp:top-2 sp:start-2 sp:border sp:border-primary;
+  }
+
+  .minicolors-theme-default .minicolors-input {
+    @apply sp:h-auto sp:ps-10;
+  }
+
+  .minicolors-panel {
+    @apply sp:border-0;
+  }
 }

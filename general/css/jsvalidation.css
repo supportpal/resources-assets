@@ -1,25 +1,29 @@
-.sp-input-has-error label {
-    @apply sp-text-red-800 !important;
-}
+@reference '#tailwind-base';
 
-.sp-input-has-error input,
-.sp-input-has-error select,
-.sp-input-has-error .tox-tinymce,
-.sp-input-has-error .codemirror-box,
-input.sp-input-has-error,
-select.sp-input-has-error {
-    @apply sp-border-red-500 !important;
-}
+@layer components {
+  .sp-input-has-error label {
+    @apply sp:text-red-800!;
+  }
 
-.sp-input-has-error .tox-tinymce,
-.sp-input-has-error .codemirror-box {
-    @apply sp-border-2;
-}
+  .sp-input-has-error input,
+  .sp-input-has-error select,
+  .sp-input-has-error .tox-tinymce,
+  .sp-input-has-error .codemirror-box,
+  input.sp-input-has-error,
+  select.sp-input-has-error {
+    @apply sp:border-red-500!;
+  }
 
-.sp-input-has-error .sp-input-error:not(:empty),
-div.sp-input-has-error ~ div > .sp-input-error:not(:empty),
-input.sp-input-has-error ~ div > .sp-input-error:not(:empty),
-select.sp-input-has-error ~ div > .sp-input-error:not(:empty),
-textarea.sp-input-has-error ~ div > .sp-input-error:not(:empty) {
-    @apply sp-inline-block sp-px-3 sp-py-3/2 sp-mt-3 sp-bg-red-500 sp-text-sm sp-text-white sp-rounded;
+  .sp-input-has-error .tox-tinymce,
+  .sp-input-has-error .codemirror-box {
+    @apply sp:border-2;
+  }
+
+  .sp-input-has-error .sp-input-error:not(:empty),
+  div.sp-input-has-error ~ div > .sp-input-error:not(:empty),
+  input.sp-input-has-error ~ div > .sp-input-error:not(:empty),
+  select.sp-input-has-error ~ div > .sp-input-error:not(:empty),
+  textarea.sp-input-has-error ~ div > .sp-input-error:not(:empty) {
+    @apply sp:inline-block sp:px-3 sp:py-1.5 sp:mt-3 sp:bg-red-500 sp:text-sm sp:text-white sp:rounded;
+  }
 }

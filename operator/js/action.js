@@ -82,11 +82,11 @@ $(function () {
         content: getCodeMirror($action.find('textarea[name$="[content]"]')),
         ticket_id: typeof ticket !== 'undefined' ? ticket.parameters().ticketId : null
       };
-    $action.find('.test-webhook-response').removeClass('text-success sp-text-green-600 text-fail sp-text-red-600').html('<i class="fa fa-spinner fa-pulse fa-fw"></i> ' + Lang.get('general.loading') + '...');
+    $action.find('.test-webhook-response').removeClass('text-success sp:text-green-600 text-fail sp:text-red-600').html('<i class="fa fa-spinner fa-pulse"></i> ' + Lang.get('general.loading') + '...');
     $.post(route, data).done(function (data) {
-      $action.find('.test-webhook-response').addClass(data.status === 'success' ? 'text-success sp-text-green-600' : 'text-fail sp-text-red-600').text(data.message);
+      $action.find('.test-webhook-response').addClass(data.status === 'success' ? 'text-success sp:text-green-600' : 'text-fail sp:text-red-600').text(data.message);
     }).fail(function (jqXHR, textStatus, errorThrown) {
-      $action.find('.test-webhook-response').addClass('text-fail sp-text-red-600').text(jqXHR.responseText);
+      $action.find('.test-webhook-response').addClass('text-fail sp:text-red-600').text(jqXHR.responseText);
     });
   });
 
@@ -97,7 +97,7 @@ $(function () {
     addNewItem('.rule');
 
     // Make sure table is visible
-    $('.rule-table').removeClass('sp-hidden');
+    $('.rule-table').removeClass('sp:hidden');
 
     // Disable and hide fields that are not needed now
     $('.rule:last .rule-value .action:not(:first)').hide().find(':input').prop('disabled', true);
@@ -112,7 +112,7 @@ $(function () {
 
     // Hide table if no actions set
     if (!$('.rule-table tbody tr:visible').length) {
-      $('.rule-table').addClass('sp-hidden');
+      $('.rule-table').addClass('sp:hidden');
     }
   });
 
@@ -121,7 +121,7 @@ $(function () {
    */
   $("#sortable").sortable({
     draggable: '.rule',
-    ghostClass: 'sp-opacity-50',
+    ghostClass: 'sp:opacity-50',
     handle: '.sp-sortable-handle'
   });
 
@@ -204,7 +204,7 @@ $(function () {
             return '<div class="item' + (item.unremovable ? ' unremovable' : '') + '">' + escape(item.value) + '</div>';
           },
           option: function (item, escape) {
-            return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" /> &nbsp;' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
+            return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" /> &nbsp;' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
           }
         },
         load: function (query, callback) {
@@ -239,7 +239,7 @@ $(function () {
    * @param id
    */
   function initCustomFields($tr, id) {
-    $tr.find('.rule-customfield').addClass('sp-hidden').find(':input').prop('disabled', true);
-    $tr.find('.rule-customfield[data-id="' + id + '"]').removeClass('sp-hidden').find(':input').prop('disabled', false);
+    $tr.find('.rule-customfield').addClass('sp:hidden').find(':input').prop('disabled', true);
+    $tr.find('.rule-customfield[data-id="' + id + '"]').removeClass('sp:hidden').find(':input').prop('disabled', false);
   }
 });

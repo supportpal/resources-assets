@@ -60,14 +60,14 @@ $(document).ready(function () {
       if (response.status == 'success') {
         // Show box with view
         $('.sp-suggested-articles .sp-articles-list').html(response.data.view);
-        $('.sp-suggested-articles').removeClass('sp-hidden');
+        $('.sp-suggested-articles').removeClass('sp:hidden');
       } else {
         // Hide box
-        $('.sp-suggested-articles').addClass('sp-hidden');
+        $('.sp-suggested-articles').addClass('sp:hidden');
       }
     }, 'json').fail(function () {
       // Hide box
-      $('.sp-suggested-articles').addClass('sp-hidden');
+      $('.sp-suggested-articles').addClass('sp:hidden');
     });
   }
 });

@@ -68,8 +68,8 @@ $.fn.datepicker = function (options) {
     // Convert from PHP date format to flatpickr format.
     dateFormat: $('meta[name=date_format]').prop('content').replace('jS', 'J').replace(/([^a-zA-Z])/g, "\\\\$1"),
     // RTL support for the arrows.
-    nextArrow: '<span class="rtl:sp-hidden"><i class="fas fa-chevron-right" aria-hidden="true"></i></span><span class="ltr:sp-hidden"><i class="fas fa-chevron-left" aria-hidden="true"></i></span>',
-    prevArrow: '<span class="rtl:sp-hidden"><i class="fas fa-chevron-left" aria-hidden="true"></i></span><span class="ltr:sp-hidden"><i class="fas fa-chevron-right" aria-hidden="true"></i></span>'
+    nextArrow: '<span class="sp:rtl:hidden"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span><span class="sp:ltr:hidden"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span>',
+    prevArrow: '<span class="sp:rtl:hidden"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></span><span class="sp:ltr:hidden"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span>'
   };
   return $(this).each(function () {
     // Quick fix to stop flatpickr being loaded twice on an input
@@ -203,22 +203,25 @@ $.fn.reverse = function () {
  *
  * @param className
  * @param container
+ * @param $idxElms
+ * @param attrMapperFn
  * @returns {number}
  */
-function addNewItem(className, container) {
+function addNewItem(className, container, $idxElms, attrMapperFn) {
+  const $class = typeof className === 'string' ? $(className) : className;
+  $idxElms = typeof $idxElms !== 'undefined' ? $idxElms : $class.find(':input[name$="[id]"]');
+
   // Clone the element
-  var newElem = $(className + ':first').clone();
+  var newElem = $class.first().clone();
 
   // Clear the input values from the cloned DOM
   newElem.removeClass('first');
 
-  // Update the index.. god damn you Laravel
-  // Longwinded but ensures a unique key
-  // Find the highest index first and add one
-  var re = /^\w+\[(\d+)?]\[\w+]?$/;
+  // Ensure a unique key: find the highest index first and add one
+  var re = /\[(\d+)?]\[id]$/;
   var m,
     index = 0;
-  $(className + ' :input[name$="[id]"]').each(function () {
+  $idxElms.each(function () {
     if ((m = re.exec($(this).attr('name'))) !== null) {
       if (typeof m[1] != 'undefined') {
         if ((m = parseInt(m[1])) >= index) {
@@ -234,8 +237,12 @@ function addNewItem(className, container) {
     elem.prop('disabled', false);
     ['name', 'for', 'id'].map(function (attribute) {
       var attr = elem.attr(attribute);
-      if (/^\w+\[(\d+)?](\[[\w:-]+])*(\[\])?$/g.test(attr)) {
-        elem.attr(attribute, attr.replace(/\[(\d+)?]/, '[' + index + ']'));
+      if (attrMapperFn) {
+        elem.attr(attribute, attrMapperFn(attr, index));
+      } else {
+        if (/^\w+\[(\d+)?](\[[\w:-]+])*(\[\])?$/g.test(attr)) {
+          elem.attr(attribute, attr.replace(/\[(\d+)?]/, '[' + index + ']'));
+        }
       }
     });
   });
@@ -246,11 +253,11 @@ function addNewItem(className, container) {
     $(container).append(newElem);
   } else {
     // Append cloned DOM to the end of the list
-    $(className + ':last').after(newElem);
+    $class.last().after(newElem);
   }
 
   // Make it visible
-  newElem.removeClass('sp-hidden');
+  newElem.removeClass('sp:hidden');
 
   // Auto select first option of dropdowns - fix for firefox
   newElem.find('select').each(function () {
@@ -289,7 +296,7 @@ $(function () {
       value: $('meta[name=csrf_token]').prop('content')
     }));
     $(document.body).append($form);
-    $form.submit();
+    $form.trigger('submit');
   });
 
   // Global event events.
@@ -335,8 +342,8 @@ $(function () {
   })
   // For opening/collapsing collapsible boxes
   .on('click', '.sp-collapsible', function () {
-    $(this).find('.fas.fa-chevron-down, .fas.fa-chevron-up').toggleClass('fa-chevron-down fa-chevron-up');
-    $(this).next().toggle(500);
+    $(this).find('.fa-solid.fa-chevron-down, .fa-solid.fa-chevron-up').toggleClass('fa-chevron-down fa-chevron-up');
+    $(this).next().slideToggle('fast');
   })
   // Smooth scrolling for anchors
   .on('click', 'a[href^="#"]', function (event) {
@@ -344,7 +351,7 @@ $(function () {
     var target = document.getElementById($.attr(this, 'href').substring(1));
     if (target !== null) {
       $('html, body, #content').animate({
-        scrollTop: $(target).offset().top - $('header.sp-sticky').height() - 24
+        scrollTop: $(target).offset().top - $('header.sp:sticky').height() - 24
       }, 500);
     }
   })
@@ -359,7 +366,7 @@ $(function () {
   if (hash !== '' && (target = document.getElementById(hash)) !== null) {
     // Now scroll to anchor
     $('html, body, #content').animate({
-      scrollTop: $(target).offset().top - $('header.sp-sticky').height() - 24
+      scrollTop: $(target).offset().top - $('header.sp:sticky').height() - 24
     }, 500);
   }
 
@@ -372,71 +379,6 @@ $(function () {
 
   // Register localisation settings.
   if (typeof Lang !== 'undefined') {
-    // Timeago
-    timeago.register('supportpal', function (number, index, total_sec) {
-      // Convert weeks to days.
-      if ([8, 9].indexOf(index) !== -1) {
-        total_sec = parseInt(total_sec / 86400);
-      }
-      return [[Lang.get('general.just_now'), Lang.get('general.shortly')], [Lang.choice('general.minutes_ago', 1, {
-        'number': 1
-      }), Lang.choice('general.in_minutes', 1, {
-        'number': 1
-      })], [Lang.choice('general.minutes_ago', 1, {
-        'number': 1
-      }), Lang.choice('general.in_minutes', 1, {
-        'number': 1
-      })], [Lang.choice('general.minutes_ago', 2, {
-        'number': '%s'
-      }), Lang.choice('general.in_minutes', 2, {
-        'number': '%s'
-      })], [Lang.choice('general.hours_ago', 1, {
-        'number': 1
-      }), Lang.choice('general.in_hours', 1, {
-        'number': 1
-      })], [Lang.choice('general.hours_ago', 2, {
-        'number': '%s'
-      }), Lang.choice('general.in_hours', 2, {
-        'number': '%s'
-      })], [Lang.choice('general.days_ago', 1, {
-        'number': 1
-      }), Lang.choice('general.in_days', 1, {
-        'number': 1
-      })], [Lang.choice('general.days_ago', 2, {
-        'number': '%s'
-      }), Lang.choice('general.in_days', 2, {
-        'number': '%s'
-      })], [Lang.choice('general.days_ago', 2, {
-        'number': total_sec
-      }), Lang.choice('general.in_days', 2, {
-        'number': total_sec
-      })], [Lang.choice('general.days_ago', 2, {
-        'number': total_sec
-      }), Lang.choice('general.in_days', 2, {
-        'number': total_sec
-      })], [Lang.choice('general.months_ago', 1, {
-        'number': 1
-      }), Lang.choice('general.in_months', 1, {
-        'number': 1
-      })], [Lang.choice('general.months_ago', 2, {
-        'number': '%s'
-      }), Lang.choice('general.in_months', 2, {
-        'number': '%s'
-      })], [Lang.choice('general.years_ago', 1, {
-        'number': 1
-      }), Lang.choice('general.in_years', 1, {
-        'number': 1
-      })], [Lang.choice('general.years_ago', 2, {
-        'number': '%s'
-      }), Lang.choice('general.in_years', 2, {
-        'number': '%s'
-      })]][index];
-    });
-
-    // Initialise global timeAgo variable (used in several other files).
-    window.timeAgo = new timeago();
-    timeAgo.setLocale("supportpal");
-
     // Hide/Show Password library defaults.
     $.extend(true, $.fn.hideShowPassword.defaults, {
       show: false,
@@ -464,18 +406,6 @@ $(function () {
       }
     });
     $('input[type=password]').hideShowPassword();
-
-    // Selectize defaults.
-    $.extend(true, $.fn.selectize.defaults, {
-      render: {
-        option_create: function (data, escape) {
-          var item = Lang.get('core.add_selectize', {
-            item: escape(data.input)
-          });
-          return '<div class="create">' + item + '</div>';
-        }
-      }
-    });
   }
 
   /**
@@ -522,8 +452,8 @@ $(function () {
       position = element.parent();
     }
 
-    // If it's editor, selectize, add after sibling.
-    if (element.next().hasClass('tox-tinymce') || element.next().hasClass('selectize-control')) {
+    // If it's editor or tom-select, add after sibling.
+    if (element.next().hasClass('tox-tinymce') || element.next().hasClass('ts-control')) {
       position = element.next();
     }
 
@@ -613,6 +543,9 @@ $(function () {
       // Run default error message handler.
       this.defaultShowErrors();
 
+      // Get the form as a jQuery object.
+      var $form = $(this.currentForm);
+
       // Move the screen to show the first error message.
       $.each(errorList, function (key, error) {
         var $elm = getErrorContainer($(error.element));
@@ -628,7 +561,7 @@ $(function () {
         // If the error is in a translatable model, open it.
         if ($elm.parent().hasClass('sp-translation')) {
           var $translatableInput = $elm.parents('.sp-input-translatable');
-          $translatableInput.find('.fa-language').click();
+          $translatableInput.find('.fa-language').trigger('click');
 
           // If the translation is not visible, select it from the dropdown.
           if (!$elm.parent().is(':visible')) {
@@ -638,12 +571,14 @@ $(function () {
             }
           }
         }
+        $form.trigger('showErrors', [$elm, error]);
 
         // Make sure the element is visible otherwise it will scroll to the top of the page.
         if ($elm.is(':visible')) {
-          $('html, body, #content').animate({
-            scrollTop: $elm.position().top - 44
-          }, 1000);
+          $elm[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
 
           // Break loop.
           return false;

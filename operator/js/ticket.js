@@ -32,7 +32,6 @@
      * @type {object}
      */
     var datatablesLoaded = {
-      'log': false,
       'escalationRules': false
     };
 
@@ -65,7 +64,7 @@
     var always_message_handler = function (form) {
       // Reset form
       form.find('textarea').prop('disabled', false);
-      form.find('input[type="submit"]').prop('disabled', false);
+      form.find('button[type="submit"]').prop('disabled', false);
 
       // Remove draft related elements
       form.find('.draft-success, .discard-draft').hide();
@@ -132,7 +131,7 @@
       $form.find('textarea:not(#' + textarea_id + ')').prop('disabled', true);
 
       // Disable the submit button, so they don't submit multiple messages.
-      $form.find('input[type="submit"]').prop('disabled', true);
+      $form.find('button[type="submit"]').prop('disabled', true);
     };
 
     /**
@@ -141,43 +140,14 @@
      * @param {string} html
      */
     this.insertMessage = function (html) {
-      // Add message to right place
-      var message,
-        code = $(html);
+      var $message = App.TicketView.insertMessage($(html));
 
-      // Make the message visible.
-      instance.showMessage(code);
-
-      // It's a note and we need to show it somewhere else than messages block only.
-      if (code.hasClass('sp-note') && (parameters.notesPosition === 0 || parameters.notesPosition === 1)) {
-        // Show the headers (in case its first note)
-        $('.notes-header, .messages-header').show();
-
-        // Definitely want to add to notes area
-        var place = $('.sp-messages-container[data-position="top"]');
-
-        // Also want to add to message area
-        if (parameters.notesPosition === 0) {
-          place = place.add($('.sp-messages-container[data-position="inline"]'));
-        }
-        if (parameters.replyOrder == 'ASC') {
-          // Add to end of block
-          message = code.appendTo(place);
-        } else {
-          // Add to start of block
-          message = code.prependTo(place);
-        }
-      } else {
-        // We need to just show it in the messages block
-        if (parameters.replyOrder == 'ASC') {
-          // Add to end of messages block
-          message = code.appendTo('.sp-messages-container[data-position="inline"]');
-        } else {
-          // Add to start of messages block
-          message = code.prependTo('.sp-messages-container[data-position="inline"]');
-        }
+      // If a message, make it visible.
+      if ($message.data('type').startsWith('message_')) {
+        instance.showMessage($message);
       }
-      instance.initialiseMessage(message);
+      App.OperatorTicketView.markAsNew($message);
+      return $message;
     };
 
     /**
@@ -187,31 +157,6 @@
      */
     this.showMessage = function (message) {
       App.OperatorTicketView.showMessage(message);
-    };
-
-    /**
-     * Highlight message and run through final loading of the message.
-     *
-     * @param message
-     */
-    this.initialiseMessage = function (message) {
-      // If more than one message, show split ticket button and checkboxes
-      if ($('.sp-message').length > 1) {
-        $('span.split-ticket').removeClass('sp-hidden');
-      }
-
-      // Load attachment previews if needed.
-      instance.loadAttachmentPreviews(message);
-      instance.highlightUserMentions(message);
-
-      // Show download all button for message if needed.
-      instance.showDownloadAllButton();
-
-      // Special effects, set as blue for 10 seconds.
-      message.addClass('sp-new-message');
-      setTimeout(function () {
-        message.removeClass('sp-new-message');
-      }, 10000);
     };
 
     /**
@@ -241,6 +186,9 @@
         name: 'ticket[0]',
         value: $form.find(':input[name=ticket_id]').val()
       });
+
+      // Stop the draft auto-save trying to run while a store is in progress.
+      App.OperatorDraftMessage.disableAutoSave();
       $.ajax({
         url: laroute.route('ticket.operator.message.store'),
         type: 'POST',
@@ -249,14 +197,14 @@
       }).done(function (response) {
         if (response.status != 'success') {
           showFeedback(true);
-          $form.trigger("supportpal.new_message:failed");
+          $form.trigger('supportpal.new_message:failed');
           return;
         }
 
         // Add message
         showFeedback();
-        self.insertMessage(response.data.view);
-        $form.trigger("supportpal.new_message:success", [$textarea]);
+        const $message = self.insertMessage(response.data.view);
+        $form.trigger('supportpal.new_message:success', [$textarea]);
 
         // Only clear the editor if it's a tinymce instance
         if (tinymce.get($textarea.prop('id'))) {
@@ -281,7 +229,7 @@
           }
 
           // Remove draft icon in quick action
-          $('.sp-reply-type .sp-action[data-type=' + replyType + '] .sp-draft-icon').addClass('sp-hidden');
+          $('.sp-reply-type .sp-action[data-type=' + replyType + '] .sp-draft-icon').addClass('sp:hidden');
         }
 
         // If posting a reply to the user, update the status in the notes and forwarding box.
@@ -292,18 +240,43 @@
         // Clear ticket attachments
         $form.find('input[name^=attachment]:not(:first)').remove();
         $form.find('ul.sp-attached-files').find('li:not(:first)').remove();
+        const shouldCloseAfterSubmit = $form.find('input[name="close_after_submit"]').val() !== '0';
+        if (shouldCloseAfterSubmit) {
+          // Hide form
+          const formTypes = {
+            'message-form': 'toggleReplyForm',
+            'notes-form': 'toggleNotesForm',
+            'forward-form': 'toggleForwardForm'
+          };
+          for (const [className, methodName] of Object.entries(formTypes)) {
+            if ($form.hasClass(className)) {
+              if (typeof App.TicketViewForm !== 'undefined' && typeof App.TicketViewForm[methodName] === 'function') {
+                App.TicketViewForm[methodName]();
+              } else {
+                $form.addClass('sp:hidden');
+              }
+              break;
+            }
+          }
+        } else {
+          // Form is being kept open, focus on the editor again.
+          $textarea.editor().focus();
+        }
 
         // Redirect to the ticket grid
         if (response.data.redirect !== false) {
           window.location.href = response.data.redirect;
         }
+
+        // Scroll to message
+        $message[0].scrollIntoView({
+          behavior: 'smooth'
+        });
       }).fail(function () {
         showFeedback(true);
       }).always(function () {
+        App.OperatorDraftMessage.enableAutoSave();
         always_message_handler($form);
-
-        // Update log and escalation rules tables
-        self.updateLogTable();
         self.updateEscalationsTable();
       });
     };
@@ -343,8 +316,8 @@
         // Replace message view with response (we use the message ID in case it's a note as it could be showing in
         // two places).
         message.find('.sp-message-text').html(response.data.message);
-        message.find('.sp-message-text-trimmed').addClass('sp-hidden');
-        message.find('.sp-message-text-original').removeClass('sp-hidden');
+        message.find('.sp-message-text-trimmed').addClass('sp:hidden');
+        message.find('.sp-message-text-original').removeClass('sp:hidden');
         message.find('.sp-message-edit-history').html(response.data.editHistory);
 
         // Close the edit form.
@@ -355,9 +328,6 @@
         message.removeClass('sp-message-updated');
       }).always(function () {
         always_message_handler($form);
-
-        // Update log table
-        self.updateLogTable();
       });
     };
 
@@ -400,7 +370,7 @@
      * @param $message
      */
     this.scrollToMessage = function ($message) {
-      App.OperatorTicketView.scrollToMessage($message);
+      App.TicketView.scrollToMessage($message);
     };
 
     /**
@@ -436,7 +406,7 @@
      * @deprecated Use visibleEditor() instead.
      */
     this.visibleTextarea = function () {
-      var $form = $('.ticket-reply-form:visible');
+      var $form = $('.ticket-reply-form form:visible');
       if ($form.length === 1) {
         return $form.find('textarea');
       }
@@ -450,13 +420,13 @@
      * Get the visible editor.
      */
     this.visibleEditor = function () {
-      if ($('.ticket-reply-form.notes-form').is(':visible')) {
-        return App.TicketViewForm.showNotesForm();
+      if ($('form.notes-form').is(':visible')) {
+        return App.TicketViewForm.toggleNotesForm(true);
       }
-      if ($('.ticket-reply-form.forward-form').is(':visible')) {
-        return App.TicketViewForm.showForwardForm();
+      if ($('form.forward-form').is(':visible')) {
+        return App.TicketViewForm.toggleForwardForm(true);
       }
-      return App.TicketViewForm.showReplyForm();
+      return App.TicketViewForm.toggleReplyForm(true);
     };
 
     /**
@@ -584,44 +554,6 @@
     };
 
     /**
-     * Get if the ticket log table has been loaded yet.
-     *
-     * @returns {boolean}
-     */
-    this.isLogTableLoaded = function () {
-      return datatablesLoaded.log;
-    };
-
-    /**
-     * Refresh the log datatable if it's been loaded.
-     *
-     * @param {boolean} force
-     */
-    this.updateLogTable = function (force) {
-      force = force || false;
-      var $tab = $('#tabLog');
-      if ($tab.is(':empty')) {
-        if ($tab.hasClass('loading')) {
-          return;
-        }
-        $tab.on('xhr.dt', function (e, settings, json, xhr) {
-          datatablesLoaded.log = true;
-        });
-        $tab.html('<i class="fas fa-spinner fa-pulse fa-fw"></i>').addClass('loading');
-        $.get(laroute.route('ticket.operator.log.render', {
-          id: ticket.parameters().ticketId
-        })).done(function (response) {
-          if (response.status === 'success') $tab.html(response.data);
-        });
-      } else {
-        // Refresh the table
-        if (this.isLogTableLoaded() || force) {
-          $tab.find('.dataTable').dataTable().api().ajax.reload();
-        }
-      }
-    };
-
-    /**
      * Get if the escalations table has been loaded yet.
      *
      * @returns {boolean}
@@ -635,7 +567,7 @@
      *
      * @param {boolean} force
      */
-    this.updateEscalationsTable = function (force) {
+    var updateEscalationsTableImpl = function (force) {
       force = force || false;
       var $tab = $('#tabEscalationRules');
       if ($tab.is(':empty')) {
@@ -644,31 +576,52 @@
         }
         $tab.on('xhr.dt', function (e, settings, data, xhr) {
           var $button = $('.sp-tabs #EscalationRules');
-          if (data.recordsTotal > 0) {
+          if (data && data.recordsTotal > 0) {
             // Show the tab if hidden and update the count of rules
-            $button.show();
+            $button.removeClass('sp:hidden');
           } else {
             // Switch to messages if we're currently on escalation rules
             if ($button.hasClass('sp-active')) {
               $('.sp-tabs #Messages').trigger('click');
             }
             // Hide the tab as no more rules exist
-            $button.hide();
+            $button.addClass('sp:hidden');
           }
           datatablesLoaded.escalationRules = true;
         });
-        $tab.html('<i class="fas fa-spinner fa-pulse fa-fw"></i>').addClass('loading');
+        $tab.html('<i class="fa-solid fa-spinner fa-pulse"></i>').addClass('loading');
         $.get(laroute.route('ticket.operator.escalationRules.render', {
           id: ticket.parameters().ticketId
         })).done(function (response) {
           if (response.status === 'success') $tab.html(response.data);
         });
       } else {
-        if (this.isEscalationsTableLoaded() || force) {
+        if (instance.isEscalationsTableLoaded() || force) {
           // Refresh the table
           $tab.find('.dataTable').dataTable().api().ajax.reload();
         }
       }
+    };
+    var updateEscalationsTableDebounceTimer = null;
+    this.updateEscalationsTable = function (force) {
+      // If force is true, clear any pending debounced call and execute immediately
+      if (force) {
+        if (updateEscalationsTableDebounceTimer) {
+          clearTimeout(updateEscalationsTableDebounceTimer);
+          updateEscalationsTableDebounceTimer = null;
+        }
+        updateEscalationsTableImpl(true);
+        return;
+      }
+
+      // Debounce regular calls to avoid multiple rapid AJAX requests
+      if (updateEscalationsTableDebounceTimer) {
+        clearTimeout(updateEscalationsTableDebounceTimer);
+      }
+      updateEscalationsTableDebounceTimer = setTimeout(function () {
+        updateEscalationsTableDebounceTimer = null;
+        updateEscalationsTableImpl(false);
+      }, 500);
     };
 
     /**
@@ -702,32 +655,25 @@
     };
 
     /**
-     * Remove expandable if there's no content before it.
-     *
-     * @param $message
-     */
-    this.removeExpandable = function ($message) {
-      App.OperatorTicketView.removeExpandable($message);
-    };
-
-    /**
      * Forward all messages from the given one.
      *
      * @param $message
      */
     this.forwardFrom = function ($message) {
-      // Uncollapse messages first
-      SpTicket.TicketView.removeCollapsedMessageGroup();
+      Swal.showLoading();
 
-      // Fetch the list of messages from this one based on the reply order, we always want latest first
-      // like you would get in an email client.
-      var $messages;
-      if (parameters.replyOrder === 'ASC') {
-        $messages = $message.prevUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack().reverse();
-      } else {
-        $messages = $message.nextUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack();
-      }
-      instance.forward($messages);
+      // Load all collapsed message sections first
+      App.TicketView.loadAllCollapsedSections().always(function () {
+        // Fetch the list of messages from this one based on the reply order, we always want latest first
+        // like you would get in an email client.
+        var $messages;
+        if (parameters.replyOrder === 'ASC') {
+          $messages = $message.nextUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack().reverse();
+        } else {
+          $messages = $message.prevUntil('#tabMessages', '.sp-message:not(.sp-note, .sp-forward)').addBack();
+        }
+        instance.forward($messages.filter('[data-type^="message_reply"]'));
+      });
     };
 
     /**
@@ -738,7 +684,6 @@
     this.forward = function ($messages) {
       // Lock the interface and show a waiting spinner (this may take a while on a large ticket).
       Swal.fire({
-        title: Lang.get('general.loading'),
         allowOutsideClick: false,
         focusConfirm: false,
         focusDeny: false,
@@ -748,10 +693,10 @@
       Swal.showLoading();
 
       // Switch to Forward tab.
-      App.TicketViewForm.showForwardForm().then(function (editor) {
+      App.TicketViewForm.toggleForwardForm(true).then(function (editor) {
         // Delete any attachments currently tied to the form.
         var deferred = [];
-        $('.forward-form .sp-attached-files li:not(.sp-hidden) .sp-delete-attachment').each(function (index, element) {
+        $('.forward-form .sp-attached-files li:not(.sp\\:hidden) .sp-delete-attachment').each(function (index, element) {
           deferred.push(parameters.forwardFileUpload.deleteNewFile(element, true));
         });
 
@@ -774,7 +719,7 @@
               message_attachments = [];
 
             // Message has attachments.
-            $message.find('ul.sp-attachments li').each(function (index, attachment) {
+            $message.find('ul.sp-attachments li[data-filename]').each(function (index, attachment) {
               var $attachment = $(attachment),
                 size = $attachment.find('.sp-delete-attachment').data('size'),
                 filename = $attachment.find('.sp-attachment-name').text().trim();
@@ -869,12 +814,23 @@
       return {
         plugins: plugins,
         toolbar: toolbar,
+        toolbar_sticky: true,
+        ui_mode: 'split',
+        // Statusbar settings.
+        statusbar: false,
         // Plugin settings.
         ticketId: this.parameters().ticketId,
         userId: this.parameters().userId,
         brandId: this.parameters().brandId,
         departmentId: this.parameters().departmentId,
-        excludeInternalArticles: this.parameters().excludeInternalArticles || false
+        excludeInternalArticles: this.parameters().excludeInternalArticles || false,
+        // Callback after editor is rendered
+        init_instance_callback: function (editor) {
+          // Add sticky toolbar class when quick actions exist
+          if ($('.sp-quick-actions').length) {
+            $(editor.getContainer()).find('.tox-editor-header').addClass('sp-with-quick-actions');
+          }
+        }
       };
     };
 
@@ -906,7 +862,7 @@
             if (!item.email) {
               return '<div>' + escape(item.value) + '</div>';
             }
-            return '<div>' + '<img class="sp-avatar sp-max-w-2xs" src="' + escape(item.avatar_url) + '" /> &nbsp;' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
+            return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" /> &nbsp;' + escape(item.formatted_name) + (item.organisation ? ' (' + escape(item.organisation || '') + ')' : '') + (item.email ? '<br /><span class="sp-description">' + escape(item.email || '') + '</span>' : '') + '</div>';
           }
         },
         load: function (query, callback) {
@@ -975,12 +931,8 @@
      */
     this.registerMessageEvents = function () {
       $(document).on('click', '.sp-pinned-message', function () {
-        const $message = $('.sp-messages-container').find('.sp-message[data-id="' + $(this).data('id') + '"]');
-        if ($message.length) {
-          setTimeout(function () {
-            instance.scrollToMessage($message);
-          }, 100);
-        }
+        const hash = App.OperatorTicketView.getMessageHash($(this));
+        instance.scrollToMessage(hash);
       })
 
       // Handle message actions button to show dropdown.
@@ -1005,21 +957,21 @@
         const $this = $(this),
           $message = $this.parents('.sp-message');
         $.post($this.data('href')).done(function (response) {
-          $message.find('.pin-message, .unpin-message').toggleClass('sp-hidden');
+          $message.find('.pin-message, .unpin-message').toggleClass('sp:hidden');
           if (response.data.pinned === null) {
             $('.sp-pinned-message[data-id="' + $message.data('id') + '"]').remove();
           } else {
-            $(response.data.pinned).insertAfter($('.sp-pinned-messages'));
+            $('.sp-pinned-messages').append(response.data.pinned);
 
             // Sort messages into right order.
-            const $messages = $('.sp-pinned-message').sort(function (a, b) {
+            const $messages = $('.sp-pinned-message').get().sort(function (a, b) {
               if (parameters.replyOrder == 'ASC') {
                 return $(a).data('id') - $(b).data('id');
               }
               return $(b).data('id') - $(a).data('id');
             });
             $('.sp-pinned-message').remove();
-            $messages.insertAfter($('.sp-pinned-messages'));
+            $('.sp-pinned-messages').append($messages);
           }
         }).always(() => Swal.close());
       })
@@ -1051,7 +1003,7 @@
           window.open(url + '?edit=true');
         } else {
           // Toggle the views. It will show a loading icon if it hasn't been loaded before.
-          $message.find('.sp-message-text, .sp-message-text-edit').toggle();
+          $message.find('.sp-message-text, .sp-message-text-edit').toggleClass('sp:hidden');
           var $editView = $message.find('.sp-message-text-edit');
 
           // If the edit message view is now visible and it hasn't already been loaded, we need
@@ -1068,7 +1020,7 @@
                 $message.find('form.edit textarea').editor(instance.defaultEditorConfig());
 
                 // Focus the editor.
-                $message.find('textarea:not(.CodeMirror textarea):eq(0)').editor('editor.startFocus');
+                $message.find('textarea:not(.CodeMirror textarea)').eq(0).editor('editor.startFocus');
               } else {
                 // Switch back to the message view.
                 $message.find('.sp-message-text, .sp-message-text-edit').toggle();
@@ -1090,7 +1042,7 @@
       // Copy link to message.
       .on('click', '.link-message', function (event) {
         var $message = $(this).parents('.sp-message'),
-          id = instance.getId($message),
+          id = App.OperatorTicketView.getMessageHash($message),
           url = laroute.route('ticket.operator.ticket.show', {
             'view': parameters.ticketId
           }) + '#' + id;
@@ -1156,15 +1108,14 @@
             $('.sp-ticket-update.sp-alert-success').show(500).delay(5000).hide(500);
 
             // Remove message from view
-            $('.sp-message-' + messageId).remove();
-            if (!$('.sp-message').length) {
-              // No more messages exist, ticket will likely have been deleted, redirect to grid
+            $('.sp-message[data-id="' + messageId + '"], .sp-pinned-message[data-id="' + messageId + '"]').remove();
+            if (result.value.data.is_trashed) {
               // We use replace() here as we don't want them to click back to ticket.
               window.location.replace(parameters.ticketGridUrl);
             }
             if (!$('.sp-note').length) {
-              // No more notes, hide the headers
-              $('.notes-header, .messages-header').hide();
+              // No more notes, hide the notes area if it's at the top
+              $('.notes-header, .sp-messages-container[data-position="top"]').addClass('sp:hidden');
             }
           }
         });

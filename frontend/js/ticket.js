@@ -5,6 +5,7 @@ $(document).ready(function () {
     defaultBtnValue = $btn.text();
   $postBtn.on('click', () => $form.find('input[name="close"]').val(0));
   $btn.on('click', () => {
+    $btn.prop('disabled', true);
     $form.find('input[name="close"]').val(1);
     $form.trigger('submit');
   });
@@ -76,7 +77,7 @@ $(document).ready(function () {
 
   // Expand recipients list to full form for editing
   $('.sp-recipients-text').on('click', function () {
-    $('.sp-recipients-text, .sp-recipients-input').toggleClass('sp-hidden');
+    $('.sp-recipients-text, .sp-recipients-input').toggleClass('sp:hidden');
   });
 
   // Backwards compatibility for JS changes in 2.1.2 (DEV-1032), this means the reply form continues to work.
@@ -139,9 +140,9 @@ $(document).ready(function () {
 
         // Show/hide mark as resolved link.
         if (e.id !== parseInt(closedStatusId)) {
-          $('.sp-mark-resolved').removeClass('sp-hidden');
+          $('.sp-mark-resolved').removeClass('sp:hidden');
         } else {
-          $('.sp-mark-resolved').addClass('sp-hidden');
+          $('.sp-mark-resolved').addClass('sp:hidden');
         }
       }).listen('.App\\Modules\\Ticket\\Events\\SubjectUpdated', e => {
         $('h1, .sp-ticket-subject').text(e.subject);
@@ -178,6 +179,9 @@ $(document).ready(function () {
     form.find('textarea[name="text"]').prop('disabled', true);
     form.find('input[type="submit"]').prop('disabled', true);
 
+    // Stop the draft auto-save trying to run while a store is in progress.
+    App.FrontendDraftMessage.disableAutoSave();
+
     // Post updated data
     $.ajax({
       url: form.attr('action'),
@@ -205,22 +209,20 @@ $(document).ready(function () {
       } else {
         if (typeof response.message != 'undefined' && response.message != '') {
           // Custom message
-          $('.sp-ticket-custom.sp-alert-error .sp-container').text(response.message).show(500).delay(5000).hide(500);
+          $('.sp-ticket-custom.sp-alert-error .sp\\:container').text(response.message).parent().show(500).delay(5000).hide(500);
         } else {
           $('.sp-ticket-reply.sp-alert-error').show(500).delay(5000).hide(500);
         }
-        // Re-enable textarea
-        form.find('textarea[name="text"]').prop('disabled', false);
       }
     }).fail(function () {
       // Show error
       $('.sp-ticket-reply.sp-alert-error').show(500).delay(5000).hide(500);
-
-      // Re-enable textarea
-      form.find('textarea[name="text"]').prop('disabled', false);
     }).always(function () {
-      // Reset form
-      form.find('input[type="submit"]').prop('disabled', false);
+      App.FrontendDraftMessage.enableAutoSave();
+
+      // Re-enable textarea and buttons
+      form.find('textarea[name="text"], input[type="submit"]').prop('disabled', false);
+      $btn.prop('disabled', false);
     });
   }
 
@@ -235,14 +237,7 @@ $(document).ready(function () {
       message = $(message).insertAfter($('.sp-message').last());
     }
     App.FrontendTicketView.showMessage(message);
-    App.FrontendTicketView.loadAttachmentPreviews(message);
-    App.FrontendTicketView.showDownloadAllButton();
-
-    // Special effects, set as blue for 10 seconds.
-    message.toggleClass('sp-new-message', 1000);
-    setTimeout(function () {
-      message.toggleClass('sp-new-message', 1000);
-    }, 10000);
+    App.FrontendTicketView.markAsNew(message);
 
     // Update last reply time/date.
     var $time = message.find('.sp-message-header time');
@@ -258,9 +253,9 @@ $(document).ready(function () {
   function updateSubmitButtons(editor) {
     let name = defaultBtnValue,
       disabled = 'disabled';
-    if ($.trim(editor.getContent({
+    if (editor.getContent({
       format: 'text'
-    })) !== '') {
+    }).trim() !== '') {
       name = $btn.data('close');
       disabled = false;
     }

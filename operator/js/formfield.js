@@ -84,7 +84,7 @@ $(function () {
   function initSortable($selector) {
     return $selector.sortable({
       draggable: '.option',
-      ghostClass: 'sp-opacity-50',
+      ghostClass: 'sp:opacity-50',
       handle: '.sp-sortable-handle'
     });
   }

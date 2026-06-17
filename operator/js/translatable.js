@@ -27,8 +27,8 @@ $(function () {
         return;
       }
 
-      // Is it the selectize or last translation option if selectize is not there
-      if ($(target).parent('.selectize-input').length || $(this).find('select[name="sp-translation-add"]').length && $(target).parents('.sp-translation').is(':last-child')) {
+      // Is it the tom-select or last translation option if tom-select is not there
+      if ($(target).parent('.ts-control').length || $(this).find('select[name="sp-translation-add"]').length && $(target).parents('.sp-translation').is(':last-child')) {
         // If so, we've tabbed outside, close it.
         close($(this));
       }
@@ -127,8 +127,8 @@ $(function () {
     return $selector.selectize({
       // Invoked when an item is selected.
       //      Insert a new translation.
-      onItemAdd: function (value, $option) {
-        var $modal = this.$dropdown.parents('.sp-translatable-modal');
+      onItemAdd: function (value) {
+        var $modal = $(this.dropdown).parents('.sp-translatable-modal');
 
         // Find template in missing list.
         var $translation = $modal.find('.missing-translations .sp-translation[data-locale="' + value + '"]');

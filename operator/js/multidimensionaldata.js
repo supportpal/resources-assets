@@ -13,14 +13,14 @@ $(document).ready(function () {
     placeholder: $(selector).attr('title'),
     onChange: function (value) {
       // Add the new DOM within the current tab.
-      var $tab = this.$input.parents('.sp-tab-content'),
+      var $tab = $(this.input).parents('.sp-tab-content'),
         $container = $tab.find('.section-items');
 
       // Clone the DOM element.
       var newElem = $tab.find('.section-item:first').clone();
 
       // Show the remove button.
-      newElem.find('button.remove-button').removeClass('sp-hidden');
+      newElem.find('button.remove-button').removeClass('sp:hidden');
 
       // Set the language code for all inputs in the new element.
       newElem.find('input[type="hidden"]:not(.mdd-ignore)').val(value);
@@ -66,7 +66,7 @@ $(document).ready(function () {
       this.removeOption(value, true);
       this.refreshOptions(false);
       // Hack to get the placeholder to show... only god knows why it disappears.
-      this.$control_input.css({
+      $(this.control_input).css({
         "opacity": "1",
         "position": "relative",
         "left": "0px",
@@ -81,7 +81,7 @@ $(document).ready(function () {
 
       // Hide the drop-down if there are no options.
       if (Object.keys(this.options).length === 0) {
-        this.$input.parents('.sp-form-container').hide();
+        $(this.input).parents('.sp-form-container').hide();
       }
 
       // Trigger DOM event.

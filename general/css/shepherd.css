@@ -1,64 +1,67 @@
-@import 'shepherd.js/dist/css/shepherd.css';
+@import 'shepherd.js/dist/css/shepherd.css' layer(components);
 
-.shepherd-element {
-    @apply sp-bg-primary sp-border sp-border-tertiary sp-text-primary sp-shadow-md dark:sp-bg-secondary;
-    z-index: 10005;
-}
+@reference '#tailwind-base';
 
-.shepherd-arrow:before {
-    @apply sp-bg-primary dark:sp-bg-secondary;
-}
+@layer components {
+  .shepherd-element {
+    @apply sp:bg-primary sp:border sp:border-tertiary sp:text-primary sp:shadow-md sp:z-10005 sp:dark:bg-secondary;
+  }
 
-.shepherd-element.shepherd-has-title[data-popper-placement^=bottom]>.shepherd-arrow:before {
-    @apply sp-bg-tertiary;
-}
+  .shepherd-arrow {
+    @apply sp:before:bg-primary sp:dark:before:bg-secondary;
+  }
 
-.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,
-.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before {
-    @apply sp-border-b sp-border-tertiary;
-}
+  .shepherd-element.shepherd-has-title[data-popper-placement^=bottom] > .shepherd-arrow {
+    @apply sp:before:bg-tertiary;
+  }
 
-.shepherd-element.shepherd-has-title[data-popper-placement^=top]>.shepherd-arrow:before,
-.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before{
-    @apply sp-border-e sp-border-tertiary;
-}
+  .shepherd-element.shepherd-has-title[data-popper-placement^=top] > .shepherd-arrow,
+  .shepherd-element.shepherd-has-title[data-popper-placement^=right] > .shepherd-arrow {
+    @apply sp:before:border-b sp:before:border-tertiary;
+  }
 
-.shepherd-element.shepherd-has-title[data-popper-placement^=right]>.shepherd-arrow:before {
-    @apply sp-border-s sp-border-tertiary;
-}
+  .shepherd-element.shepherd-has-title[data-popper-placement^=top] > .shepherd-arrow,
+  .shepherd-element.shepherd-has-title[data-popper-placement^=left] > .shepherd-arrow {
+    @apply sp:before:border-e sp:before:border-tertiary;
+  }
 
-.shepherd-element.shepherd-has-title[data-popper-placement^=left]>.shepherd-arrow:before {
-    @apply sp-border-t sp-border-tertiary;
-}
+  .shepherd-element.shepherd-has-title[data-popper-placement^=right] > .shepherd-arrow {
+    @apply sp:before:border-s sp:before:border-tertiary;
+  }
 
-.shepherd-has-title .shepherd-content .shepherd-header {
-    @apply sp-px-4 sp-py-2 sp-bg-tertiary;
-}
+  .shepherd-element.shepherd-has-title[data-popper-placement^=left] > .shepherd-arrow {
+    @apply sp:before:border-t sp:before:border-tertiary;
+  }
 
-.shepherd-title {
-    @apply sp-text-lg sp-text-primary sp-font-bold;
-}
+  .shepherd-has-title .shepherd-content .shepherd-header {
+    @apply sp:px-4 sp:py-2 sp:bg-tertiary;
+  }
 
-.shepherd-has-title .shepherd-content .shepherd-cancel-icon {
-    @apply sp-text-secondary sp-shadow-none;
-}
+  .shepherd-title {
+    @apply sp:text-lg sp:text-primary sp:font-bold;
+  }
 
-.shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
-    @apply sp-text-primary;
-}
+  .shepherd-has-title .shepherd-content .shepherd-cancel-icon {
+    @apply sp:text-secondary sp:shadow-none;
+  }
 
-.shepherd-cancel-icon {
-    @apply sp-text-2xl sp-font-bold;
-}
+  .shepherd-has-title .shepherd-content .shepherd-cancel-icon:hover {
+    @apply sp:text-primary;
+  }
 
-.shepherd-text {
-    @apply sp-text-primary sp-overflow-auto;
-}
+  .shepherd-cancel-icon {
+    @apply sp:text-2xl sp:font-bold;
+  }
 
-.shepherd-button {
-    @apply sp-bg-primary-800 sp-text-white sp-rounded;
-}
+  .shepherd-text {
+    @apply sp:text-primary sp:overflow-auto;
+  }
 
-.shepherd-button:not(:disabled):hover {
-    @apply sp-bg-primary-900 sp-text-white;
+  .shepherd-button {
+    @apply sp:bg-primary-800 sp:text-white sp:rounded;
+  }
+
+  .shepherd-button:not(:disabled):hover {
+    @apply sp:bg-primary-900 sp:text-white;
+  }
 }

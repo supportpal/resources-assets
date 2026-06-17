@@ -33,9 +33,9 @@ $(document).ready(function () {
 
   // Search - open/close search bar
   $('.sp-search-button, .sp-search-close').on('click', function () {
-    $('header .sp-search').toggleClass('sp-hidden');
+    $('header .sp-search').toggleClass('sp:hidden');
     if ($('header .sp-search').is(':visible')) {
-      $('header .sp-search').find('input[name=query]').focus();
+      $('header .sp-search').find('input[name=query]').trigger('focus');
     }
   });
 
@@ -48,7 +48,8 @@ $(document).ready(function () {
 
   // Mobile navigation
   $('.sp-mobile-nav-button').on('click', function () {
-    $('.sp-mobile-nav').slideToggle().toggleClass('sp-hidden');
+    $(this).toggleClass('sp:bg-tertiary sp:text-primary-800');
+    $('.sp-mobile-nav').slideToggle().toggleClass('sp:hidden');
     $('body').toggleClass('sp-mobile-nav-open');
   });
 });

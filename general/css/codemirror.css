@@ -1,54 +1,56 @@
-.codemirror-box {
-    @apply sp-border sp-border-tertiary sp-rounded;
-}
+@reference '#tailwind-base';
 
-.codemirror-box .cm-focused {
-    @apply sp-outline-0;
-}
+@layer components {
+  .codemirror-box {
+    @apply sp:border sp:border-tertiary sp:rounded;
+  }
 
-.codemirror-box .toolbar-wrapper {
-    @apply sp-sticky sp-top-0 sp-z-[1000];
-}
+  .codemirror-box .cm-focused {
+    @apply sp:outline-0;
+  }
 
-.codemirror-box .toolbar {
-    @apply sp-bg-secondary sp-border-0 sp-border-b sp-border-solid sp-border-tertiary sp-rounded-t;
-}
+  .codemirror-box .toolbar-wrapper {
+    @apply sp:sticky sp:top-0 sp:z-1000;
+  }
 
-.codemirror-box .toolbar a {
-    @apply sp-inline-block sp-align-middle;
-}
+  .codemirror-box .toolbar {
+    @apply sp:bg-secondary sp:border-0 sp:border-b sp:border-solid sp:border-tertiary sp:rounded-t;
+  }
 
-.codemirror-box .toolbar svg {
-    fill: var(--color-text-primary);
-}
+  .codemirror-box .toolbar a {
+    @apply sp:inline-block sp:align-middle;
+  }
 
-.codemirror-box .toolbar a.button-icon {
-    @apply sp-p-3/2;
-}
+  .codemirror-box .toolbar svg {
+    @apply sp:fill-(--color-text-primary);
+  }
 
-.codemirror-box .toolbar a:hover,
-.codemirror-box .toolbar a:hover .fa {
-    @apply sp-text-secondary;
-}
+  .codemirror-box .toolbar a.button-icon {
+    @apply sp:p-1.5;
+  }
 
-.codemirror-box .toolbar a:hover svg {
-    @apply sp-text-secondary;
-    fill: var(--color-text-secondary);
-}
+  .codemirror-box .toolbar a:hover,
+  .codemirror-box .toolbar a:hover .fa {
+    @apply sp:text-secondary;
+  }
 
-.codemirror-box .cm-editor {
-    @apply sp-rounded-b;
-}
+  .codemirror-box .toolbar a:hover svg {
+    @apply sp:text-secondary sp:fill-(--color-text-secondary);
+  }
 
-.codemirror-box .cm-gutters {
-    @apply sp-text-tertiary sp-rounded-es;
-    background-color: #00000025;
-}
+  .codemirror-box .cm-editor {
+    @apply sp:rounded-b;
+  }
 
-.codemirror-box .cm-activeLineGutter {
-    background-color: #cceeff33;
-}
+  .codemirror-box .cm-gutters {
+    @apply sp:bg-[#00000025] sp:text-tertiary sp:rounded-es;
+  }
 
-.codemirror-box .cm-activeLine {
-    background-color: #99eeff20;
+  .codemirror-box .cm-activeLineGutter {
+    @apply sp:bg-[#cceeff33];
+  }
+
+  .codemirror-box .cm-activeLine {
+    @apply sp:bg-[#99eeff20];
+  }
 }

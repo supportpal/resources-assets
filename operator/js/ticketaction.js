@@ -26,15 +26,15 @@
    * @returns {*|jQuery}
    */
   var createList = function (tickets) {
-    var ticketList = $('<ul />').addClass('sp-list-none sp-p-0 sp-m-0 sp-border sp-border-secondary sp-rounded sp-text-start sp-overflow-y-auto').css('max-height', '15rem');
+    var ticketList = $('<ul />').addClass('sp:list-none sp:p-0 sp:m-0 sp:border sp:border-secondary sp:rounded sp:text-start sp:overflow-y-auto').css('max-height', '15rem');
 
     // Add each ticket to list.
     $.each(tickets, function (index, value) {
-      var $li = $('<li />').addClass('sp-py-1 sp-px-3');
+      var $li = $('<li />').addClass('sp:py-1 sp:px-3');
       if (index >= 1) {
-        $li.addClass('sp-border-t sp-border-secondary');
+        $li.addClass('sp:border-t sp:border-secondary');
       }
-      $li.append($('<a />').text('#' + value.number + ' - ' + value.subject).prop('href', value.operator_url).prop('target', '_blank')).append('<br />').append($('<img />').prop('src', value.user.avatar_url).prop('class', 'sp-avatar sp-max-w-2xs')).append('&nbsp; ').append($('<span>').addClass('sp-description').text(value.user.formatted_name)).appendTo(ticketList);
+      $li.append($('<a />').text('#' + value.number + ' - ' + value.subject).prop('href', value.operator_url).prop('target', '_blank')).append('<br />').append($('<img />').prop('src', value.user.avatar_url).prop('class', 'sp-avatar sp:max-w-5')).append('&nbsp; ').append($('<span>').addClass('sp-description').text(value.user.formatted_name)).appendTo(ticketList);
     });
     return ticketList;
   };
@@ -62,10 +62,33 @@
    * Register a selectize instance on the given jQuery context.
    *
    * @param $context
-   * @param tickets
+   * @param tickets       Array of ticket IDs to exclude from search results.
+   * @param initialOptions  Optional array of full ticket models. When provided the user may only
+   *                        pick from these options — AJAX searching is disabled.
    */
-  var registerSelectize = function ($context, tickets) {
-    var params = {
+  var registerSelectize = function ($context, tickets, initialOptions) {
+    var render = {
+      item: function (item, escape) {
+        return '<div class="item">' + item.status.icon + '&nbsp; #' + escape(item.number) + " - " + escape(item.subject) + "</div>";
+      },
+      option: function (item, escape) {
+        return '<div>' + item.status.icon + '&nbsp; ' + '<strong>#' + escape(item.number) + "</strong>&nbsp; " + escape(item.subject) + '<br />' + '<span class="sp-description">' + escape(item.user.formatted_name) + ' &nbsp;&middot;&nbsp; ' + escape(item.department.name) + ' &nbsp;&middot;&nbsp; ' + escape(item.brand.name) + '</span>' + '</div>';
+      }
+    };
+
+    // When initial options are provided, lock the picker to only those tickets — no searching.
+    if (initialOptions && initialOptions.length) {
+      $context.selectize({
+        valueField: 'id',
+        labelField: 'number',
+        searchField: ['number', 'subject'],
+        options: initialOptions,
+        create: false,
+        render: render
+      });
+      return;
+    }
+    $context.selectize({
       valueField: 'id',
       labelField: 'number',
       // Selectize has internal filtering based on searchField which we don't want. So in order to get it to display
@@ -74,14 +97,7 @@
       searchField: ['searchField'],
       placeholder: Lang.get('core.sSearchPlaceholder'),
       create: false,
-      render: {
-        item: function (item, escape) {
-          return '<div class="item">#' + escape(item.number) + " - " + escape(item.subject) + "</div>";
-        },
-        option: function (item, escape) {
-          return '<div>' + '<strong>#' + escape(item.number) + "</strong>&nbsp; " + escape(item.subject) + '<br />' + '<span class="sp-description">' + escape(item.user.formatted_name) + ' &nbsp;&middot;&nbsp; ' + escape(item.department.name) + ' &nbsp;&middot;&nbsp; ' + escape(item.brand.name) + '</span>' + '</div>';
-        }
-      },
+      render: render,
       load: function (query, callback) {
         this.clearOptions();
 
@@ -105,8 +121,7 @@
           callback();
         });
       }
-    };
-    $context.selectize(params);
+    });
   };
 
   /*
@@ -138,64 +153,6 @@
    * @returns {*}
    */
   TicketAction.merge = function (tickets) {
-    /**
-     * Filter out tickets which are not in the provided list.
-     *
-     * @param tickets
-     * @param ids
-     * @param excludeIds
-     * @returns {*}
-     */
-    var whereIn = function (tickets, ids, excludeIds) {
-      var results = [];
-      $.each(ids, function (index, value) {
-        if (typeof excludeIds !== 'undefined' && $.inArray(value, excludeIds) !== -1) {
-          return;
-        }
-        var ticket = $.grep(tickets, function (obj) {
-          return obj.id == value;
-        });
-        if (ticket.length) {
-          results.push(ticket[0]);
-        }
-      });
-      return results;
-    };
-
-    /**
-     * Get the oldest ticket from the collection.
-     *
-     * @param tickets
-     * @returns {number}
-     */
-    var getOldestTicket = function (tickets) {
-      var oldest = null;
-      $.each(tickets, function (index, ticket) {
-        if (oldest === null || ticket.created_at < oldest.created_at) {
-          oldest = ticket;
-        }
-      });
-      return oldest;
-    };
-
-    /**
-     * Generate the HTML used for the modal.
-     *
-     * @param ticketInfo
-     * @returns {jQuery}
-     */
-    var makeInterface = function (ticketInfo) {
-      var selectedTickets = whereIn(ticketInfo, tickets),
-        $select = $('<select/>').attr('name', 'merge_into_id').attr('id', 'swal2-select');
-      if (selectedTickets.length > 1) {
-        appendTicketsToList($select, selectedTickets, getOldestTicket(selectedTickets));
-      } else {
-        var recentTickets = whereIn(ticketInfo, recentTicketIds, tickets);
-        $select.append($('<option />'));
-        appendTicketsToList($select, recentTickets);
-      }
-      return $('<div />').append(createList(selectedTickets)).append('<br />').append($('<form />').append($('<label />').text(Lang.get('ticket.merge_tickets_into'))).append($select)).html();
-    };
     return Swal.fire({
       title: Lang.get('ticket.merge_tickets'),
       html: '',
@@ -204,21 +161,38 @@
       didOpen: function () {
         Swal.showLoading();
 
-        // Fetch details of the selected tickets and also recent tickets.
-        return $.get(laroute.route('ticket.operator.action.search'), {
-          include_ids: tickets.concat(recentTicketIds)
+        // Fetch the merge modal HTML from the server
+        return $.get(laroute.route('ticket.operator.action.merge.modal'), {
+          ticket_ids: tickets,
+          include_ids: recentTicketIds
         }).then(function (response) {
           if (response.status === 'success') {
             Swal.hideLoading();
             Swal.update({
-              html: makeInterface(response.data),
+              html: response.data,
               showCancelButton: true
             });
-            registerSelectize($(Swal.getHtmlContainer().querySelector('#swal2-select')), tickets);
+
+            // Initialize selectize for the merge into dropdown with onChange callback
+            var $select = $(Swal.getHtmlContainer().querySelector('#swal2-select'));
+            var $statusSelect = $(Swal.getHtmlContainer().querySelector('#swal2-status-select'));
+
+            // When merging multiple tickets, read the pre-populated ticket models from
+            // the rendered options and lock the picker to only those choices.
+            var initialOptions = tickets.length > 1 ? $select.find('option[data-data]').map(function () {
+              return JSON.parse($(this).attr('data-data'));
+            }).get() : null;
+            registerSelectize($select, tickets, initialOptions);
+
+            // Initialize selectize for status dropdown
+            $statusSelect.selectize({
+              create: false,
+              allowEmptyOption: true
+            });
           } else {
-            throw new Error(response.statusText);
+            throw new Error(response.message || 'Failed to load merge modal');
           }
-        }).catch(function () {
+        }).catch(function (error) {
           Swal.fire(Lang.get('messages.error'), Lang.get('messages.general_error'), 'error');
         });
       },
@@ -227,12 +201,14 @@
         if (!$('#swal2-select').val()) {
           return false;
         }
+        var statusValue = $('#swal2-status-select').val();
         return $.ajax({
           url: laroute.route('ticket.operator.action.merge'),
           type: 'POST',
           data: {
             'ticket': tickets,
-            'merge_into_id': $('#swal2-select').val()
+            'merge_into_id': $('#swal2-select').val(),
+            'status': statusValue
           },
           dataType: 'json'
         }).then(function (response) {

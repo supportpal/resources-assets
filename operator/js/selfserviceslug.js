@@ -54,7 +54,7 @@ var SupportPalSlugGenerator = function (parameters) {
         $brandUri = $slug.find('.brand-uri'),
         regex = new RegExp("\/" + default_frontend_locale + "$", "");
       $brandUri.text($brandUri.text().replace(regex, "/" + (typeof locale === 'undefined' ? default_frontend_locale : locale)));
-      $slug.removeClass('sp-hidden');
+      $slug.removeClass('sp:hidden');
     }).fail(function (jqXHR, textStatus, errorThrown) {
       void 0;
     }).always(function () {

@@ -3,43 +3,6 @@
 })(this, function (exports) {
   'use strict';
 
-  /*
-     * DOMParser HTML extension
-     * 2012-09-04
-     *
-     * By Eli Grey, http://eligrey.com
-     * Public domain.
-     * NO WARRANTY EXPRESSED OR IMPLIED. USE AT YOUR OWN RISK.
-     */
-
-  /*! @source https://gist.github.com/1129031 */
-  function DOMParser() {
-    var proto = DOMParser.prototype,
-      nativeParse = proto.parseFromString;
-
-    // Firefox/Opera/IE throw errors on unsupported types
-    try {
-      // WebKit returns null on unsupported types
-      if (new DOMParser().parseFromString("", "text/html")) {
-        // text/html parsing is natively supported
-        return;
-      }
-    } catch (ex) {}
-    proto.parseFromString = function (markup, type) {
-      if (/^\s*text\/html\s*(?:;|$)/i.test(type)) {
-        var doc = document.implementation.createHTMLDocument("");
-        if (markup.toLowerCase().indexOf('<!doctype') > -1) {
-          doc.documentElement.innerHTML = markup;
-        } else {
-          doc.body.innerHTML = markup;
-        }
-        return doc;
-      } else {
-        return nativeParse.apply(this, arguments);
-      }
-    };
-  }
-
   /**
    * Merge fields.
    *
@@ -57,14 +20,6 @@
       $preview,
       $editor,
       valFn = parameters.valFn;
-
-    /**
-     * List of node attributes that are permitted to contain twig template code.
-     */
-    var whitelisted = {
-      'img': ['src'],
-      'a': ['href']
-    };
 
     /**
      * HTML used to wrap plugin contents in the DOM.
@@ -85,7 +40,7 @@
      * @private
      */
     var createToolbar = function () {
-      return '' + '<div class="sp-inline-block sp-mt-3">' + '<button class="switch-view visual-preview" type="button">' + Lang.get('general.preview') + '</button>' + '<button class="switch-view code-editor sp-hidden" type="button">' + Lang.get('general.editor') + '</button>' + '</div>';
+      return '' + '<div class="sp:inline-block sp:mt-3">' + '<button class="switch-view visual-preview" type="button">' + Lang.get('general.preview') + '</button>' + '<button class="switch-view code-editor sp:hidden" type="button">' + Lang.get('general.editor') + '</button>' + '</div>';
     };
 
     /**
@@ -99,41 +54,6 @@
     };
 
     /**
-     * Check whether the 'html' contains any twig code that exists within HTML nodes or its' attributes.
-     *
-     * @param html
-     * @returns {boolean}
-     */
-    var containsTwig = function (html) {
-      var parser = new DOMParser(),
-        doc = parser.parseFromString(html, "text/html");
-      var items = doc.getElementsByTagName("*");
-      for (var i = items.length; i--;) {
-        // Get the Element.
-        var node = items[i];
-
-        // Remove any whitelisted attributes.
-        if (whitelisted.hasOwnProperty(node.tagName.toLowerCase())) {
-          var attributes = whitelisted[node.tagName.toLowerCase()];
-          for (var c = attributes.length; c--;) {
-            if (node.hasAttribute(attributes[c])) {
-              node.removeAttribute(attributes[c]);
-            }
-          }
-        }
-
-        // Get the node value (not including any children).
-        var node_html = node.innerHTML ? node.outerHTML.slice(0, node.outerHTML.indexOf(node.innerHTML)) : node.outerHTML;
-
-        // Check if the node contains any twig.
-        if (/<[^{>]*(\{\{(?:[^}]+|}(?!}))*}}|\{%(?:[^%]+|%(?!}))*%})[^>]*>/gi.test(node_html)) {
-          return true;
-        }
-      }
-      return false;
-    };
-
-    /**
      * Check whether the html contains {{ operator.reply_template }} and show a warning.
      *
      * @param html
@@ -143,7 +63,7 @@
       if (/\{\{\s*operator\.reply_template(\|raw)?\s*}}/.test(html)) {
         if (!$container.find('.twig-sig-warning').length) {
           $container.append($('<div>', {
-            class: "sp-alert sp-alert-warning sp-mt-3 sp-mb-0 twig-sig-warning",
+            class: "sp-alert sp-alert-warning sp:mt-3 sp:mb-0 twig-sig-warning",
             text: Lang.get('core.twig_operator_reply_template')
           }));
         }
@@ -160,20 +80,6 @@
     this.callback = function (html) {
       // Check if the editor contains {{ operator.reply_template }}.
       containsReplyTemplate(html);
-
-      // Check any twig code exists within HTML nodes or its' attributes.
-      if (containsTwig(html)) {
-        // Add a warning if there isn't one already
-        if (!$container.find('.twig-html-warning').length) {
-          $container.append($('<div>', {
-            class: "sp-alert sp-alert-warning sp-mt-3 sp-mb-0 twig-html-warning",
-            text: Lang.get('core.twig_html_warning')
-          }));
-        }
-      } else {
-        // Remove warning if it exists
-        $container.find('.twig-html-warning').remove();
-      }
     };
 
     /**
@@ -298,7 +204,7 @@
   MergeFields.modalContent = '<section> \
                         <span class="sp-description">' + MergeFields.translations.merge_fields_desc + '</span> \
                         <br /><br /> \
-                        <div class="sp-merge-fields sp-flex sp-flex-wrap"> \
+                        <div class="sp-merge-fields sp:flex sp:flex-wrap"> \
                         </div> \
                       </section>';
 
@@ -310,7 +216,7 @@
    */
   MergeFields.ticketTemplate = function (show_canned_responses) {
     show_canned_responses = show_canned_responses || true;
-    return String() + '<div class="sp-w-full lg:sp-w-1/2">' + '<strong class="sp-text-xl">' + Lang.choice('ticket.ticket', 2) + '</strong>' + '<table>' + '<tr>' + '<td><strong>' + Lang.get('operator.strings') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.number }}">' + Lang.get('general.number') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.token }}">' + Lang.get('core.token') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.subject }}">' + Lang.get('ticket.subject') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(ticket.due_time) }}">' + Lang.get('ticket.due_time') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(ticket.created_at) }}">' + Lang.get('ticket.created_time') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(ticket.updated_at) }}">' + Lang.get('ticket.last_action') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.lastReply.purified_text|raw }}">' + Lang.get('ticket.last_message_text') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.frontend_url }}">' + Lang.get('operator.frontend_url') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.operator_url }}">' + Lang.get('operator.operator_url') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('ticket.department', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.department.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.department.frontend_name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('general.status', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.status.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.status.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('ticket.priority', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.priority.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.priority.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('ticket.sla_plan', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.slaplan.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.get('operator.collections') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for tag in ticket.tags %}{{ tag.name }}{% endfor %}">' + Lang.choice('ticket.tag', 2) + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for user in ticket.assigned %}{{ user.formatted_name }}{% endfor %}">' + Lang.get('ticket.assigned_operator') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for field in ticket.customfields %}{{ field.id }}{% endfor %}">' + Lang.choice('customfield.customfield', 2) + '</button></td>' + '</tr>' + (!show_canned_responses ? '' : '<tr>' + '<td><br /></td>' + '</tr>' + '<tr>' + '<td><strong class="sp-text-xl">' + Lang.choice('ticket.cannedresponse', 2) + '</strong></td>' + '</tr>' + '<tr>' + '<td><span class="sp-description">' + Lang.get('operator.merge_field_canned_desc') + '</span></td>' + '</tr>') + '</table>' + '</div>';
+    return String() + '<div class="sp:w-full sp:lg:w-1/2">' + '<strong class="sp:text-xl">' + Lang.choice('ticket.ticket', 2) + '</strong>' + '<table>' + '<tr>' + '<td><strong>' + Lang.get('operator.strings') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.number }}">' + Lang.get('general.number') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.token }}">' + Lang.get('core.token') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.subject }}">' + Lang.get('ticket.subject') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(ticket.due_time) }}">' + Lang.get('ticket.due_time') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(ticket.created_at) }}">' + Lang.get('ticket.created_time') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(ticket.updated_at) }}">' + Lang.get('ticket.last_action') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.lastReply.purified_text|raw }}">' + Lang.get('ticket.last_message_text') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.frontend_url }}">' + Lang.get('operator.frontend_url') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.operator_url }}">' + Lang.get('operator.operator_url') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('ticket.department', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.department.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.department.frontend_name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('general.status', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.status.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.status.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('ticket.priority', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.priority.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.priority.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.choice('ticket.sla_plan', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ ticket.slaplan.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.get('operator.collections') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for tag in ticket.tags %}{{ tag.name }}{% endfor %}">' + Lang.choice('ticket.tag', 2) + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for user in ticket.assigned %}{{ user.formatted_name }}{% endfor %}">' + Lang.get('ticket.assigned_operator') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for field in ticket.customfields %}{{ field.id }}{% endfor %}">' + Lang.choice('customfield.customfield', 2) + '</button></td>' + '</tr>' + (!show_canned_responses ? '' : '<tr>' + '<td><br /></td>' + '</tr>' + '<tr>' + '<td><strong class="sp:text-xl">' + Lang.choice('ticket.cannedresponse', 2) + '</strong></td>' + '</tr>' + '<tr>' + '<td><span class="sp-description">' + Lang.get('operator.merge_field_canned_desc') + '</span></td>' + '</tr>') + '</table>' + '</div>';
   };
 
   /**
@@ -320,7 +226,7 @@
    * @returns {string}
    */
   MergeFields.userAndSystemTemplate = function (show_organisations) {
-    return String() + '<div class="sp-w-full sp-mt-6 lg:sp-w-1/2 lg:sp-mt-0">' + '<strong class="sp-text-xl">' + Lang.choice('user.user', 2) + '</strong>' + '<table>' + '<tr>' + '<td><strong>' + Lang.get('operator.strings') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.formatted_name }}">' + Lang.get('user.formatted_name') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.firstname }}">' + Lang.get('user.firstname') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.lastname }}">' + Lang.get('user.lastname') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.email }}">' + Lang.get('general.email') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.email_verified }}">' + Lang.get('user.verified') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.active }}">' + Lang.get('user.account_active') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.country }}">' + Lang.get('user.country') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.language_code }}">' + Lang.choice('general.language', 1) + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(user.created_at) }}">' + Lang.get('ticket.created_time') + '</button></td>' + '</tr>' + (!show_organisations ? '' : '<tr>' + '<td><strong>' + Lang.choice('user.organisation', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.organisation.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>') + '<tr>' + '<td><strong>' + Lang.get('operator.collections') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for group in user.groups %}{{ group.name }}{% endfor %}">' + Lang.choice('user.group', 2) + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for field in ticket.customfields %}{{ field.id }}{% endfor %}">' + Lang.choice('customfield.customfield', 2) + '</button></td>' + '</tr>' + '<tr>' + '<td>' + '<br />' + '<strong class="sp-text-xl">' + Lang.choice('core.brand', 1) + '</strong>' + '</td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.get('operator.strings') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ brand.name }}">' + Lang.get('core.brand_name') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ brand.default_email }}">' + Lang.get('general.email_address') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ brand.frontend_url }}">' + Lang.get('operator.frontend_url') + '</button></td>' + '</tr>' + '</table>' + '</div>';
+    return String() + '<div class="sp:w-full sp:mt-6 sp:lg:w-1/2 sp:lg:mt-0">' + '<strong class="sp:text-xl">' + Lang.choice('user.user', 2) + '</strong>' + '<table>' + '<tr>' + '<td><strong>' + Lang.get('operator.strings') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.id }}">' + Lang.get('general.id') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.formatted_name }}">' + Lang.get('user.formatted_name') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.firstname }}">' + Lang.get('user.firstname') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.lastname }}">' + Lang.get('user.lastname') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.email }}">' + Lang.get('general.email') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.email_verified }}">' + Lang.get('user.verified') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.active }}">' + Lang.get('user.account_active') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.country }}">' + Lang.get('user.country') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.language_code }}">' + Lang.choice('general.language', 1) + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ formatDate(user.created_at) }}">' + Lang.get('ticket.created_time') + '</button></td>' + '</tr>' + (!show_organisations ? '' : '<tr>' + '<td><strong>' + Lang.choice('user.organisation', 1) + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ user.organisation.name }}">' + Lang.get('general.name') + '</button></td>' + '</tr>') + '<tr>' + '<td><strong>' + Lang.get('operator.collections') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for group in user.groups %}{{ group.name }}{% endfor %}">' + Lang.choice('user.group', 2) + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{% for field in ticket.customfields %}{{ field.id }}{% endfor %}">' + Lang.choice('customfield.customfield', 2) + '</button></td>' + '</tr>' + '<tr>' + '<td>' + '<br />' + '<strong class="sp:text-xl">' + Lang.choice('core.brand', 1) + '</strong>' + '</td>' + '</tr>' + '<tr>' + '<td><strong>' + Lang.get('operator.strings') + '</strong></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ brand.name }}">' + Lang.get('core.brand_name') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ brand.default_email }}">' + Lang.get('general.email_address') + '</button></td>' + '</tr>' + '<tr>' + '<td><button type="button" class="sp-button-sm" data-mf="{{ brand.frontend_url }}">' + Lang.get('operator.frontend_url') + '</button></td>' + '</tr>' + '</table>' + '</div>';
   };
 
   /**

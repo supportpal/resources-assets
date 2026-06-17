@@ -24,16 +24,16 @@ function Article(parameters) {
 
     // Initialise the visible type drop-down.
     $('select[name="category[' + id + '][type]"]').selectize({
-      plugins: ['disableDelete'],
+      plugins: ['disable_delete'],
       onChange: function (value) {
         // Hide the URL/views for this type
-        this.$input.parents('.sp-form-container').find('.type-url, .type-views').remove();
+        $(this.input).parents('.sp-form-container').find('.type-url, .type-views').remove();
 
         // Only carry on if we have a type
         if (!value.length) return;
 
         // Get the category selectize instance.
-        var select_categories = this.$input.parents(self.getClassName()).find('select[name$="[categories][]"]');
+        var select_categories = $(this.input).parents(self.getClassName()).find('select[name$="[categories][]"]');
         if (select_categories.length == 0 || typeof select_categories[0].selectize === 'undefined') {
           void 0;
           return;
@@ -172,7 +172,7 @@ $(document).ready(function () {
   $('#toggle_published').on('change', function () {
     var $published_at = $('.published_at');
     if (this.checked) {
-      $published_at.removeClass('sp-hidden');
+      $published_at.removeClass('sp:hidden');
       $published_at.find(':input').prop('disabled', false);
 
       // If the article is currently not published
@@ -186,7 +186,7 @@ $(document).ready(function () {
         $published_at.removeClass('not-published');
       }
     } else {
-      $published_at.addClass('sp-hidden');
+      $published_at.addClass('sp:hidden');
       $published_at.find(':input').prop('disabled', 'disabled');
     }
   });

@@ -1,29 +1,36 @@
-body.lg-on {
-    @apply sp-overflow-hidden;
-}
+@import "../../../../node_modules/lightgallery/css/lightgallery.css" layer(components);
+@import "../../../../node_modules/lightgallery/css/lg-video.css" layer(components);
+@import "../../../../node_modules/lightgallery/css/lg-zoom.css" layer(components);
 
-.lg-backdrop {
-    z-index: 10003;
-}
+@reference '#tailwind-base';
 
-.lg-backdrop, .lg-toolbar {
-    background-color: rgba(0, 0, 0, 0.9) !important;
-}
+@layer components {
+  body.lg-on {
+    @apply sp:overflow-hidden;
+  }
 
-.lg-outer {
-    z-index: 10004;
-}
+  .lg-backdrop {
+    @apply sp:z-10003;
+  }
 
-.lg-actions .lg-next,
-.lg-actions .lg-prev {
-    @apply sp-shadow-none;
-    background-color: rgba(0, 0, 0, .9);
-}
+  .lg-backdrop, .lg-toolbar {
+    @apply sp:bg-black/90!;
+  }
 
-.lg-icon:hover {
-    background-color: rgba(0, 0, 0, .9) !important;
-}
+  .lg-outer {
+    @apply sp:z-10004;
+  }
 
-.lg-video-object {
-    @apply sp-bg-gray-900;
+  .lg-actions .lg-next,
+  .lg-actions .lg-prev {
+    @apply sp:bg-black/90 sp:shadow-none;
+  }
+
+  .lg-icon:hover {
+    @apply sp:bg-black/90!;
+  }
+
+  .lg-video-object {
+    @apply sp:bg-gray-900;
+  }
 }

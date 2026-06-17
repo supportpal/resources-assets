@@ -113,7 +113,7 @@ var installer = function (parameters) {
       // Fire the next request after 0.5 seconds
       if (json.data.complete == true) {
         $textarea.scrollTop($textarea[0].scrollHeight);
-        $migration.find('.sp-form-button.sp-hidden').show().find('input[type=submit]').prop('disabled', false);
+        $migration.find('.sp-form-button.sp\\:hidden').show().find('input[type=submit]').prop('disabled', false);
 
         // Remove alert when clicking continue.
         window.removeEventListener('beforeunload', handleUnload);

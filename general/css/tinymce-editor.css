@@ -1,71 +1,87 @@
-:root {
+@import "../../../../../node_modules/tinymce/skins/ui/oxide/skin.css" layer(components);
+@import "../../../../../node_modules/tinymce/skins/ui/oxide/content.css" layer(components);
+@import "../../../general/css/tinymce-published.css" layer(components);
+
+@reference '#tailwind-base';
+
+@layer base {
+  :root {
     --font-code: 'Menlo', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', 'monospace';
-}
+  }
 
-html {
-    @apply sp-leading-normal sp-break-words;
-}
+  html {
+    @apply sp:leading-[1.5] sp:break-words;
+  }
 
-body {
-    @apply sp-m-3 sp-text-primary;
-}
+  body {
+    @apply sp:m-3 sp:text-primary;
+  }
 
-* {
+  * {
     print-color-adjust: exact;
+  }
+
+  a {
+    @apply sp:text-secondary;
+  }
+
+  hr {
+    @apply sp:my-6 sp:border-0 sp:border-t sp:border-tertiary sp:border-solid;
+  }
+
+  code,
+  pre:not(.moz-signature) {
+    @apply sp:font-code sp:text-primary sp:text-shadow-none;
+  }
 }
 
-a {
-    @apply sp-text-secondary;
-}
+@layer components {
+  .mce-content-body {
+    @apply sp:overflow-y-auto!;
+  }
 
-hr {
-    @apply sp-my-6 sp-border-0 sp-border-t sp-border-tertiary sp-border-solid;
-}
+  .mce-content-body[data-mce-placeholder]:not(.mce-visualblocks)::before {
+    @apply sp:text-secondary;
+  }
 
-code,
-pre:not(.moz-signature) {
-    @apply sp-font-code sp-text-primary;
-    text-shadow: none;
-}
-
-table[style*="border-width: 0px"],
-.mce-item-table:not([border]),
-.mce-item-table[border="0"],
-table[style*="border-width: 0px"] td,
-.mce-item-table:not([border]) td,
-.mce-item-table[border="0"] td,
-table[style*="border-width: 0px"] th,
-.mce-item-table:not([border]) th,
-.mce-item-table[border="0"] th,
-table[style*="border-width: 0px"] caption,
-.mce-item-table:not([border]) caption,
-.mce-item-table[border="0"] caption {
+  table[style*="border-width: 0px"],
+  .mce-item-table:not([border]),
+  .mce-item-table[border="0"],
+  table[style*="border-width: 0px"] td,
+  .mce-item-table:not([border]) td,
+  .mce-item-table[border="0"] td,
+  table[style*="border-width: 0px"] th,
+  .mce-item-table:not([border]) th,
+  .mce-item-table[border="0"] th,
+  table[style*="border-width: 0px"] caption,
+  .mce-item-table:not([border]) caption,
+  .mce-item-table[border="0"] caption {
     border: inherit;
-}
+  }
 
-span[data-mce-type="bookmark"]:before {
-    @apply sp-inline-block sp-me-2 sp-border sp-border-tertiary sp-border-dashed sp-align-middle;
+  span[data-mce-type="bookmark"]:before {
+    @apply sp:inline-block sp:me-2 sp:border sp:border-tertiary sp:border-dashed sp:align-middle;
     content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' focusable='false'%3E%3Cpath d='M6 4v17l6-4 6 4V4c0-.6-.4-1-1-1H7a1 1 0 0 0-1 1Z' fill-rule='nonzero'%3E%3C/path%3E%3C/svg%3E");
-}
+  }
 
-.mce-content-body *[data-mce-selected="inline-boundary"] {
-    @apply sp-bg-tertiary;
-}
+  .mce-content-body *[data-mce-selected="inline-boundary"] {
+    @apply sp:bg-tertiary;
+  }
 
-div.expandable:before {
-    @apply sp-inline-block sp-content-['...'] sp-h-4 sp-px-1 sp-my-3 sp-bg-secondary sp-border sp-border-tertiary sp-rounded sp-leading-[0.375rem];
-}
+  div.expandable:before {
+    @apply sp:inline-block sp:content-['...'] sp:h-4 sp:px-1 sp:my-3 sp:bg-secondary sp:border sp:border-tertiary sp:rounded sp:leading-[0.375rem];
+  }
 
-div.expandable:hover:before {
-    @apply sp-bg-tertiary sp-cursor-pointer;
-}
+  div.expandable:hover:before {
+    @apply sp:bg-tertiary sp:cursor-pointer;
+  }
 
-div.expandable + div.supportpal_quote {
-    @apply sp-hidden sp-text-tertiary;
-}
+  div.expandable + div.supportpal_quote {
+    @apply sp:hidden sp:text-tertiary;
+  }
 
-/* Fix for Firefox */
-
-:focus-visible {
-    @apply sp-outline-none;
+  /* Fix for Firefox */
+  :focus-visible {
+    @apply sp:outline-none;
+  }
 }

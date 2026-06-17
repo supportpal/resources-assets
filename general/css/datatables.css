@@ -1,42 +1,50 @@
-div.dt-container:not(.dt-container-normal-margin) {
-    @apply sp--mx-6;
-}
+/* Note: deliberately excluding buttons CSS as we use our own */
+@import "../../../../node_modules/datatables.net-dt/css/dataTables.dataTables.css" layer(components);
+@import "../../../../node_modules/datatables.net-responsive-dt/css/responsive.dataTables.css" layer(components);
+@import "../../../../node_modules/@supportpal/yadcf/src/jquery.dataTables.yadcf.css" layer(components);
 
-div.dt-container div.dt-layout-row {
-    @apply sp-m-0;
-}
+@reference '#tailwind-base';
 
-div.dt-container div.dt-layout-cell {
-    @apply sp-p-0;
-}
+@layer components {
+  div.dt-container:not(.dt-container-normal-margin) {
+    @apply sp:-mx-6;
+  }
 
-div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
-    @apply sp-me-auto sp-mr-0;
-}
+  div.dt-container div.dt-layout-row {
+    @apply sp:m-0;
+  }
 
-div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
-    @apply sp-ms-auto sp-ml-0;
-}
+  div.dt-container div.dt-layout-cell {
+    @apply sp:p-0;
+  }
 
-div.dt-container .dt-length,
-div.dt-container .dt-search,
-div.dt-container .dt-info,
-div.dt-container .dt-processing,
-div.dt-container .dt-paging,
-div.dt-container .dataTables_sort {
-    @apply sp-mx-6 sp-text-primary;
-}
+  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-start {
+    @apply sp:me-auto sp:mr-0;
+  }
 
-div.dt-container.dt-container-normal-margin .dt-length,
-div.dt-container.dt-container-normal-margin .dt-search,
-div.dt-container.dt-container-normal-margin .dt-info,
-div.dt-container.dt-container-normal-margin .dt-processing,
-div.dt-container.dt-container-normal-margin .dt-paging,
-div.dt-container.dt-container-normal-margin .dataTables_sort {
-    @apply sp-mx-0;
-}
+  div.dt-container div.dt-layout-row div.dt-layout-cell.dt-layout-end {
+    @apply sp:ms-auto sp:ml-0;
+  }
 
-@media print {
+  div.dt-container .dt-length,
+  div.dt-container .dt-search,
+  div.dt-container .dt-info,
+  div.dt-container .dt-processing,
+  div.dt-container .dt-paging,
+  div.dt-container .dataTables_sort {
+    @apply sp:mx-6 sp:text-primary;
+  }
+
+  div.dt-container.dt-container-normal-margin .dt-length,
+  div.dt-container.dt-container-normal-margin .dt-search,
+  div.dt-container.dt-container-normal-margin .dt-info,
+  div.dt-container.dt-container-normal-margin .dt-processing,
+  div.dt-container.dt-container-normal-margin .dt-paging,
+  div.dt-container.dt-container-normal-margin .dataTables_sort {
+    @apply sp:mx-0;
+  }
+
+  @media print {
     div.dt-container,
     div.dt-container .dt-length,
     div.dt-container .dt-search,
@@ -44,442 +52,364 @@ div.dt-container.dt-container-normal-margin .dataTables_sort {
     div.dt-container .dt-processing,
     div.dt-container .dt-paging,
     div.dt-container .dataTables_sort {
-        @apply sp-mx-0;
+      @apply sp:mx-0;
     }
-}
+  }
 
-div.dt-container .dt-processing {
+  div.dt-container .dt-processing {
     background: 0;
-    @apply sp-h-full sp-w-full sp-start-0 sp-top-0 sp-pt-2 sp-m-0 sp-bg-primary sp-opacity-75 sp-z-20;
-}
+    @apply sp:h-full sp:w-full sp:start-0 sp:top-0 sp:pt-2 sp:m-0 sp:bg-primary sp:opacity-75 sp:z-20;
+  }
 
-div.dt-processing > div:last-child > div {
-    @apply sp-h-2 sp-w-2;
-}
+  div.dt-processing > div:last-child > div {
+    @apply sp:h-2 sp:w-2;
+  }
 
-div.dt-container .dt-length,
-div.dt-container .dt-info {
-    @apply sp-hidden;
-}
+  div.dt-container .dt-length,
+  div.dt-container .dt-info {
+    @apply sp:hidden;
+  }
 
-.dt-length,
-.dt-search {
-    @apply sp-p-0 sp-pb-4;
-}
+  .dt-length,
+  .dt-search {
+    @apply sp:p-0 sp:pb-4;
+  }
 
-div.dt-container .dt-search input {
-    @apply sp-ms-0;
-}
+  div.dt-container .dt-search input {
+    @apply sp:ms-0;
+  }
 
-div.dt-container .dt-length select,
-div.dt-container .dataTables_sort select,
-div.dt-container .dt-search input {
-    @apply sp-px-3 sp-py-1/2 sp-bg-secondary sp-border-2 sp-border-secondary sp-rounded;
-    min-height: 2rem;
-}
+  div.dt-container .dt-length select,
+  div.dt-container .dataTables_sort select,
+  div.dt-container .dt-search input {
+    @apply sp:min-h-8 sp:px-3 sp:py-0.5 sp:bg-secondary sp:border-2 sp:border-secondary sp:rounded;
+  }
 
-div.dt-container .dt-length select,
-div.dt-container .dataTables_sort select {
-    @apply sp-pe-8;
-}
+  div.dt-container .dt-length select,
+  div.dt-container .dataTables_sort select {
+    @apply sp:pe-8;
+  }
 
-div.dt-container .dt-length select {
-    @apply sp-mx-1;
-}
+  div.dt-container .dt-length select {
+    @apply sp:mx-1;
+  }
 
-div.dt-container .dataTables_sort {
-    @apply sp-pb-4 sp-float-end;
-}
+  div.dt-container .dataTables_sort {
+    @apply sp:pb-4 sp:float-end;
+  }
 
-div.dt-container .dt-info,
-div.dt-container .dt-paging {
-    @apply sp-pt-4;
-}
+  div.dt-container .dt-info,
+  div.dt-container .dt-paging {
+    @apply sp:pt-4;
+  }
 
-div.dt-container .top .dt-info {
-    @apply sp-px-0 sp-pt-1 sp-pb-5;
-}
+  div.dt-container .top .dt-info {
+    @apply sp:px-0 sp:pt-1 sp:pb-5;
+  }
 
-div.dt-container .dt-info {
-    @apply sp-leading-loose;
-}
+  div.dt-container .dt-info {
+    @apply sp:leading-loose;
+  }
 
-.dt-paging.dt-inputpaging {
-    @apply sp-flex sp-items-center sp-justify-center;
-}
+  .dt-paging.dt-inputpaging {
+    @apply sp:flex sp:items-center sp:justify-center;
+  }
 
-.dt-paging.dt-inputpaging.sp-hidden {
-    display: none !important;
-}
+  .dt-paging .dt-paging-input {
+    @apply sp:mx-3;
+  }
 
-.dt-paging .dt-paging-input {
-    @apply sp-mx-3;
-}
+  .dt-paging .dt-paging-input input {
+    @apply sp:w-6 sp:min-h-[auto] sp:min-w-6 sp:border-0 sp:box-content;
+  }
 
-.dt-paging .dt-paging-input input {
-    @apply sp-w-6 sp-min-h-[auto] sp-min-w-6 sp-border-0 sp-box-content;
-}
+  div.dt-container .dt-paging .dt-paging-button,
+  .dt-paging .dt-paging-button {
+    @apply sp:px-1.5 sp:py-1 sp:ms-0 sp:border-0 sp:rounded sp:shadow-none sp:text-secondary! sp:xs:px-2;
+  }
 
-div.dt-container .dt-paging .dt-paging-button,
-.dt-paging .dt-paging-button {
-    @apply sp-px-2 sp-py-1 sp-ms-0 sp-border-0 sp-rounded sp-shadow-none;
-    @apply sp-text-secondary !important;
-}
+  div.dt-container .dt-paging .dt-paging-button:hover,
+  div.dt-container .dt-paging .dt-paging-button:active,
+  .dt-paging .dt-paging-button:hover,
+  .dt-paging .dt-paging-button:active {
+    @apply sp:bg-tertiary! sp:border-0 sp:shadow-inner sp:text-primary! sp:cursor-pointer;
+  }
 
-div.dt-container .dt-paging .dt-paging-button:hover,
-div.dt-container .dt-paging .dt-paging-button:active,
-.dt-paging .dt-paging-button:hover,
-.dt-paging .dt-paging-button:active {
-    @apply sp-border-0 sp-shadow-inner sp-cursor-pointer;
-    @apply sp-text-primary !important;
-    background: var(--color-background-tertiary) !important;
-}
+  div.dt-container .dt-paging .dt-paging-button.disabled,
+  div.dt-container .dt-paging .dt-paging-button.disabled:hover,
+  div.dt-container .dt-paging .dt-paging-button.disabled:active,
+  .dt-paging .dt-paging-button.disabled,
+  .dt-paging .dt-paging-button.disabled:hover,
+  .dt-paging .dt-paging-button.disabled:active {
+    @apply sp:bg-none sp:border-0 sp:shadow-none sp:text-secondary! sp:cursor-auto sp:opacity-25;
+  }
 
-div.dt-container .dt-paging .dt-paging-button.disabled,
-div.dt-container .dt-paging .dt-paging-button.disabled:hover,
-div.dt-container .dt-paging .dt-paging-button.disabled:active,
-.dt-paging .dt-paging-button.disabled,
-.dt-paging .dt-paging-button.disabled:hover,
-.dt-paging .dt-paging-button.disabled:active {
-    @apply sp-border-0 sp-shadow-none sp-cursor-auto sp-opacity-25;
-    @apply sp-text-secondary !important;
-    background: 0;
-}
+  div.dt-container .dt-input {
+    @apply sp:px-3 sp:py-1.5 sp:bg-secondary sp:border-2 sp:border-secondary sp:rounded;
+  }
 
-div.dt-container .dt-input {
-    @apply sp-px-3 sp-py-3/2 sp-bg-secondary sp-border-2 sp-border-secondary sp-rounded;
-}
+  div.dt-container .dt-input:focus {
+    @apply sp:bg-primary;
+  }
 
-div.dt-container .dt-input:focus {
-    @apply sp-bg-primary;
-}
+  div.dt-container .dt-input.sp\:md\:rounded-e-none {
+    @apply sp:rounded-e-none;
+  }
 
-div.dt-container .dt-input.md\:sp-rounded-e-none {
-    @apply sp-rounded-e-none;
-}
+  table.dataTable.no-footer {
+    @apply sp:border-b-0;
+  }
 
-table.dataTable.no-footer {
-    @apply sp-border-b-0;
-}
+  table.dataTable:not(.sp\:table-inline) thead td,
+  table.dataTable:not(.sp\:table-inline) thead th {
+    @apply sp:sticky! sp:top-0 sp:bg-primary sp:overflow-hidden sp:text-ellipsis sp:whitespace-nowrap sp:z-10;
+  }
 
-table.dataTable:not(.sp-table-inline) thead td,
-table.dataTable:not(.sp-table-inline) thead th {
-    @apply sp-sticky !important;
-    @apply sp-top-0 sp-bg-primary sp-overflow-hidden sp-text-ellipsis sp-whitespace-nowrap sp-z-10;
-}
+  table.dataTable thead:not(.sp\:table-inline) th.sp\:relative {
+    @apply sp:sticky;
+  }
 
-table.dataTable thead:not(.sp-table-inline) th.sp-relative {
-    @apply sp-sticky;
-}
+  table.dataTable.sp-with-actions thead td,
+  table.dataTable.sp-with-actions thead th {
+    @apply sp:top-12;
+  }
 
-table.dataTable.sp-with-actions thead td,
-table.dataTable.sp-with-actions thead th {
-    @apply sp-top-12;
-}
+  table.dataTable > thead > tr > th,
+  table.dataTable > thead > tr > td,
+  table.dataTable > tfoot > tr > th,
+  table.dataTable > tfoot > tr > td {
+    @apply sp:border-b-2 sp:border-tertiary;
+  }
 
-table.dataTable > thead > tr > th,
-table.dataTable > thead > tr > td,
-table.dataTable > tfoot > tr > th,
-table.dataTable > tfoot > tr > td {
-    @apply sp-border-b-2 sp-border-tertiary;
-}
+  table.dataTable > thead > tr > th,
+  table.dataTable > thead > tr > td,
+  table.dataTable > tbody > tr > th,
+  table.dataTable > tbody > tr > td,
+  table.dataTable > tfoot > tr > th,
+  table.dataTable > tfoot > tr > td {
+    @apply sp:px-3 sp:py-2;
+  }
 
-table.dataTable > thead > tr > th,
-table.dataTable > thead > tr > td,
-table.dataTable > tbody > tr > th,
-table.dataTable > tbody > tr > td,
-table.dataTable > tfoot > tr > th,
-table.dataTable > tfoot > tr > td {
-    @apply sp-px-3 sp-py-2;
-}
+  table.dataTable thead th:first-child,
+  table.dataTable thead td:first-child,
+  table.dataTable tbody th:first-child,
+  table.dataTable tbody td:first-child,
+  table.dataTable tfoot th:first-child,
+  table.dataTable tfoot td:first-child {
+    @apply sp:ps-6;
+  }
 
-table.dataTable thead th:first-child,
-table.dataTable thead td:first-child,
-table.dataTable tbody th:first-child,
-table.dataTable tbody td:first-child,
-table.dataTable tfoot th:first-child,
-table.dataTable tfoot td:first-child {
-    @apply sp-ps-6;
-}
+  table.dataTable thead th:first-child[style*="display: none"] + th:not([style*="display: none"]),
+  table.dataTable thead td:first-child[style*="display: none"] + td:not([style*="display: none"]),
+  table.dataTable tbody th:first-child[style*="display: none"] + th:not([style*="display: none"]),
+  table.dataTable tbody td:first-child[style*="display: none"] + td:not([style*="display: none"]),
+  table.dataTable tfoot th:first-child[style*="display: none"] + th:not([style*="display: none"]),
+  table.dataTable tfoot td:first-child[style*="display: none"] + td:not([style*="display: none"]) {
+    @apply sp:ps-6;
+  }
 
-table.dataTable thead th:first-child[style*="display: none"] + th:not([style*="display: none"]),
-table.dataTable thead td:first-child[style*="display: none"] + td:not([style*="display: none"]),
-table.dataTable tbody th:first-child[style*="display: none"] + th:not([style*="display: none"]),
-table.dataTable tbody td:first-child[style*="display: none"] + td:not([style*="display: none"]),
-table.dataTable tfoot th:first-child[style*="display: none"] + th:not([style*="display: none"]),
-table.dataTable tfoot td:first-child[style*="display: none"] + td:not([style*="display: none"]) {
-    @apply sp-ps-6;
-}
+  table.dataTable thead th:last-child,
+  table.dataTable thead td:last-child,
+  table.dataTable tbody th:last-child,
+  table.dataTable tbody td:last-child,
+  table.dataTable tfoot th:last-child,
+  table.dataTable tfoot td:last-child {
+    @apply sp:pe-6!;
+  }
 
-table.dataTable thead th:last-child,
-table.dataTable thead td:last-child,
-table.dataTable tbody th:last-child,
-table.dataTable tbody td:last-child,
-table.dataTable tfoot th:last-child,
-table.dataTable tfoot td:last-child,
-table.dataTable thead th.sp-pe-6,
-table.dataTable thead td.sp-pe-6,
-table.dataTable tbody th.sp-pe-6,
-table.dataTable tbody td.sp-pe-6,
-table.dataTable tfoot th.sp-pe-6,
-table.dataTable tfoot td.sp-pe-6 {
-    padding-inline-end: 1.5rem;
-}
+  table.settings thead th:first-child {
+    @apply sp:border-s-0;
+  }
 
-table.settings thead th:first-child {
-    @apply sp-border-s-0;
-}
+  table.dataTable thead > tr > th.dt-orderable-asc,
+  table.dataTable thead > tr > th.dt-orderable-desc,
+  table.dataTable thead > tr > th.dt-ordering-asc,
+  table.dataTable thead > tr > th.dt-ordering-desc {
+    @apply sp:pe-[1.875rem];
+  }
 
-table.dataTable thead > tr > th.dt-orderable-asc,
-table.dataTable thead > tr > th.dt-orderable-desc,
-table.dataTable thead > tr > th.dt-ordering-asc,
-table.dataTable thead > tr > th.dt-ordering-desc {
-    @apply sp-pe-[1.875rem];
-}
+  table.dataTable thead > tr > th:last-child.dt-orderable-asc,
+  table.dataTable thead > tr > th:last-child.dt-orderable-desc,
+  table.dataTable thead > tr > th:last-child.dt-ordering-asc,
+  table.dataTable thead > tr > th:last-child.dt-ordering-desc {
+    @apply sp:pe-11;
+  }
 
-table.dataTable thead > tr > th:last-child.dt-orderable-asc,
-table.dataTable thead > tr > th:last-child.dt-orderable-desc,
-table.dataTable thead > tr > th:last-child.dt-ordering-asc,
-table.dataTable thead > tr > th:last-child.dt-ordering-desc {
-    @apply sp-pe-11;
-}
+  table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order,
+  table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order,
+  table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order,
+  table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order {
+    @apply sp:end-2!;
+  }
 
-table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order,
-table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order,
-table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order,
-table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order {
-    @apply sp-end-2 !important;
-}
+  table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
+  table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before,
+  table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after,
+  table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after {
+    @apply sp:font-icon sp:text-base sp:leading-0;
+  }
 
-table.dataTable thead > tr > th:last-child.dt-orderable-asc span.dt-column-order,
-table.dataTable thead > tr > th:last-child.dt-orderable-desc span.dt-column-order,
-table.dataTable thead > tr > th:last-child.dt-ordering-asc span.dt-column-order,
-table.dataTable thead > tr > th:last-child.dt-ordering-desc span.dt-column-order {
-    @apply sp-end-6 !important;
-}
+  table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
+  table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before {
+    @apply sp:content-["\f0de"];
+  }
 
-table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
-table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before,
-table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after,
-table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after {
-    @apply sp-font-icon sp-text-base sp-leading-0;
-}
+  table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after,
+  table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after {
+    @apply sp:font-icon sp:content-["\f0dd"];
+  }
 
-table.dataTable thead > tr > th.dt-orderable-asc span.dt-column-order:before,
-table.dataTable thead > tr > th.dt-ordering-asc span.dt-column-order:before {
-    content: "\f0de";
-}
+  table.dataTable > tbody > tr:first-child > * {
+    @apply sp:border-t-0;
+  }
 
-table.dataTable thead > tr > th.dt-orderable-desc span.dt-column-order:after,
-table.dataTable thead > tr > th.dt-ordering-desc span.dt-column-order:after {
-    @apply sp-font-icon;
-    content: "\f0dd";
-}
+  table.dataTable:not(.sp\:table-inline) > tbody > tr:last-child > * {
+    @apply sp:border-b sp:border-tertiary sp:border-solid;
+  }
 
-table.dataTable > tbody > tr:first-child > * {
-    @apply sp-border-t-0;
-}
+  div.dt-container.dt-empty-footer tbody > tr:last-child > * {
+    @apply sp:border-b-tertiary;
+  }
 
-table.dataTable:not(.sp-table-inline) > tbody > tr:last-child > * {
-    @apply sp-border-b sp-border-tertiary sp-border-solid;
-}
+  div.dt-container.dt-empty-footer table.dataTable.sp\:table-inline tbody > tr:last-child > * {
+    @apply sp:border-b-0;
+  }
 
-div.dt-container.dt-empty-footer tbody > tr:last-child > * {
-    @apply sp-border-b-tertiary;
-}
+  table.dataTable tbody tr.selected {
+    @apply sp:bg-primary-200 sp:shadow-none sp:dark:bg-primary-800;
+  }
 
-div.dt-container.dt-empty-footer table.dataTable.sp-table-inline tbody > tr:last-child > * {
-    @apply sp-border-b-0;
-}
+  table.dataTable tbody tr.selected > * {
+    @apply sp:text-[inherit] sp:shadow-none;
+  }
 
-table.dataTable tbody tr.selected {
-    @apply sp-bg-primary-200 sp-shadow-none dark:sp-bg-primary-800;
-}
+  table.dataTable tbody tr.selected a {
+    @apply sp:text-primary-800 sp:dark:text-primary-100;
+  }
 
-table.dataTable tbody tr.selected > * {
-    @apply sp-shadow-none;
-    color: inherit;
-}
-
-table.dataTable tbody tr.selected a {
-    @apply sp-text-primary-800 dark:sp-text-primary-100;
-}
-
-table.dataTable tfoot th,
-table.dataTable tfoot td {
-    @apply sp-border-t sp-border-tertiary;
-}
+  table.dataTable tfoot th,
+  table.dataTable tfoot td {
+    @apply sp:border-t sp:border-tertiary;
+  }
 
 
-table.dataTable tbody td.all a .fas {
-    @apply sp-text-secondary;
-}
+  table.dataTable tbody td.all a .fa-solid {
+    @apply sp:text-secondary;
+  }
 
-table.dataTable tbody td.all a:hover .fas {
-    @apply sp-text-primary;
-}
+  table.dataTable tbody td.all a:hover .fa-solid {
+    @apply sp:text-primary;
+  }
 
-.sp-quick-actions .dt-paging-button {
-    @apply sp-inline-block sp-py-3/2 sp-shadow-none sp-align-middle;
-    background: 0;
-}
+  .sp-quick-actions .dt-paging-button {
+    @apply sp:inline-block sp:py-1.5 sp:bg-transparent sp:shadow-none sp:align-middle;
+  }
 
-.sp-quick-actions .dt-paging-input,
-.sp-quick-actions .paginate_of {
-    @apply sp-hidden;
-}
+  .sp-quick-actions .dt-paging-input,
+  .sp-quick-actions .paginate_of {
+    @apply sp:hidden;
+  }
 
-.sp-quick-actions .dt-search {
-    @apply sp-p-0;
-    padding: 0;
-}
+  .sp-quick-actions .dt-search {
+    @apply sp:p-0;
+  }
 
-/* Small (xs) */
-@media (min-width: 480px) {
-    table.dataTable thead th.xs\:sp-pe-3,
-    table.dataTable thead td.xs\:sp-pe-3,
-    table.dataTable tbody th.xs\:sp-pe-3,
-    table.dataTable tbody td.xs\:sp-pe-3,
-    table.dataTable tfoot th.xs\:sp-pe-3,
-    table.dataTable tfoot td.xs\:sp-pe-3 {
-        padding-inline-end: 0.75rem;
-    }
-}
-
-/* Small (sm) */
-@media (min-width: 640px) {
-    table.dataTable thead th.sm\:sp-pe-3,
-    table.dataTable thead td.sm\:sp-pe-3,
-    table.dataTable tbody th.sm\:sp-pe-3,
-    table.dataTable tbody td.sm\:sp-pe-3,
-    table.dataTable tfoot th.sm\:sp-pe-3,
-    table.dataTable tfoot td.sm\:sp-pe-3 {
-        padding-inline-end: 0.75rem;
-    }
-
+  /* Small (sm) */
+  @media (min-width: 640px) {
     .sp-quick-actions .dt-paging-input,
     .sp-quick-actions .paginate_of {
-        @apply sp-inline;
+      @apply sp:inline;
     }
-}
+  }
 
-/* Medium (md) */
-@media screen and (min-width: 768px) {
+  /* Medium (md) */
+  @media screen and (min-width: 768px) {
     div.dt-container .dt-length,
     div.dt-container .dt-info {
-        @apply sp-block;
+      @apply sp:block;
     }
 
     div.dt-container .dt-search {
-        @apply sp-float-none;
+      @apply sp:float-none;
     }
 
     div.dt-container .dt-search input {
-        @apply sp-w-full;
-        width: 100%;
+      @apply sp:w-full;
     }
 
     div.dt-container .dt-paging .dt-paging-button,
     .dt-paging .dt-paging-button {
-        @apply sp-px-3;
+      @apply sp:px-3;
     }
+  }
 
-    table.dataTable thead th.md\:sp-pe-3,
-    table.dataTable thead td.md\:sp-pe-3,
-    table.dataTable tbody th.md\:sp-pe-3,
-    table.dataTable tbody td.md\:sp-pe-3,
-    table.dataTable tfoot th.md\:sp-pe-3,
-    table.dataTable tfoot td.md\:sp-pe-3 {
-        padding-inline-end: 0.75rem;
-    }
-}
-
-/* Large (lg) */
-@media (min-width: 1024px) {
-    table.dataTable thead th.lg\:sp-pe-3,
-    table.dataTable thead td.lg\:sp-pe-3,
-    table.dataTable tbody th.lg\:sp-pe-3,
-    table.dataTable tbody td.lg\:sp-pe-3,
-    table.dataTable tfoot th.lg\:sp-pe-3,
-    table.dataTable tfoot td.lg\:sp-pe-3 {
-        padding-inline-end: 0.75rem;
-    }
-}
-
-/* Extra Large (xl) */
-@media (min-width: 1280px) {
-    table.dataTable thead th.xl\:sp-pe-3,
-    table.dataTable thead td.xl\:sp-pe-3,
-    table.dataTable tbody th.xl\:sp-pe-3,
-    table.dataTable tbody td.xl\:sp-pe-3,
-    table.dataTable tfoot th.xl\:sp-pe-3,
-    table.dataTable tfoot td.xl\:sp-pe-3 {
-        padding-inline-end: 0.75rem;
-    }
-}
-
-/* Responsive */
-
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
-table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
-    @apply sp-ps-14;
+  /* Responsive */
+  table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control,
+  table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control {
+    @apply sp:ps-14;
     position: relative;
-}
+  }
 
-table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
-table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
-    @apply sp-absolute sp-start-6 sp-top-1/2 sp-h-5 sp-w-5 sp-bg-green-500 sp-border-0 sp-rounded sp-font-icon sp-font-bold sp-text-xs sp-text-white sp-text-center sp-leading-5 sp-transform sp--translate-y-1/2;
+  table.dataTable.dtr-inline.collapsed > tbody > tr > td.dtr-control:before,
+  table.dataTable.dtr-inline.collapsed > tbody > tr > th.dtr-control:before {
+    @apply sp:absolute sp:start-6 sp:top-1/2 sp:h-5 sp:w-5 sp:bg-green-500 sp:border-0 sp:rounded sp:font-icon sp:font-bold sp:text-xs sp:text-white sp:text-center sp:leading-5 sp:transform sp:-translate-y-1/2;
     content: "\f067";
-}
+  }
 
-table.dataTable.dtr-inline.collapsed > tbody > tr.dtr-expanded > td.dtr-control:before {
-    @apply sp-bg-red-500 sp-border-0;
+  table.dataTable.dtr-inline.collapsed > tbody > tr.dtr-expanded > td.dtr-control:before {
+    @apply sp:bg-red-500 sp:border-0;
     content: "\f068";
-}
+  }
 
-table.dataTable > tbody > tr.child ul.dtr-details > li {
-    @apply sp-p-0 sp-border-0;
-}
+  table.dataTable > tbody > tr.child ul.dtr-details > li {
+    @apply sp:py-0.5 sp:border-0;
+  }
 
-table.dataTable > tbody > tr.child span.dtr-title {
-    min-width: auto;
-}
+  table.dataTable > tbody > tr.child span.dtr-title {
+    @apply sp:min-w-auto sp:mr-0.5;
+  }
 
-table.dataTable.sp-table-fixed colgroup:nth-child(2) {
-    @apply sp-hidden;
-}
+  table.dataTable.sp\:table-fixed colgroup:nth-child(2) {
+    @apply sp:hidden;
+  }
 
-@media screen and (max-width: 767px) {
+  @media screen and (max-width: 767px) {
     div.dt-container div.dt-layout-row:not(.dt-layout-table) div.dt-layout-cell > * {
-        @apply sp-mx-6 sp-my-0;
+      @apply sp:mx-6 sp:my-0;
     }
-}
+  }
 
-/* yadcf */
+  /* yadcf */
+  .yadcf-filter-wrapper {
+    @apply sp:w-[calc(100%-2.25rem)] sp:ms-0!;
+  }
 
-.yadcf-filter-wrapper {
-    @apply sp-ms-0 !important;
-    width: calc(100% - 2.25rem);
-}
+  .yadcf-filter-wrapper input,
+  .yadcf-filter-wrapper select {
+    @apply sp:max-w-full!;
+  }
 
-.yadcf-filter-wrapper input,
-.yadcf-filter-wrapper select {
-    @apply sp-max-w-full !important;
-}
+  .yadcf-filter {
+    @apply sp:px-3! sp:py-1.5!;
+  }
 
-.yadcf-filter.inuse {
-    @apply sp-bg-primary;
-}
+  select.yadcf-filter {
+    @apply sp:pe-8!;
+  }
 
-.yadcf-filter > option {
-    @apply sp-bg-secondary !important;
-}
+  .yadcf-filter.inuse {
+    @apply sp:bg-primary;
+  }
 
-.yadcf-filter-reset-button {
-    @apply sp-relative sp-h-10 sp-w-9;
-}
+  .yadcf-filter > option {
+    @apply sp:bg-secondary!;
+  }
 
-.yadcf-filter-reset-button:before {
-    @apply sp-absolute sp-start-3 sp-top-2 sp-text-primary sp-font-icon sp-font-bold;
-    content: "\f00d";
+  .yadcf-filter-reset-button {
+    @apply sp:relative sp:h-10 sp:w-9;
+  }
+
+  .yadcf-filter-reset-button:before {
+    @apply sp:absolute sp:start-3 sp:top-2 sp:text-primary sp:font-icon sp:font-bold sp:content-["\f00d"];
+  }
 }

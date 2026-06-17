@@ -1,90 +1,119 @@
-:root {
+@import "../../../../node_modules/intl-tel-input/build/css/intlTelInput.css" layer(components);
+
+@reference '#tailwind-base';
+
+@layer base {
+  :root {
     --iti-arrow-padding: 0.25rem;
     --iti-hover-color: transparent;
+  }
 }
 
-.sp-phone-number {
-    @apply sp-mb-3;
-}
+@layer components {
+  .sp-phone-number {
+    @apply sp:mb-3;
+  }
 
-.iti input[type="tel"] {
-    @apply sp-w-full;
-}
+  .iti {
+    @apply sp:xs:w-64;
+  }
 
-.iti--inline-dropdown .iti__dropdown-content {
-    @apply sp-mt-1 sp-bg-primary sp-border sp-border-tertiary;
-}
+  .iti input[type="tel"] {
+    @apply sp:w-full;
+  }
 
-.iti__search-input {
-    @apply sp-min-h-0 sp-bg-primary sp-rounded-t sp-rounded-b-none sp-px-3 sp-py-3/2 sp-text-sm;
-}
+  .iti input.iti__tel-input,
+  .iti input.iti__tel-input[type=text],
+  .iti input.iti__tel-input[type=tel] {
+    @apply sp:static;
+  }
 
-.iti__search-input ~ .iti__country-list {
-    @apply sp-border-t sp-border-tertiary;
-}
+  .iti--inline-dropdown .iti__dropdown-content {
+    @apply sp:mt-1 sp:bg-primary sp:border sp:border-tertiary;
+  }
 
-.iti__country.iti__highlight {
-    @apply sp-bg-secondary;
-}
+  .iti__search-icon {
+    @apply sp:z-101;
+  }
 
-.iti__divider {
-    @apply sp-pb-1 sp-mb-1 sp-border-tertiary;
-}
+  .iti__search-icon-svg {
+    @apply sp:stroke-(--color-text-tertiary);
+  }
 
-.iti__country {
-    @apply sp-px-2 sp-py-1 sp-text-sm;
-}
+  .iti__search-input {
+    @apply sp:min-h-0 sp:bg-primary sp:rounded-t sp:rounded-b-none sp:ps-7 sp:pe-3 sp:py-1.5 sp:text-sm;
+  }
 
-.iti__country-name {
-    @apply sp-truncate;
-}
+  .iti__search-input ~ .iti__country-list {
+    @apply sp:border-t sp:border-tertiary;
+  }
 
-.iti__dial-code {
-    @apply sp-flex-none sp-text-tertiary;
-}
+  .iti__country.iti__highlight {
+    @apply sp:bg-secondary;
+  }
 
-.iti__arrow {
-    border-top-color: var(--color-text-primary);
-}
+  .iti__divider {
+    @apply sp:pb-1 sp:mb-1 sp:border-tertiary;
+  }
 
-.iti__arrow--up {
-    border-bottom-color: var(--color-text-primary);
-}
+  .iti__country {
+    @apply sp:px-2 sp:py-1 sp:text-sm;
+  }
 
-.iti__country-container {
-    @apply sp-p-0 sp-z-[101];
-}
+  .iti__country-name {
+    @apply sp:truncate;
+  }
 
-.iti__selected-country {
-    @apply sp-py-0 sp-px-5/2 sp-bg-tertiary sp-text-sm sp-rounded-s;
-}
+  .iti__dial-code {
+    @apply sp:flex-none sp:text-tertiary;
+  }
 
-.iti--allow-dropdown .iti__country-container:hover .iti__selected-country {
-    @apply sp-bg-tertiary;
-}
+  .iti__arrow {
+    @apply sp:border-t-(--color-text-primary);
+  }
 
-.iti--allow-dropdown .iti__country-container:has(+ input[disabled]) .iti__selected-country,
-.iti--allow-dropdown .iti__country-container:has(+ input[readonly]) .iti__selected-country,
-.iti--allow-dropdown .iti__country-container:has(+ input[disabled]):hover .iti__selected-country,
-.iti--allow-dropdown .iti__country-container:has(+ input[readonly]):hover .iti__selected-country {
-    @apply sp-bg-secondary sp-cursor-default;
-}
+  .iti__arrow--up {
+    @apply sp:border-b-(--color-text-primary);
+  }
 
-.sp-input-has-error .iti__country-container {
-    @apply sp-p-1/2 sp-pe-0;
-}
+  .iti__country-container {
+    @apply sp:p-0;
+  }
 
-.sp-input-has-error .iti__selected-country {
-    @apply sp-ps-2 sp-py-0;
-}
+  .iti__selected-country {
+    @apply sp:py-0 sp:px-2.5 sp:bg-tertiary sp:text-sm sp:rounded-s;
+  }
 
-.iti__selected-country-primary {
-    @apply sp-ps-0;
-}
+  .iti--allow-dropdown .iti__country-container:hover .iti__selected-country {
+    @apply sp:bg-tertiary;
+  }
 
-/* Small (xs) */
-@media (min-width: 480px) {
-    .iti {
-        @apply sp-w-64;
-    }
+  .iti--allow-dropdown .iti__country-container:has(+ input[disabled]) .iti__selected-country,
+  .iti--allow-dropdown .iti__country-container:has(+ input[readonly]) .iti__selected-country,
+  .iti--allow-dropdown .iti__country-container:has(+ input[disabled]):hover .iti__selected-country,
+  .iti--allow-dropdown .iti__country-container:has(+ input[readonly]):hover .iti__selected-country {
+    @apply sp:bg-secondary sp:cursor-default;
+  }
+
+  .sp-input-has-error .iti__country-container {
+    @apply sp:p-0.5 sp:pe-0;
+  }
+
+  .sp-input-has-error .iti__selected-country {
+    @apply sp:ps-2 sp:py-0;
+  }
+
+  .iti__selected-country-primary {
+    @apply sp:ps-0;
+  }
+
+  .iti--allow-dropdown .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country-primary:hover,
+  .iti--allow-dropdown .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country:has(+ .iti__dropdown-content:hover) .iti__selected-country-primary {
+    @apply sp:bg-transparent;
+  }
+
+  .iti--allow-dropdown .iti__country-container:has(+ input[disabled]) button.iti__selected-country .iti__arrow,
+  .iti--allow-dropdown .iti__country-container:has(+ input[readonly]) button.iti__selected-country .iti__arrow {
+    @apply sp:hidden;
+  }
 }

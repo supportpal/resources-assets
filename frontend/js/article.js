@@ -36,7 +36,7 @@ $(document).ready(function () {
   $('.sp-comment-ordering').on('change', function () {
     // Show loading
     var $loading = $(this).parent().find('.sp-loading');
-    $loading.removeClass('sp-hidden');
+    $loading.removeClass('sp:hidden');
 
     // Make call
     $.get($('.sp-comments-block').data('commentRoute'), {
@@ -46,12 +46,12 @@ $(document).ready(function () {
     }, function (response) {
       if (response.status == 'success') {
         $('.sp-comments-block').html(response.data.comments);
-        if ($('.sp-comments-block > .sp-comments > .sp-comment').length >= response.data.comment_total) {
+        if ($('.sp-comments-block > .sp-comment').length >= response.data.comment_total) {
           // Hide show more option
           $('.sp-more-parent-comments').hide();
         } else {
           // Show option and update count
-          $('.sp-more-parent-comments').show().data('count', $('.sp-comments-block > .sp-comments > .sp-comment').length);
+          $('.sp-more-parent-comments').show().data('count', $('.sp-comments-block > .sp-comment').length);
         }
       } else {
         // Show error
@@ -62,7 +62,7 @@ $(document).ready(function () {
       $('.sp-comments-loading.sp-alert-error').show(500).delay(5000).hide(500);
     }).always(function () {
       // Hide loading
-      $loading.addClass('sp-hidden');
+      $loading.addClass('sp:hidden');
     });
   });
 
@@ -74,21 +74,21 @@ $(document).ready(function () {
       "articleId": $('.sp-article').data('articleId'),
       "typeId": $('.sp-article').data('typeId'),
       "order": $('.sp-comment-ordering').val(),
-      "last": $('.sp-comments-block > .sp-comments > .sp-comment:last-child').data('id'),
+      "last": $('.sp-comments-block > .sp-comment:last-child').data('id'),
       "startParent": $this.data('count')
     }, function (response) {
       // Re-enable button
       $this.prop('disabled', false);
       if (response.status == 'success') {
         // Add the new comments to the end of the comments list
-        $(response.data.comments).children('div').appendTo('.sp-comments-block > .sp-comments');
+        $(response.data.comments).children('div').appendTo('.sp-comments-block');
 
         // Hide the button if we've shown all the comments
-        if ($('.sp-comments-block > .sp-comments > .sp-comment').length >= response.data.comment_total) {
+        if ($('.sp-comments-block > .sp-comment').length >= response.data.comment_total) {
           $this.hide();
         } else {
           // Update the number of parents
-          $this.data('count', $('.sp-comments-block > .sp-comments > .sp-comment').length);
+          $this.data('count', $('.sp-comments-block > .sp-comment').length);
         }
       } else {
         // Show error
@@ -115,7 +115,7 @@ $(document).ready(function () {
       $this.prop('disabled', false);
       if (response.status == 'success') {
         // Replace current list with new list
-        $this.parent().find('.sp-comments').replaceWith(response.data.comments);
+        $this.parent().find('.sp-comments-block').replaceWith(response.data.comments);
         // Remove link
         $this.remove();
       } else {
@@ -148,7 +148,7 @@ $(document).ready(function () {
     $(".add-comment").find('input[name=parent_id]').val($(this).data('id'));
 
     // Get name of parent comment
-    var name = $(this).parent().parent().find('> .sp-message-header .sp-name').text();
+    var name = $(this).closest('.sp-message-content').find('> .sp-message-header .sp-name').text();
 
     // Show name of being replied to
     $('.sp-reply-name').text(name);
@@ -166,7 +166,7 @@ $(document).ready(function () {
 
     // Add to textarea
     var $editor = $('.add-comment').find('textarea').editor();
-    $editor.setContent('@' + $.trim(name.replace(/\s/g, '')) + '&nbsp;');
+    $editor.setContent('@' + name.replace(/\s/g, '').trim() + '&nbsp;');
     $editor.selection.select(tinyMCE.activeEditor.getBody(), true);
     $editor.selection.collapse(false);
     $editor.focus();
@@ -186,8 +186,8 @@ $(document).ready(function () {
     }, function (response) {
       if (response.status == 'success') {
         // Update thumb colour, reset other thumb
-        $this.find('.fas').hasClass('sp-text-secondary') ? $this.find('.fas').removeClass('sp-text-secondary') : $this.find('.fas').addClass('sp-text-secondary');
-        $that.find('.fas').removeClass('sp-text-secondary');
+        $this.find('.fa-solid').hasClass('sp:text-secondary') ? $this.find('.fa-solid').removeClass('sp:text-secondary') : $this.find('.fa-solid').addClass('sp:text-secondary');
+        $that.find('.fa-solid').removeClass('sp:text-secondary');
 
         // Update article rating
         if (response.data !== null) {

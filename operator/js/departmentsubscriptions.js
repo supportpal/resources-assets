@@ -21,8 +21,8 @@ $(function () {
         render: render,
         onChange: function (subscription) {
           postNotifications({
-            user_id: this.$input.data('user-id'),
-            department_id: this.$input.data('department-id'),
+            user_id: $(this.input).data('user-id'),
+            department_id: $(this.input).data('department-id'),
             subscription: subscription
           });
         }

@@ -41,7 +41,7 @@
             var row = $element.parents('.sp-form-row');
             row.find('input[name="avatar"]').val('');
             row.find('.sp-avatar').attr('src', data.data);
-            row.find('.remove-avatar').removeClass('sp-hidden').parent().addClass('sp-button-group');
+            row.find('.remove-avatar').removeClass('sp:hidden').parent().addClass('sp-button-group');
             Swal.close();
           }
         }).fail(function (jqXHR, textStatus, errorThrown) {
@@ -77,15 +77,15 @@
           width: '100%',
           src: image
         }))).append($('<div>', {
-          class: 'profile-crop-image-controls sp-button-group sp-inline-block sp-mt-3'
+          class: 'profile-crop-image-controls sp-button-group sp:inline-block sp:mt-3'
         }).append($('<button>', {
           class: 'profile-crop-image-control-minus'
         }).append($('<i>', {
-          class: 'fas fa-search-minus'
+          class: 'fa-solid fa-search-minus'
         }))).append($('<button>', {
           class: 'profile-crop-image-control-plus'
         }).append($('<i>', {
-          class: 'fas fa-search-plus'
+          class: 'fa-solid fa-search-plus'
         })))).html(),
         didOpen: onShowModal,
         didClose: onHideModal,
@@ -193,7 +193,7 @@
               var row = $(button).parents('.sp-form-row');
               row.find('input[name="avatar"]').val('');
               row.find('.sp-avatar').prop('src', response.data);
-              $(button).addClass('sp-hidden').parent().removeClass('sp-button-group');
+              $(button).addClass('sp:hidden').parent().removeClass('sp-button-group');
               Swal.close();
               return response;
             }

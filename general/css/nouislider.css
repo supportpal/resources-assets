@@ -1,36 +1,47 @@
-.noUi-horizontal {
-    @apply sp-h-3 sp-bg-tertiary sp-border-0 sp-rounded sp-shadow-none;
-}
+@import "../../../../../node_modules/nouislider/dist/nouislider.css" layer(components);
 
-.noUi-handle {
-    @apply sp-bg-green-500 sp-border-0 sp-rounded-full sp-shadow-none;
-}
+@reference '#tailwind-base';
 
-.noUi-horizontal .noUi-handle {
-    @apply sp-h-6 sp-w-6 sp--right-3;
-}
+@layer components {
+  .noUi-horizontal {
+    @apply sp:h-3 sp:bg-tertiary sp:border-0 sp:rounded sp:shadow-none;
+  }
 
-.noUi-handle:before,
-.noUi-handle:after {
-    content: none;
-}
+  .noUi-connect,
+  .noUi-origin {
+    @apply sp:transition sp:duration-300;
+  }
 
-.noUi-connect {
-    @apply sp-bg-green-500 sp-opacity-75;
-}
+  .noUi-handle {
+    @apply sp:bg-green-500 sp:border-0 sp:rounded-full sp:shadow-none;
+  }
 
-.noUi-touch-area {
-    @apply sp-cursor-pointer;
-}
+  .noUi-horizontal .noUi-handle {
+    @apply sp:h-6 sp:w-6 sp:-right-3;
+  }
 
-.noUi-pips-horizontal {
-    @apply sp-px-0 sp-py-2;
-}
+  .noUi-handle:before,
+  .noUi-handle:after {
+    @apply sp:content-none;
+  }
 
-.noUi-value {
-    @apply sp-mt-1 sp-text-sm sp-cursor-pointer;
-}
+  .noUi-connect {
+    @apply sp:bg-green-500 sp:opacity-75;
+  }
 
-.noUi-marker-horizontal.noUi-marker-large {
-    @apply sp-h-3;
+  .noUi-touch-area {
+    @apply sp:cursor-pointer;
+  }
+
+  .noUi-pips-horizontal {
+    @apply sp:px-0 sp:py-2;
+  }
+
+  .noUi-value {
+    @apply sp:mt-1 sp:text-sm sp:cursor-pointer;
+  }
+
+  .noUi-marker-horizontal.noUi-marker-large {
+    @apply sp:h-3;
+  }
 }

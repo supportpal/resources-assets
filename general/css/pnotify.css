@@ -1,43 +1,49 @@
-body>.pnotify.pnotify-positioned {
-    @apply sp-z-10002;
-}
+@import "../../../../node_modules/@pnotify/core/dist/PNotify.css" layer(components);
 
-[data-pnotify].supportpal-elem {
-    @apply sp-text-yellow-700 dark:sp-text-yellow-200;
-}
+@reference '#tailwind-base';
 
-[data-pnotify] .supportpal-container {
-    @apply sp-p-4 sp-bg-yellow-100 sp-border-s-2 sp-border-yellow-700 sp-rounded dark:sp-bg-yellow-700 dark:sp-border-0;
-}
+@layer components {
+  body > .pnotify.pnotify-positioned {
+    @apply sp:z-10002;
+  }
 
-[data-pnotify] .supportpal-container.pnotify-shadow {
-    @apply sp-shadow-md;
-}
+  [data-pnotify].supportpal-elem {
+    @apply sp:text-yellow-700 sp:dark:text-yellow-200;
+  }
 
-[data-pnotify] .supportpal-content a {
-    @apply dark:sp-text-primary;
-}
+  [data-pnotify] .supportpal-container {
+    @apply sp:p-4 sp:bg-yellow-100 sp:border-s-2 sp:border-yellow-700 sp:rounded sp:dark:bg-yellow-700 sp:dark:border-0;
+  }
 
-[data-pnotify] .supportpal-content a:hover {
-    @apply dark:sp-text-white;
-}
+  [data-pnotify] .supportpal-container.pnotify-shadow {
+    @apply sp:shadow-md;
+  }
 
-[data-pnotify] .supportpal-icon {
-    @apply sp-mt-1;
-}
+  [data-pnotify] .supportpal-content a {
+    @apply sp:dark:text-primary;
+  }
 
-[data-pnotify] .supportpal-content {
-    @apply sp-ps-1;
-}
+  [data-pnotify] .supportpal-content a:hover {
+    @apply sp:dark:text-white;
+  }
 
-[data-pnotify] .supportpal-title {
-    @apply sp-mb-3 sp-text-xl sp-leading-tight;
-}
+  [data-pnotify] .supportpal-icon {
+    @apply sp:mt-1;
+  }
 
-[data-pnotify] .supportpal-closer {
-    @apply sp-float-end;
-}
+  [data-pnotify] .supportpal-content {
+    @apply sp:ps-1;
+  }
 
-[data-pnotify] .supportpal-text {
-    @apply sp-leading-5;
+  [data-pnotify] .supportpal-title {
+    @apply sp:mb-3 sp:text-xl sp:leading-tight;
+  }
+
+  [data-pnotify] .supportpal-closer {
+    @apply sp:float-end;
+  }
+
+  [data-pnotify] .supportpal-text {
+    @apply sp:leading-5;
+  }
 }

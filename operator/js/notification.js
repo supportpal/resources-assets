@@ -136,9 +136,9 @@
       closerHover: false,
       sticker: false,
       styling: 'supportpal',
-      icon: 'fas fa-bell',
+      icon: 'fa-solid fa-bell',
       icons: {
-        closer: 'fas fa-times'
+        closer: 'fa-solid fa-times'
       },
       stack: pNotifyStack
     });
