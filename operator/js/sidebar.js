@@ -402,7 +402,7 @@ $(function () {
       $body: $body,
       $panel: $sidebarPanel
     });
-    $body.detach().appendTo($iconDropdown);
+    $body.show().detach().appendTo($iconDropdown);
 
     // Position just to the right of the collapsed navigation sidebar, capped so it
     // never extends beyond the bottom of the viewport.
