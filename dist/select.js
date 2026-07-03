@@ -4299,6 +4299,7 @@
     const DEFAULT_OPTIONS = {
       hidePlaceholder: true,
       dataAttr: 'data',
+      clearAfterSelect: true,
       render: {
         loading: () => null,
         'no_results': () => {

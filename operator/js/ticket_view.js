@@ -962,12 +962,12 @@
       $(this).parents('.reply-all').find('.sp-action .sp-icon').removeClass('fa-reply fa-reply-all');
       if (value == '1') {
         $(this).parents('.reply-all').find('.sp-action .sp-icon').addClass('fa-reply-all');
-        $('.sp-reply-all-recipients, .cc-emails').show();
-        $('.sp-reply-recipients').hide();
+        $(this).parents('.reply-form').find('.sp-reply-all-recipients, .cc-emails').show();
+        $(this).parents('.reply-form').find('.sp-reply-recipients').hide();
       } else {
         $(this).parents('.reply-all').find('.sp-action .sp-icon').addClass('fa-reply');
-        $('.sp-reply-all-recipients, .cc-emails').hide();
-        $('.sp-reply-recipients').show();
+        $(this).parents('.reply-form').find('.sp-reply-all-recipients, .cc-emails').hide();
+        $(this).parents('.reply-form').find('.sp-reply-recipients').show();
       }
     });
 
@@ -979,9 +979,9 @@
         return;
       }
       if ($('.sp-full-recipients:visible').length) {
-        $replyAll.prependTo('.to-emails').show();
+        $replyAll.prependTo('.to-emails');
       } else {
-        $replyAll.prependTo('.recipients .sp\\:flex').show();
+        $replyAll.prependTo('.recipients .sp\\:flex');
       }
       $replyAll.find('.sp-action').toggleClass('sp:m-1 sp:me-2');
     });
@@ -997,14 +997,14 @@
 
     // Show CC email input
     $('.add-cc').on('click', function () {
-      $('.cc-emails').show();
-      $('.add-cc, .cc-emails').hide();
+      $(this).parents('.recipients').find('.cc-emails').show();
+      $(this).parents('.recipients').find('.add-cc').hide();
     });
 
     // Show BCC email input
     $('.add-bcc').on('click', function () {
-      $('.bcc-emails').show();
-      $('.add-bcc, .bcc-emails').hide();
+      $(this).parents('.recipients').find('.bcc-emails').show();
+      $(this).parents('.recipients').find('.add-bcc').hide();
     });
 
     /**

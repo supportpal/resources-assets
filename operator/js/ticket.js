@@ -68,17 +68,6 @@
 
       // Remove draft related elements
       form.find('.draft-success, .discard-draft').hide();
-
-      // If we have one or more CC email in the reply form, show the reply-all button, else hide it (if it's there)
-      if ($('.message-form .cc-emails').is(':visible')) {
-        if (instance.ccSelectize()[0].selectize.getValue().length) {
-          $('.message-form .recipients').addClass('with-cc');
-          $('.message-form .recipients .reply-all').show();
-        } else {
-          $('.message-form .recipients').removeClass('with-cc');
-          $('.message-form .recipients .reply-all').hide();
-        }
-      }
     };
 
     /**
@@ -888,10 +877,12 @@
           });
         },
         onChange: function (input) {
+          var self = this;
           if (!input) {
             // In case of removing all emails
             input = [];
           }
+
           // Detach and re-attach the list of CC addresses
           $.post(laroute.route('ticket.operator.ticket.updateCc', {
             id: parameters.ticketId
@@ -908,6 +899,9 @@
           }).fail(function (data) {
             $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
           });
+
+          // Update the recipients section.
+          instance.updateRecipientsOptions(self);
         },
         onDelete: function (input) {
           var self = this;
@@ -919,11 +913,36 @@
             }
           });
 
+          // Update the recipients section.
+          instance.updateRecipientsOptions(self);
+
           // We handle the deletions above, no need to carry on with deleteSelect()
           return false;
         }
       });
       this.$ccSelectize = $('.message-form select[name="cc[]"]').selectize(params);
+    };
+
+    /**
+     * Update the recipients options and text based on the current CC selectize values.
+     *
+     * @param {Selectize} selectizeInstance
+     */
+    this.updateRecipientsOptions = function (selectizeInstance) {
+      var ccValues = selectizeInstance.getValue(),
+        hasCc = ccValues.length > 0;
+
+      // Show/hide reply all option depending how many CC emails there are.
+      $('.message-form .recipients').toggleClass('with-cc', hasCc);
+      $('.message-form .recipients .reply-all').toggle(hasCc);
+
+      // Update the recipients list of emails based on the current CC list.
+      var toEmailsText = $('.message-form .sp-reply-recipients').text().trim(),
+        parts = toEmailsText ? [toEmailsText] : [];
+      parts = parts.concat(ccValues);
+      $('.message-form .sp-reply-all-recipients').text(parts.join(', '));
+      $('.message-form .sp-reply-recipients').toggle(!hasCc);
+      $('.message-form .sp-reply-all-recipients').toggle(hasCc);
     };
 
     /**
