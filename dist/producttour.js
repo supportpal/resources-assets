@@ -2962,7 +2962,7 @@
       c() {
         button = element("button");
         attr(button, "aria-label", button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null);
-        attr(button, "class", button_class_value = `${/*classes*/ctx[1] || ''} shepherd-button ${/*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`);
+        attr(button, "class", button_class_value = `${ /*classes*/ctx[1] || ''} shepherd-button ${ /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`);
         button.disabled = /*disabled*/ctx[2];
         attr(button, "tabindex", "0");
         attr(button, "type", "button");
@@ -2972,7 +2972,7 @@
         button.innerHTML = /*text*/ctx[5];
         if (!mounted) {
           dispose = listen(button, "click", function () {
-            if (is_function( /*action*/ctx[0])) /*action*/ctx[0].apply(this, arguments);
+            if (is_function(/*action*/ctx[0])) /*action*/ctx[0].apply(this, arguments);
           });
           mounted = true;
         }
@@ -2983,7 +2983,7 @@
         if (dirty & /*label*/8 && button_aria_label_value !== (button_aria_label_value = /*label*/ctx[3] ? /*label*/ctx[3] : null)) {
           attr(button, "aria-label", button_aria_label_value);
         }
-        if (dirty & /*classes, secondary*/18 && button_class_value !== (button_class_value = `${/*classes*/ctx[1] || ''} shepherd-button ${/*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`)) {
+        if (dirty & /*classes, secondary*/18 && button_class_value !== (button_class_value = `${ /*classes*/ctx[1] || ''} shepherd-button ${ /*secondary*/ctx[4] ? 'shepherd-button-secondary' : ''}`)) {
           attr(button, "class", button_class_value);
         }
         if (dirty & /*disabled*/4) {
@@ -3052,7 +3052,7 @@
   function create_if_block$3(ctx) {
     let each_1_anchor;
     let current;
-    let each_value = ensure_array_like( /*buttons*/ctx[1]);
+    let each_value = ensure_array_like(/*buttons*/ctx[1]);
     let each_blocks = [];
     for (let i = 0; i < each_value.length; i += 1) {
       each_blocks[i] = create_each_block(get_each_context(ctx, each_value, i));
@@ -3078,7 +3078,7 @@
       },
       p(ctx, dirty) {
         if (dirty & /*buttons, step*/3) {
-          each_value = ensure_array_like( /*buttons*/ctx[1]);
+          each_value = ensure_array_like(/*buttons*/ctx[1]);
           let i;
           for (i = 0; i < each_value.length; i += 1) {
             const child_ctx = get_each_context(ctx, each_value, i);
@@ -3176,7 +3176,7 @@
         current = true;
       },
       p(ctx, [dirty]) {
-        if ( /*buttons*/ctx[1]) {
+        if (/*buttons*/ctx[1]) {
           if (if_block) {
             if_block.p(ctx, dirty);
             if (dirty & /*buttons*/2) {
@@ -3473,7 +3473,7 @@
         current = true;
       },
       p(ctx, [dirty]) {
-        if ( /*title*/ctx[2]) {
+        if (/*title*/ctx[2]) {
           if (if_block0) {
             if_block0.p(ctx, dirty);
             if (dirty & /*title*/4) {
@@ -3492,7 +3492,7 @@
           });
           check_outros();
         }
-        if ( /*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled) {
+        if (/*cancelIcon*/ctx[3] && /*cancelIcon*/ctx[3].enabled) {
           if (if_block1) {
             if_block1.p(ctx, dirty);
             if (dirty & /*cancelIcon*/8) {
@@ -3752,11 +3752,11 @@
   }
   function create_fragment$2(ctx) {
     let div;
-    let show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
+    let show_if_2 = !isUndefined(/*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
     let t0;
-    let show_if_1 = !isUndefined( /*step*/ctx[2].options.text);
+    let show_if_1 = !isUndefined(/*step*/ctx[2].options.text);
     let t1;
-    let show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
+    let show_if = Array.isArray(/*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
     let current;
     let if_block0 = show_if_2 && create_if_block_2(ctx);
     let if_block1 = show_if_1 && create_if_block_1(ctx);
@@ -3781,7 +3781,7 @@
         current = true;
       },
       p(ctx, [dirty]) {
-        if (dirty & /*step*/4) show_if_2 = !isUndefined( /*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
+        if (dirty & /*step*/4) show_if_2 = !isUndefined(/*step*/ctx[2].options.title) || /*step*/ctx[2].options.cancelIcon && /*step*/ctx[2].options.cancelIcon.enabled;
         if (show_if_2) {
           if (if_block0) {
             if_block0.p(ctx, dirty);
@@ -3801,7 +3801,7 @@
           });
           check_outros();
         }
-        if (dirty & /*step*/4) show_if_1 = !isUndefined( /*step*/ctx[2].options.text);
+        if (dirty & /*step*/4) show_if_1 = !isUndefined(/*step*/ctx[2].options.text);
         if (show_if_1) {
           if (if_block1) {
             if_block1.p(ctx, dirty);
@@ -3821,7 +3821,7 @@
           });
           check_outros();
         }
-        if (dirty & /*step*/4) show_if = Array.isArray( /*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
+        if (dirty & /*step*/4) show_if = Array.isArray(/*step*/ctx[2].options.buttons) && /*step*/ctx[2].options.buttons.length;
         if (show_if) {
           if (if_block2) {
             if_block2.p(ctx, dirty);
@@ -3926,7 +3926,7 @@
       }
     });
     let div_levels = [{
-      "aria-describedby": div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null
+      "aria-describedby": div_aria_describedby_value = !isUndefined(/*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null
     }, {
       "aria-labelledby": div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null
     }, /*dataStepId*/ctx[1], {
@@ -3963,7 +3963,7 @@
         }
       },
       p(ctx, [dirty]) {
-        if ( /*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on) {
+        if (/*step*/ctx[4].options.arrow && /*step*/ctx[4].options.attachTo && /*step*/ctx[4].options.attachTo.element && /*step*/ctx[4].options.attachTo.on) {
           if (if_block) ;else {
             if_block = create_if_block();
             if_block.c();
@@ -3978,7 +3978,7 @@
         if (dirty & /*labelId*/8) shepherdcontent_changes.labelId = /*labelId*/ctx[3];
         if (dirty & /*step*/16) shepherdcontent_changes.step = /*step*/ctx[4];
         shepherdcontent.$set(shepherdcontent_changes);
-        set_attributes(div, div_data = get_spread_update(div_levels, [(!current || dirty & /*step, descriptionId*/20 && div_aria_describedby_value !== (div_aria_describedby_value = !isUndefined( /*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null)) && {
+        set_attributes(div, div_data = get_spread_update(div_levels, [(!current || dirty & /*step, descriptionId*/20 && div_aria_describedby_value !== (div_aria_describedby_value = !isUndefined(/*step*/ctx[4].options.text) ? /*descriptionId*/ctx[2] : null)) && {
           "aria-describedby": div_aria_describedby_value
         }, (!current || dirty & /*step, labelId*/24 && div_aria_labelledby_value !== (div_aria_labelledby_value = /*step*/ctx[4].options.title ? /*labelId*/ctx[3] : null)) && {
           "aria-labelledby": div_aria_labelledby_value
@@ -4587,7 +4587,7 @@ Z`;
         svg = svg_element("svg");
         path = svg_element("path");
         attr(path, "d", /*pathDefinition*/ctx[2]);
-        attr(svg, "class", svg_class_value = `${/*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`);
+        attr(svg, "class", svg_class_value = `${ /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`);
       },
       m(target, anchor) {
         insert(target, svg, anchor);
@@ -4603,7 +4603,7 @@ Z`;
         if (dirty & /*pathDefinition*/4) {
           attr(path, "d", /*pathDefinition*/ctx[2]);
         }
-        if (dirty & /*modalIsVisible*/2 && svg_class_value !== (svg_class_value = `${/*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`)) {
+        if (dirty & /*modalIsVisible*/2 && svg_class_value !== (svg_class_value = `${ /*modalIsVisible*/ctx[1] ? 'shepherd-modal-is-visible' : ''} shepherd-modal-overlay-container`)) {
           attr(svg, "class", svg_class_value);
         }
       },
