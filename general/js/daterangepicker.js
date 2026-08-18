@@ -2,6 +2,7 @@
 (function ($, m) {
   /*
    * Maps PHP date() format to moment.js equivalent
+   * From https://stackoverflow.com/a/30192680
    * https://www.php.net/manual/en/datetime.format.php
    * http://momentjs.com/docs/#/displaying/format/
    */
@@ -12,64 +13,52 @@
       j: 'D',
       l: 'dddd',
       N: 'E',
-      S: function () {
-        return '[' + this.format('Do').replace(/\d*/g, '') + ']';
-      },
-      w: 'd',
-      z: function () {
-        return this.format('DDD') - 1;
-      },
+      S: 'o',
+      w: 'e',
+      z: 'DDD',
       W: 'W',
       F: 'MMMM',
       m: 'MM',
       M: 'MMM',
       n: 'M',
-      t: function () {
-        return this.daysInMonth();
-      },
-      L: function () {
-        return this.isLeapYear() ? 1 : 0;
-      },
-      o: 'GGGG',
+      t: '',
+      // no equivalent
+      L: '',
+      // no equivalent
+      o: 'YYYY',
       Y: 'YYYY',
       y: 'YY',
       a: 'a',
       A: 'A',
-      B: function () {
-        var utc = this.clone().utc(),
-          swatch = (utc.hours() + 1) % 24 + utc.minutes() / 60 + utc.seconds() / 3600;
-        return Math.floor(swatch * 1000 / 24);
-      },
+      B: '',
+      // no equivalent
       g: 'h',
       G: 'H',
       h: 'hh',
       H: 'HH',
       i: 'mm',
       s: 'ss',
-      u: '',
-      // Microseconds aren't supported by JS Date object: https://github.com/moment/moment/issues/3196
-      e: '',
-      // No equivalent of Timezone names.
-      I: function () {
-        return this.isDST() ? 1 : 0;
-      },
-      O: 'ZZ',
-      P: 'Z',
+      u: 'SSS',
+      e: 'zz',
+      I: '',
+      // no equivalent
+      O: '',
+      // no equivalent
+      P: '',
+      // no equivalent
       T: '',
-      // [z, zz] options are deprecated, only work when moment-timezone addon is used.
-      Z: function () {
-        return parseInt(this.format('ZZ'), 10) * 36;
-      },
-      c: 'YYYY-MM-DD[T]HH:mm:ssZ',
-      r: 'ddd, DD MMM YYYY HH:mm:ss ZZ',
+      // no equivalent
+      Z: '',
+      // no equivalent
+      c: '',
+      // no equivalent
+      r: '',
+      // no equivalent
       U: 'X'
     };
+  const getSupportPalDateFormat = () => $('meta[name=date_format]').prop('content').replace(formatEx, match => formatMap[match]);
   m.fn.formatSupportPal = function () {
-    var that = this,
-      format = $('meta[name=date_format]').prop('content');
-    return this.format(format.replace(formatEx, function (phpStr) {
-      return typeof formatMap[phpStr] === 'function' ? formatMap[phpStr].call(that) : formatMap[phpStr];
-    }));
+    return this.format(getSupportPalDateFormat());
   };
 
   // Construct predefined date ranges for easy access.
@@ -91,6 +80,7 @@
     ranges: ranges,
     showCustomRangeLabel: false,
     'locale': {
+      'format': getSupportPalDateFormat(),
       'applyLabel': Lang.get('general.apply'),
       'cancelLabel': Lang.get('general.clear'),
       'separator': Lang.get('general.range_separator'),

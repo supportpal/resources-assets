@@ -3970,7 +3970,7 @@
   }
   .sp-message .sp-message-text table {
     float: none;
-    max-width: fit-content !important;
+    max-width: 100% !important;
   }
   .sp-message .sp-message-text a {
     &:where(.sp-theme-dark, .sp-theme-dark *) {

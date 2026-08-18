@@ -1161,7 +1161,7 @@
   }
 
   .sp-message .sp-message-text table {
-    @apply sp:float-none sp:max-w-fit!;
+    @apply sp:float-none sp:max-w-full!;
   }
 
   .sp-message .sp-message-text a {
