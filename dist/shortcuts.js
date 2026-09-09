@@ -18,7 +18,7 @@
     link: 'meta+k',
     strikethrough: 'meta+shift+s',
     codesample: 'meta+shift+x',
-    blockquote: 'meta+q',
+    blockquote: 'meta+shift+.',
     numlist: 'meta+.',
     bullist: 'meta+/',
     outdent: 'meta+[',
@@ -794,6 +794,7 @@
     keyboardShortcuts.SHORTCUT_EXPAND_ALL = new KeyboardShortcut(18, ';', Lang.get('core.shortcut_expand_all'));
     keyboardShortcuts.SHORTCUT_COLLAPSE_ALL = new KeyboardShortcut(19, ':', Lang.get('core.shortcut_collapse_all'));
     keyboardShortcuts.SHORTCUT_PRINT_TICKET = new KeyboardShortcut(20, 'p', Lang.get('core.shortcut_print_ticket'));
+    keyboardShortcuts.SHORTCUT_MINIMISE_FORM = new KeyboardShortcut(21, '_', Lang.get('core.shortcut_minimise_form'));
 
     // Editor shortcuts (IDs 100+)
     // Mapping from editorShortcuts key to {id, langKey}
@@ -912,6 +913,7 @@
     ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_FOCUS_REPLY_FORM);
     ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_FOCUS_NOTES_FORM);
     ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_FOCUS_FORWARD_FORM);
+    ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_MINIMISE_FORM);
     ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_TOGGLE_USER_DETAILS);
     ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_TAKE_TICKET);
     ticketView.registerShortcut(keyboardShortcuts.SHORTCUT_CLOSE_TICKET);

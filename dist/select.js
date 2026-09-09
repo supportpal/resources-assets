@@ -702,7 +702,7 @@
    * ```
    *
    */
-  const iterate$1 = (object, callback) => {
+  const iterate$2 = (object, callback) => {
     if (Array.isArray(object)) {
       object.forEach(callback);
     } else {
@@ -848,7 +848,7 @@
               sum += scoreValue(value, token, 1);
             }
           } else {
-            iterate$1(weights, (weight, field) => {
+            iterate$2(weights, (weight, field) => {
               sum += scoreValue(getAttrFn(data, field), token, weight);
             });
           }
@@ -874,7 +874,7 @@
       } else {
         return function (data) {
           var sum = 0;
-          iterate$1(tokens, token => {
+          iterate$2(tokens, token => {
             sum += scoreObject(token, data);
           });
           return sum / token_count;
@@ -1006,7 +1006,7 @@
       const fn_score = options.score || self._getScoreFunction(search);
       // perform search and sort
       if (query.length) {
-        iterate$1(self.items, (item, id) => {
+        iterate$2(self.items, (item, id) => {
           score = fn_score(item);
           if (options.filter === false || score > 0) {
             search.items.push({
@@ -1016,7 +1016,7 @@
           }
         });
       } else {
-        iterate$1(self.items, (_, id) => {
+        iterate$2(self.items, (_, id) => {
           search.items.push({
             'score': 1,
             'id': id
@@ -1060,7 +1060,7 @@
    * Escapes a string for use within HTML.
    *
    */
-  const escape_html$1 = str => {
+  const escape_html = str => {
     return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   };
   /**
@@ -1208,7 +1208,7 @@
    * ```
    *
    */
-  const iterate = (object, callback) => {
+  const iterate$1 = (object, callback) => {
     if (Array.isArray(object)) {
       object.forEach(callback);
     } else {
@@ -1269,9 +1269,9 @@
    * Add css classes
    *
    */
-  const addClasses = (elmts, ...classes) => {
-    var norm_classes = classesArray(classes);
-    elmts = castAsArray(elmts);
+  const addClasses$1 = (elmts, ...classes) => {
+    var norm_classes = classesArray$1(classes);
+    elmts = castAsArray$1(elmts);
     elmts.map(el => {
       norm_classes.map(cls => {
         el.classList.add(cls);
@@ -1283,8 +1283,8 @@
    *
    */
   const removeClasses = (elmts, ...classes) => {
-    var norm_classes = classesArray(classes);
-    elmts = castAsArray(elmts);
+    var norm_classes = classesArray$1(classes);
+    elmts = castAsArray$1(elmts);
     elmts.map(el => {
       norm_classes.map(cls => {
         el.classList.remove(cls);
@@ -1295,9 +1295,9 @@
    * Return arguments
    *
    */
-  const classesArray = args => {
+  const classesArray$1 = args => {
     var classes = [];
-    iterate(args, _classes => {
+    iterate$1(args, _classes => {
       if (typeof _classes === 'string') {
         _classes = _classes.trim().split(/[\t\n\f\r\s]/);
       }
@@ -1311,7 +1311,7 @@
    * Create an array from arg if it's not already an array
    *
    */
-  const castAsArray = arg => {
+  const castAsArray$1 = arg => {
     if (!Array.isArray(arg)) {
       arg = [arg];
     }
@@ -1373,7 +1373,7 @@
    *
    */
   const setAttr = (el, attrs) => {
-    iterate(attrs, (val, attr) => {
+    iterate$1(attrs, (val, attr) => {
       if (val == null) {
         el.removeAttribute(attr);
       } else {
@@ -1630,12 +1630,12 @@
         optgroup_data.$order = optgroup_data.$order || ++$order;
         settings_element.optgroups.push(optgroup_data);
         id = optgroup_data[field_optgroup_value];
-        iterate(optgroup.children, option => {
+        iterate$1(optgroup.children, option => {
           addOption(option, id);
         });
       };
       settings_element.maxItems = input.hasAttribute('multiple') ? null : 1;
-      iterate(input.children, child => {
+      iterate$1(input.children, child => {
         tagName = child.tagName.toLowerCase();
         if (tagName === 'optgroup') {
           addGroup(child);
@@ -1655,7 +1655,7 @@
         var value = (_b = (_a = input === null || input === void 0 ? void 0 : input.value) === null || _a === void 0 ? void 0 : _a.trim()) !== null && _b !== void 0 ? _b : '';
         if (!settings.allowEmptyOption && !value.length) return;
         const values = value.split(settings.delimiter);
-        iterate(values, value => {
+        iterate$1(values, value => {
           const option = {};
           option[field_label] = value;
           option[field_value] = value;
@@ -1664,7 +1664,7 @@
         settings_element.items = values;
       } else {
         settings_element.options = JSON.parse(data_raw);
-        iterate(settings_element.options, opt => {
+        iterate$1(settings_element.options, opt => {
           settings_element.items.push(opt[field_value]);
         });
       }
@@ -1761,14 +1761,14 @@
       const classes = this.input.getAttribute('class') || '';
       const inputMode = settings.mode;
       var control_input;
-      addClasses(wrapper, settings.wrapperClass, classes, inputMode);
-      addClasses(control, settings.controlClass);
+      addClasses$1(wrapper, settings.wrapperClass, classes, inputMode);
+      addClasses$1(control, settings.controlClass);
       append(wrapper, control);
-      addClasses(dropdown, settings.dropdownClass, inputMode);
+      addClasses$1(dropdown, settings.dropdownClass, inputMode);
       if (settings.copyClassesToDropdown) {
-        addClasses(dropdown, classes);
+        addClasses$1(dropdown, classes);
       }
-      addClasses(dropdown_content, settings.dropdownContentClass);
+      addClasses$1(dropdown_content, settings.dropdownContentClass);
       append(dropdown, dropdown_content);
       getDom$1(settings.dropdownParent || wrapper).appendChild(dropdown);
       // default controlInput
@@ -1776,7 +1776,7 @@
         control_input = getDom$1(settings.controlInput);
         // set attributes
         var attrs = ['autocorrect', 'autocapitalize', 'autocomplete', 'spellcheck', 'aria-label'];
-        iterate(attrs, attr => {
+        iterate$1(attrs, attr => {
           if (input.getAttribute(attr)) {
             setAttr(control_input, {
               [attr]: input.getAttribute(attr)
@@ -1850,7 +1850,7 @@
       wrapper.style.maxWidth = input.style.maxWidth;
       if (self.plugins.names.length) {
         const classes_plugins = 'plugin-' + self.plugins.names.join(' plugin-');
-        addClasses([wrapper, dropdown], classes_plugins);
+        addClasses$1([wrapper, dropdown], classes_plugins);
       }
       if ((settings.maxItems === null || settings.maxItems > 1) && self.is_select_tag) {
         setAttr(input, {
@@ -1971,7 +1971,7 @@
       self.inputState();
       self.isSetup = true;
       self.on('change', this.onChange);
-      addClasses(input, 'tomselected', 'ts-hidden-accessible');
+      addClasses$1(input, 'tomselected', 'ts-hidden-accessible');
       self.trigger('initialize');
       // preload options
       if (settings.preload === true) {
@@ -1986,7 +1986,7 @@
       // build options table
       this.addOptions(options);
       // build optgroup table
-      iterate(optgroups, optgroup => {
+      iterate$1(optgroups, optgroup => {
         this.registerOptionGroup(optgroup);
       });
     }
@@ -2135,7 +2135,7 @@
           return;
         }
         var splitInput = pastedText.trim().split(self.settings.splitOn);
-        iterate(splitInput, piece => {
+        iterate$1(splitInput, piece => {
           const hash = hash_key(piece);
           if (hash) {
             if (this.options[piece]) {
@@ -2431,7 +2431,7 @@
     load(value) {
       const self = this;
       if (!self.canLoad(value)) return;
-      addClasses(self.wrapper, self.settings.loadingClass);
+      addClasses$1(self.wrapper, self.settings.loadingClass);
       self.loading++;
       const callback = self.loadCallback.bind(self);
       self.settings.load.call(self, value, callback);
@@ -2564,7 +2564,7 @@
       const self = this;
       const last_active = self.control.querySelector('.last-active');
       if (last_active) removeClasses(last_active, 'last-active');
-      addClasses(item, 'active last-active');
+      addClasses$1(item, 'active last-active');
       self.trigger('item_select', item);
       if (self.activeItems.indexOf(item) == -1) {
         self.activeItems.push(item);
@@ -2605,7 +2605,7 @@
       setAttr(option, {
         'aria-selected': 'true'
       });
-      addClasses(option, 'active');
+      addClasses$1(option, 'active');
       if (scroll) this.scrollToOption(option);
     }
     /**
@@ -2664,7 +2664,7 @@
       self.inputState();
       self.close();
       self.activeItems = activeItems;
-      iterate(activeItems, item => {
+      iterate$1(activeItems, item => {
         self.setActiveItemClass(item);
       });
     }
@@ -2911,7 +2911,7 @@
       }
       // render optgroup headers & join groups
       html = document.createDocumentFragment();
-      iterate(groups_order, group_order => {
+      iterate$1(groups_order, group_order => {
         let group_fragment = group_order.fragment;
         let optgroup = group_order.optgroup;
         if (!group_fragment || !group_fragment.children.length) return;
@@ -2937,7 +2937,7 @@
       if (self.settings.highlight) {
         removeHighlight(dropdown_content);
         if (results.query.length && results.tokens.length) {
-          iterate(results.tokens, tok => {
+          iterate$1(results.tokens, tok => {
             highlight(dropdown_content, tok.regex);
           });
         }
@@ -3043,7 +3043,7 @@
      *
      */
     addOptions(data, user_created = false) {
-      iterate(data, dat => {
+      iterate$1(data, dat => {
         this.addOption(dat, user_created);
       });
     }
@@ -3139,7 +3139,7 @@
           self.items.splice(index_item, 1, value_new);
         }
         item_new = self._render('item', data);
-        if (item.classList.contains('active')) addClasses(item_new, 'active');
+        if (item.classList.contains('active')) addClasses$1(item_new, 'active');
         replaceNode(item, item_new);
       }
       // we might have updated the sortField
@@ -3168,7 +3168,7 @@
       this.userOptions = {};
       this.clearCache();
       const selected = {};
-      iterate(this.options, (option, key) => {
+      iterate$1(this.options, (option, key) => {
         if (boundFilter(option, key)) {
           selected[key] = option;
         }
@@ -3496,7 +3496,7 @@
         const has_selected = self.input.querySelectorAll('option:checked').length;
         function AddSelected(option_el, value, label) {
           if (!option_el) {
-            option_el = getDom$1('<option value="' + escape_html$1(value) + '">' + escape_html$1(label) + '</option>');
+            option_el = getDom$1('<option value="' + escape_html(value) + '">' + escape_html(label) + '</option>');
           }
           // don't move empty option from top of list
           // fixes bug in firefox https://bugzilla.mozilla.org/show_bug.cgi?id=1725293
@@ -3506,7 +3506,7 @@
           selected.push(option_el);
           // marking empty option as selected can break validation
           // fixes https://github.com/orchidjs/tom-select/issues/303
-          if (option_el != empty_option || has_selected > 0) {
+          if (option_el != empty_option || has_selected > 0 || self.settings.mode == 'multi') {
             option_el.selected = true;
           }
           return option_el;
@@ -3618,7 +3618,7 @@
       var self = this;
       if (!self.items.length) return;
       var items = self.controlChildren();
-      iterate(items, item => {
+      iterate$1(items, item => {
         self.removeItem(item, true);
       });
       self.inputState();
@@ -3654,7 +3654,7 @@
         if (direction > 0) {
           caret++;
         }
-        iterate(self.activeItems, item => rm_items.push(item));
+        iterate$1(self.activeItems, item => rm_items.push(item));
       } else if ((self.isFocused || self.settings.mode === 'single') && self.items.length) {
         const items = self.controlChildren();
         let rm_item;
@@ -3844,7 +3844,7 @@
         return null;
       }
       // render markup
-      html = self.settings.render[templateName].call(this, data, escape_html$1);
+      html = self.settings.render[templateName].call(this, data, escape_html);
       if (!html) {
         return null;
       }
@@ -3878,12 +3878,12 @@
         });
         // make sure we have some classes if a template is overwritten
         if (templateName === 'item') {
-          addClasses(html, self.settings.itemClass);
+          addClasses$1(html, self.settings.itemClass);
           setAttr(html, {
             'data-ts-item': ''
           });
         } else {
-          addClasses(html, self.settings.optionClass);
+          addClasses$1(html, self.settings.optionClass);
           setAttr(html, {
             role: 'option',
             id: data.$id
@@ -3913,7 +3913,7 @@
      *
      */
     clearCache() {
-      iterate(this.options, option => {
+      iterate$1(this.options, option => {
         if (option.$div) {
           option.$div.remove();
           delete option.$div;
@@ -3986,7 +3986,7 @@
       style.appendChild(document.createTextNode(css));
     }
   }
-  var css_248z = "/*! tailwindcss v4.3.1 | MIT License | https://tailwindcss.com */\n@layer properties{@supports ((-webkit-hyphens:none) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-border-style:solid;--tw-leading:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-font-weight:initial;--tw-content:\"\"}}}@layer components{.ts-control{z-index:1;box-sizing:border-box;width:100%;box-shadow:none;border:1px solid #d0d0d0;border-radius:3px;flex-wrap:wrap;padding:8px;display:flex;position:relative;overflow:hidden}.ts-wrapper.multi.has-items .ts-control{padding:6px 8px 3px}.full .ts-control{background-color:#fff}.disabled .ts-control,.disabled .ts-control *{cursor:default!important}.focus .ts-control{box-shadow:none}.ts-control>*{vertical-align:baseline;display:inline-block}.ts-wrapper.multi .ts-control>div{cursor:pointer;color:#303030;background:#f2f2f2;border:0 solid #d0d0d0;margin:0 3px 3px 0;padding:2px 6px;overflow:auto}.ts-wrapper.multi .ts-control>div.active{color:#303030;background:#e8e8e8;border:0 solid #cacaca}.ts-wrapper.multi.disabled .ts-control>div,.ts-wrapper.multi.disabled .ts-control>div.active{color:#7d7d7d;background:#fff;border:0 solid #fff}.ts-control>input{flex:auto;min-width:7rem;text-indent:0!important;max-width:100%!important;min-height:0!important;max-height:none!important;line-height:inherit!important;-webkit-user-select:auto!important;-moz-user-select:auto!important;user-select:auto!important;box-shadow:none!important;background:0 0!important;border:0!important;margin:0!important;padding:0!important;display:inline-block!important}.ts-control>input::-ms-clear{display:none}.ts-control>input:focus{outline:none!important}.has-items .ts-control>input{margin:0 4px!important}.ts-control.rtl{text-align:right}.ts-control.rtl.single .ts-control:after{left:15px;right:auto}.ts-control.rtl .ts-control>input{margin:0 4px 0 -2px!important}.disabled .ts-control{opacity:.5;background-color:#fafafa}.input-hidden .ts-control>input{opacity:0;position:absolute;left:-10000px}.ts-dropdown{z-index:10;box-sizing:border-box;background:#fff;border:1px solid #d0d0d0;border-top:0;border-radius:0 0 3px 3px;width:100%;margin:.25rem 0 0;position:absolute;top:100%;left:0;box-shadow:0 1px 3px #0000001a}.ts-dropdown [data-selectable]{cursor:pointer;overflow:hidden}.ts-dropdown [data-selectable] .highlight{background:#7da8d033;border-radius:1px}.ts-dropdown .option,.ts-dropdown .optgroup-header,.ts-dropdown .no-results,.ts-dropdown .create{padding:5px 8px}.ts-dropdown .option,.ts-dropdown [data-disabled],.ts-dropdown [data-disabled] [data-selectable].option{cursor:inherit;opacity:.5}.ts-dropdown [data-selectable].option{opacity:1;cursor:pointer}.ts-dropdown .optgroup:first-child .optgroup-header{border-top:0}.ts-dropdown .optgroup-header{color:#303030;cursor:default;background:#fff}.ts-dropdown .active{color:#495c68;background-color:#f5fafd}.ts-dropdown .active.create{color:#495c68}.ts-dropdown .create{color:#30303080}.ts-dropdown .spinner{width:30px;height:30px;margin:5px 8px;display:inline-block}.ts-dropdown .spinner:after{content:\" \";border:5px solid #d0d0d0;border-color:#d0d0d0 #0000;border-radius:50%;width:24px;height:24px;margin:3px;animation:1.2s linear infinite lds-dual-ring;display:block}@keyframes lds-dual-ring{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.ts-dropdown-content{scroll-behavior:smooth;max-height:200px;overflow:hidden auto}.ts-wrapper.plugin-drag_drop .ts-dragging{color:#0000!important}.ts-wrapper.plugin-drag_drop .ts-dragging>*{visibility:hidden!important}.plugin-checkbox_options:not(.rtl) .option input{margin-right:.5rem}.plugin-checkbox_options.rtl .option input{margin-left:.5rem}.plugin-clear_button{--ts-pr-clear-button:1em}.plugin-clear_button .clear-button{opacity:0;cursor:pointer;transition:opacity .5s;position:absolute;top:50%;right:2px;transform:translateY(-50%);background:0 0!important;margin-right:0!important}.plugin-clear_button.form-select .clear-button,.plugin-clear_button.single .clear-button{right:max(var(--ts-pr-caret), 8px)}.plugin-clear_button.focus.has-items .clear-button,.plugin-clear_button:not(.disabled):hover.has-items .clear-button{opacity:1}.ts-wrapper .dropdown-header{background:color-mix(#fff, #d0d0d0, 85%);border-bottom:1px solid #d0d0d0;border-radius:3px 3px 0 0;padding:10px 8px;position:relative}.ts-wrapper .dropdown-header-close{color:#303030;opacity:.4;margin-top:-12px;line-height:20px;position:absolute;top:50%;right:8px;font-size:20px!important}.ts-wrapper .dropdown-header-close:hover{color:#000}.plugin-dropdown_input.focus.dropdown-active .ts-control{box-shadow:none;border:1px solid #d0d0d0}.plugin-dropdown_input .dropdown-input{box-shadow:none;background:0 0;border:0 solid #d0d0d0;border-bottom-width:1px;width:100%;padding:8px;display:block}.plugin-dropdown_input .items-placeholder{width:100%;box-shadow:none!important;border:0!important}.plugin-dropdown_input.has-items .items-placeholder,.plugin-dropdown_input.dropdown-active .items-placeholder{display:none!important}.ts-wrapper.plugin-input_autogrow.has-items .ts-control>input{min-width:0}.ts-wrapper.plugin-input_autogrow.has-items.focus .ts-control>input{flex:none;min-width:4px}.ts-wrapper.plugin-input_autogrow.has-items.focus .ts-control>input::-moz-placeholder{color:#0000}.ts-wrapper.plugin-input_autogrow.has-items.focus .ts-control>input::placeholder{color:#0000}.ts-dropdown.plugin-optgroup_columns .ts-dropdown-content{display:flex}.ts-dropdown.plugin-optgroup_columns .optgroup{border-top:0;border-right:1px solid #f2f2f2;flex-grow:1;flex-basis:0;min-width:0}.ts-dropdown.plugin-optgroup_columns .optgroup:last-child{border-right:0}.ts-dropdown.plugin-optgroup_columns .optgroup:before{display:none}.ts-dropdown.plugin-optgroup_columns .optgroup-header{border-top:0}.ts-wrapper.plugin-remove_button .item{align-items:center;display:inline-flex}.ts-wrapper.plugin-remove_button .item .remove{color:inherit;vertical-align:middle;box-sizing:border-box;border-radius:0 2px 2px 0;padding:0 6px;text-decoration:none;display:inline-block}.ts-wrapper.plugin-remove_button .item .remove:hover{background:#0000000d}.ts-wrapper.plugin-remove_button.disabled .item .remove:hover{background:0 0}.ts-wrapper.plugin-remove_button .remove-single{font-size:23px;position:absolute;top:0;right:0}.ts-wrapper.plugin-remove_button:not(.rtl) .item{padding-right:0!important}.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove{border-left:1px solid #d0d0d0;margin-left:6px}.ts-wrapper.plugin-remove_button:not(.rtl) .item.active .remove{border-left-color:#cacaca}.ts-wrapper.plugin-remove_button:not(.rtl).disabled .item .remove{border-left-color:#fff}.ts-wrapper.plugin-remove_button.rtl .item{padding-left:0!important}.ts-wrapper.plugin-remove_button.rtl .item .remove{border-right:1px solid #d0d0d0;margin-right:6px}.ts-wrapper.plugin-remove_button.rtl .item.active .remove{border-right-color:#cacaca}.ts-wrapper.plugin-remove_button.rtl.disabled .item .remove{border-right-color:#fff}:root{--ts-pr-clear-button:0px;--ts-pr-caret:0px;--ts-pr-min:.75rem}.ts-wrapper.single .ts-control,.ts-wrapper.single .ts-control input{cursor:pointer}.ts-control:not(.rtl){padding-right:max(var(--ts-pr-min), var(--ts-pr-clear-button) + var(--ts-pr-caret))!important}.ts-control.rtl{padding-left:max(var(--ts-pr-min), var(--ts-pr-clear-button) + var(--ts-pr-caret))!important}.ts-wrapper{position:relative}.ts-dropdown,.ts-control,.ts-control input{color:#303030;font-family:inherit;font-size:13px;line-height:18px}.ts-control,.ts-wrapper.single.input-active .ts-control{cursor:text;background:#fff}.ts-hidden-accessible{clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important;width:1px!important;padding:0!important;position:absolute!important;overflow:hidden!important}.ts-wrapper{text-align:start}.ts-wrapper .ts-control{min-height:calc(var(--sp-spacing,.25rem) * 10);border-style:var(--tw-border-style);border-width:2px;border-color:var(--sp-color-secondary,var(--color-background-secondary));background-color:var(--sp-color-secondary,var(--color-background-secondary));max-width:100%;padding-inline:calc(var(--sp-spacing,.25rem) * 3);padding-block:calc(var(--sp-spacing,.25rem) * 1.5);--tw-leading:var(--sp-leading-normal,1.5);line-height:var(--sp-leading-normal,1.5);color:var(--sp-text-color-primary,var(--color-text-primary));--tw-shadow:0 0 #0000;box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);overflow:inherit;border-radius:.25rem}.ts-wrapper.single .ts-control{padding-inline-end:calc(var(--sp-spacing,.25rem) * 7)}.ts-wrapper.single.input-active .ts-control{background-color:var(--sp-color-secondary,var(--color-background-secondary))}.ts-wrapper.focus .ts-control{--tw-shadow:0 0 #0000;--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);--tw-ring-color:var(--sp-color-primary-200,var(--color-primary-200))}.ts-wrapper.dropdown-active .ts-control:before{background-color:#0000}.ts-wrapper .ts-control>*{display:inline}.ts-wrapper .ts-control>input{height:calc(var(--sp-spacing,.25rem) * 6);width:auto;min-width:0;margin:0!important}.ts-dropdown,.ts-control,.ts-control input{color:var(--sp-text-color-primary,var(--color-text-primary));font-size:inherit}.ts-wrapper.single .ts-control.has-items,.ts-wrapper.single .ts-control.input-active{background-position:right .125rem center;background-repeat:no-repeat;background-size:1.5rem}:is(.ts-wrapper.single .ts-control.has-items,.ts-wrapper.single .ts-control.input-active):where(:dir(rtl),[dir=rtl],[dir=rtl] *){background-position:.125rem}.ts-wrapper.single .ts-control.has-items,.ts-wrapper.single .ts-control.input-active{background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3e%3cpath d='M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.4l3.3 3.29 3.3-3.3z'/%3e%3c/svg%3e\")}.ts-wrapper.single .ts-control:after{display:none}.ts-wrapper.multi.has-items .ts-control{padding-inline:calc(var(--sp-spacing,.25rem) * 2);padding-top:calc(var(--sp-spacing,.25rem) * 1.5);padding-bottom:calc(var(--sp-spacing,.25rem) * .5)}.ts-wrapper.multi .ts-control>div{margin-inline-start:0;margin-inline-end:var(--sp-spacing,.25rem);margin-top:0;margin-bottom:var(--sp-spacing,.25rem);border-radius:var(--sp-radius-sm,.25rem);padding-inline:calc(var(--sp-spacing,.25rem) * 2);padding-block:0;overflow:hidden}.ts-wrapper.multi .ts-control>div,.ts-wrapper.multi .ts-control>div.active{background-color:var(--sp-color-tertiary,var(--color-background-tertiary));color:var(--sp-text-color-primary,var(--color-text-primary));display:inline-block}.sp-selectize-inline-block .ts-wrapper{display:block}@media (min-width:640px){.sp-selectize-inline-block .ts-wrapper{min-width:calc(var(--sp-spacing,.25rem) * 64);vertical-align:middle;display:inline-block}}.ts-wrapper.sp\\:rounded-e-none .ts-control{border-start-end-radius:0;border-end-end-radius:0}.ts-dropdown{z-index:10001;margin-top:var(--sp-spacing,.25rem);border-style:var(--tw-border-style);border-width:2px;border-color:var(--sp-color-secondary,var(--color-background-secondary));background-color:var(--sp-color-primary,var(--color-background-primary));color:var(--sp-text-color-primary,var(--color-text-primary));--tw-shadow:0 0 #0000;box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);border-radius:.25rem}.ts-dropdown .ts-dropdown-content{border-radius:.25rem}.ts-dropdown .option.active,.ts-dropdown .active{background-color:var(--sp-color-secondary,var(--color-background-secondary));color:var(--sp-text-color-primary,var(--color-text-primary))}.ts-dropdown .optgroup-header{--tw-font-weight:var(--sp-font-weight-bold,700);font-weight:var(--sp-font-weight-bold,700);color:var(--sp-text-color-primary,var(--color-text-primary));background-color:#0000}.ts-dropdown .optgroup-header,.ts-dropdown .option,.ts-dropdown [data-selectable]{padding-inline:calc(var(--sp-spacing,.25rem) * 3);padding-block:calc(var(--sp-spacing,.25rem) * 1.5)}.ts-dropdown .option,.ts-dropdown [data-selectable]{cursor:pointer}.ts-dropdown .create,.ts-dropdown .active.create{color:var(--sp-text-color-secondary,var(--color-text-secondary))}.ts-wrapper.loading .ts-control:before{z-index:50;font-family:var(--sp-font-icon,\"Font Awesome 7 Free\");font-size:var(--sp-text-base,1rem);line-height:var(--tw-leading,var(--sp-text-base--line-height,calc(1.5 / 1)));--tw-font-weight:var(--sp-font-weight-bold,700);font-weight:var(--sp-font-weight-bold,700);color:var(--sp-text-color-secondary,var(--color-text-secondary));--tw-content:\"\";content:var(--tw-content);inset-inline-end:calc(var(--sp-spacing,.25rem) * 3);animation:2s linear infinite fa-spin;position:absolute;top:.375rem}.ts-wrapper.single.loading .ts-control.has-items:before{inset-inline-end:calc(var(--sp-spacing,.25rem) * 7)}.ts-wrapper.loading.dropdown-active .ts-control:before{inset-inline-start:auto;height:auto;bottom:auto}.ts-wrapper.disabled .ts-control{opacity:.5}.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove{border-left-style:var(--tw-border-style);border-left-width:0;margin-left:0}.ts-wrapper.plugin-remove_button.rtl .item .remove{border-right-style:var(--tw-border-style);border-right-width:0;margin-right:0}.ts-wrapper.plugin-remove_button .item .remove,.ts-wrapper.plugin-remove_button .item.active .remove{height:100%;font-size:var(--sp-text-sm,.875rem);line-height:var(--tw-leading,var(--sp-text-sm--line-height,calc(1.25 / .875)));inset-inline-end:calc(var(--sp-spacing,.25rem) * 0);right:auto}.ts-wrapper.plugin-remove_button [data-value] .remove,.ts-wrapper.plugin-remove_button [data-value].active .remove{height:100%;font-size:var(--sp-text-sm,.875rem);line-height:var(--tw-leading,var(--sp-text-sm--line-height,calc(1.25 / .875)))}.ts-wrapper.plugin-remove_button [data-value] .remove:hover{opacity:.75;background-color:#0000}.ts-wrapper.plugin-remove_button .item[style*=color] .remove{color:inherit!important}.ts-wrapper.plugin-remove_button .item.unremovable{padding-inline-end:calc(var(--sp-spacing,.25rem) * 2)!important}.ts-wrapper.plugin-remove_button .item.unremovable .remove{display:none}}@property --tw-border-style{syntax:\"*\";inherits:false;initial-value:solid}@property --tw-leading{syntax:\"*\";inherits:false}@property --tw-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:\"*\";inherits:false}@property --tw-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:\"*\";inherits:false}@property --tw-inset-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:\"*\";inherits:false}@property --tw-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:\"*\";inherits:false}@property --tw-inset-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:\"*\";inherits:false}@property --tw-ring-offset-width{syntax:\"<length>\";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:\"*\";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-font-weight{syntax:\"*\";inherits:false}@property --tw-content{syntax:\"*\";inherits:false;initial-value:\"\"}\n";
+  var css_248z = "/*! tailwindcss v4.3.3 | MIT License | https://tailwindcss.com */\n@layer properties{@supports ((-webkit-hyphens:none) and (not (margin-trim:inline))) or ((-moz-orient:inline) and (not (color:rgb(from red r g b)))){*,:before,:after,::backdrop{--tw-border-style:solid;--tw-leading:initial;--tw-shadow:0 0 #0000;--tw-shadow-color:initial;--tw-shadow-alpha:100%;--tw-inset-shadow:0 0 #0000;--tw-inset-shadow-color:initial;--tw-inset-shadow-alpha:100%;--tw-ring-color:initial;--tw-ring-shadow:0 0 #0000;--tw-inset-ring-color:initial;--tw-inset-ring-shadow:0 0 #0000;--tw-ring-inset:initial;--tw-ring-offset-width:0px;--tw-ring-offset-color:#fff;--tw-ring-offset-shadow:0 0 #0000;--tw-font-weight:initial;--tw-content:\"\"}}}@layer components{.ts-control{z-index:1;box-sizing:border-box;width:100%;box-shadow:none;border:1px solid #d0d0d0;border-radius:3px;flex-wrap:wrap;padding:8px;display:flex;position:relative;overflow:hidden}.ts-wrapper.multi.has-items .ts-control{padding:6px 8px 3px}.full .ts-control{background-color:#fff}.disabled .ts-control,.disabled .ts-control *{cursor:default!important}.focus .ts-control{box-shadow:none}.ts-control>*{vertical-align:baseline;display:inline-block}.ts-wrapper.multi .ts-control>div{cursor:pointer;color:#303030;background:#f2f2f2;border:0 solid #d0d0d0;margin:0 3px 3px 0;padding:2px 6px;overflow:auto}.ts-wrapper.multi .ts-control>div.active{color:#303030;background:#e8e8e8;border:0 solid #cacaca}.ts-wrapper.multi.disabled .ts-control>div,.ts-wrapper.multi.disabled .ts-control>div.active{color:#7d7d7d;background:#fff;border:0 solid #fff}.ts-control>input{flex:auto;min-width:7rem;text-indent:0!important;max-width:100%!important;min-height:0!important;max-height:none!important;line-height:inherit!important;-webkit-user-select:auto!important;-moz-user-select:auto!important;user-select:auto!important;box-shadow:none!important;background:0 0!important;border:0!important;margin:0!important;padding:0!important;display:inline-block!important}.ts-control>input::-ms-clear{display:none}.ts-control>input:focus{outline:none!important}.has-items .ts-control>input{margin:0 4px!important}.ts-control.rtl{text-align:right}.ts-control.rtl.single .ts-control:after{left:15px;right:auto}.ts-control.rtl .ts-control>input{margin:0 4px 0 -2px!important}.disabled .ts-control{opacity:.5;background-color:#fafafa}.input-hidden .ts-control>input{opacity:0;position:absolute;left:-10000px}.ts-dropdown{z-index:10;box-sizing:border-box;background:#fff;border:1px solid #d0d0d0;border-top:0;border-radius:0 0 3px 3px;width:100%;margin:.25rem 0 0;position:absolute;top:100%;left:0;box-shadow:0 1px 3px #0000001a}.ts-dropdown [data-selectable]{cursor:pointer;overflow:hidden}.ts-dropdown [data-selectable] .highlight{background:#7da8d033;border-radius:1px}.ts-dropdown .option,.ts-dropdown .optgroup-header,.ts-dropdown .no-results,.ts-dropdown .create{padding:5px 8px}.ts-dropdown .option,.ts-dropdown [data-disabled],.ts-dropdown [data-disabled] [data-selectable].option{cursor:inherit;opacity:.5}.ts-dropdown [data-selectable].option{opacity:1;cursor:pointer}.ts-dropdown .optgroup:first-child .optgroup-header{border-top:0}.ts-dropdown .optgroup-header{color:#303030;cursor:default;background:#fff}.ts-dropdown .active{color:#495c68;background-color:#f5fafd}.ts-dropdown .active.create{color:#495c68}.ts-dropdown .create{color:#30303080}.ts-dropdown .spinner{width:30px;height:30px;margin:5px 8px;display:inline-block}.ts-dropdown .spinner:after{content:\" \";border:5px solid #d0d0d0;border-color:#d0d0d0 #0000;border-radius:50%;width:24px;height:24px;margin:3px;animation:1.2s linear infinite lds-dual-ring;display:block}@keyframes lds-dual-ring{0%{transform:rotate(0)}to{transform:rotate(360deg)}}.ts-dropdown-content{scroll-behavior:smooth;max-height:200px;overflow:hidden auto}.ts-wrapper.plugin-drag_drop .ts-dragging{color:#0000!important}.ts-wrapper.plugin-drag_drop .ts-dragging>*{visibility:hidden!important}.plugin-checkbox_options:not(.rtl) .option input{margin-right:.5rem}.plugin-checkbox_options.rtl .option input{margin-left:.5rem}.plugin-clear_button{--ts-pr-clear-button:1em}.plugin-clear_button .clear-button{opacity:0;cursor:pointer;transition:opacity .5s;position:absolute;top:50%;right:2px;transform:translateY(-50%);background:0 0!important;margin-right:0!important}.plugin-clear_button.form-select .clear-button,.plugin-clear_button.single .clear-button{right:max(var(--ts-pr-caret), 8px)}.plugin-clear_button.focus.has-items .clear-button,.plugin-clear_button:not(.disabled):hover.has-items .clear-button{opacity:1}.ts-wrapper .dropdown-header{background:color-mix(#fff, #d0d0d0, 85%);border-bottom:1px solid #d0d0d0;border-radius:3px 3px 0 0;padding:10px 8px;position:relative}.ts-wrapper .dropdown-header-close{color:#303030;opacity:.4;margin-top:-12px;line-height:20px;position:absolute;top:50%;right:8px;font-size:20px!important}.ts-wrapper .dropdown-header-close:hover{color:#000}.plugin-dropdown_input.focus.dropdown-active .ts-control{box-shadow:none;border:1px solid #d0d0d0}.plugin-dropdown_input .dropdown-input{box-shadow:none;background:0 0;border:0 solid #d0d0d0;border-bottom-width:1px;width:100%;padding:8px;display:block}.plugin-dropdown_input .items-placeholder{width:100%;box-shadow:none!important;border:0!important}.plugin-dropdown_input.has-items .items-placeholder,.plugin-dropdown_input.dropdown-active .items-placeholder{display:none!important}.ts-wrapper.plugin-input_autogrow.has-items .ts-control>input{min-width:0}.ts-wrapper.plugin-input_autogrow.has-items.focus .ts-control>input{flex:none;min-width:4px}.ts-wrapper.plugin-input_autogrow.has-items.focus .ts-control>input::-moz-placeholder{color:#0000}.ts-wrapper.plugin-input_autogrow.has-items.focus .ts-control>input::placeholder{color:#0000}.ts-dropdown.plugin-optgroup_columns .ts-dropdown-content{display:flex}.ts-dropdown.plugin-optgroup_columns .optgroup{border-top:0;border-right:1px solid #f2f2f2;flex-grow:1;flex-basis:0;min-width:0}.ts-dropdown.plugin-optgroup_columns .optgroup:last-child{border-right:0}.ts-dropdown.plugin-optgroup_columns .optgroup:before{display:none}.ts-dropdown.plugin-optgroup_columns .optgroup-header{border-top:0}.ts-wrapper.plugin-remove_button .item{align-items:center;display:inline-flex}.ts-wrapper.plugin-remove_button .item .remove{color:inherit;vertical-align:middle;box-sizing:border-box;border-radius:0 2px 2px 0;padding:0 6px;text-decoration:none;display:inline-block}.ts-wrapper.plugin-remove_button .item .remove:hover{background:#0000000d}.ts-wrapper.plugin-remove_button.disabled .item .remove:hover{background:0 0}.ts-wrapper.plugin-remove_button .remove-single{font-size:23px;position:absolute;top:0;right:0}.ts-wrapper.plugin-remove_button:not(.rtl) .item{padding-right:0!important}.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove{border-left:1px solid #d0d0d0;margin-left:6px}.ts-wrapper.plugin-remove_button:not(.rtl) .item.active .remove{border-left-color:#cacaca}.ts-wrapper.plugin-remove_button:not(.rtl).disabled .item .remove{border-left-color:#fff}.ts-wrapper.plugin-remove_button.rtl .item{padding-left:0!important}.ts-wrapper.plugin-remove_button.rtl .item .remove{border-right:1px solid #d0d0d0;margin-right:6px}.ts-wrapper.plugin-remove_button.rtl .item.active .remove{border-right-color:#cacaca}.ts-wrapper.plugin-remove_button.rtl.disabled .item .remove{border-right-color:#fff}:root{--ts-pr-clear-button:0px;--ts-pr-caret:0px;--ts-pr-min:.75rem}.ts-wrapper.single .ts-control,.ts-wrapper.single .ts-control input{cursor:pointer}.ts-control:not(.rtl){padding-right:max(var(--ts-pr-min), var(--ts-pr-clear-button) + var(--ts-pr-caret))!important}.ts-control.rtl{padding-left:max(var(--ts-pr-min), var(--ts-pr-clear-button) + var(--ts-pr-caret))!important}.ts-wrapper{position:relative}.ts-dropdown,.ts-control,.ts-control input{color:#303030;font-family:inherit;font-size:13px;line-height:18px}.ts-control,.ts-wrapper.single.input-active .ts-control{cursor:text;background:#fff}.ts-hidden-accessible{clip:rect(0 0 0 0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important;width:1px!important;padding:0!important;position:absolute!important;overflow:hidden!important}.ts-wrapper{text-align:start}.ts-wrapper .ts-control{min-height:calc(var(--sp-spacing,.25rem) * 10);max-width:100%;min-width:calc(var(--sp-spacing,.25rem) * 64);border-style:var(--tw-border-style);border-width:2px;border-color:var(--sp-color-secondary,var(--color-background-secondary));background-color:var(--sp-color-secondary,var(--color-background-secondary));padding-inline:calc(var(--sp-spacing,.25rem) * 3);padding-block:calc(var(--sp-spacing,.25rem) * 1.5);--tw-leading:var(--sp-leading-normal,1.5);line-height:var(--sp-leading-normal,1.5);color:var(--sp-text-color-primary,var(--color-text-primary));--tw-shadow:0 0 #0000;box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);overflow:inherit;border-radius:.25rem}.ts-wrapper.single .ts-control{padding-inline-end:calc(var(--sp-spacing,.25rem) * 7)}.ts-wrapper.single.input-active .ts-control{background-color:var(--sp-color-secondary,var(--color-background-secondary))}.ts-wrapper.focus .ts-control{--tw-shadow:0 0 #0000;--tw-ring-shadow:var(--tw-ring-inset,) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color,currentcolor);box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);--tw-ring-color:var(--sp-color-primary-200,var(--color-primary-200))}.ts-wrapper.dropdown-active .ts-control:before{background-color:#0000}.ts-wrapper .ts-control>*{display:inline}.ts-wrapper .ts-control>input{height:calc(var(--sp-spacing,.25rem) * 6);width:auto;min-width:0;margin:0!important}.ts-dropdown,.ts-control,.ts-control input{color:var(--sp-text-color-primary,var(--color-text-primary));font-size:inherit}.ts-wrapper.single.has-items .ts-control,.ts-wrapper.single.input-active .ts-control{background-position:right .125rem center;background-repeat:no-repeat;background-size:1.5rem}:is(.ts-wrapper.single.has-items .ts-control,.ts-wrapper.single.input-active .ts-control):where(:dir(rtl),[dir=rtl],[dir=rtl] *){background-position:.125rem}.ts-wrapper.single.has-items .ts-control,.ts-wrapper.single.input-active .ts-control{background-image:url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a0aec0'%3e%3cpath d='M15.3 9.3a1 1 0 0 1 1.4 1.4l-4 4a1 1 0 0 1-1.4 0l-4-4a1 1 0 0 1 1.4-1.4l3.3 3.29 3.3-3.3z'/%3e%3c/svg%3e\")}.ts-wrapper.single .ts-control:after{display:none}.ts-wrapper.multi.has-items .ts-control{padding-inline:calc(var(--sp-spacing,.25rem) * 2);padding-top:calc(var(--sp-spacing,.25rem) * 1.5);padding-bottom:calc(var(--sp-spacing,.25rem) * .5)}.ts-wrapper.multi .ts-control>div{margin-inline-start:0;margin-inline-end:var(--sp-spacing,.25rem);margin-top:0;margin-bottom:var(--sp-spacing,.25rem);border-radius:var(--sp-radius-sm,.25rem);padding-inline:calc(var(--sp-spacing,.25rem) * 2);white-space:nowrap;padding-block:0;overflow:hidden}.ts-wrapper.multi .ts-control>div,.ts-wrapper.multi .ts-control>div.active{background-color:var(--sp-color-tertiary,var(--color-background-tertiary));color:var(--sp-text-color-primary,var(--color-text-primary));display:inline-block}.sp-selectize-inline-block .ts-wrapper{display:block}@media (min-width:640px){.sp-selectize-inline-block .ts-wrapper{min-width:calc(var(--sp-spacing,.25rem) * 64);vertical-align:middle;display:inline-block}}.ts-wrapper.sp\\:rounded-e-none .ts-control{border-start-end-radius:0;border-end-end-radius:0}.ts-dropdown{z-index:10001;border-style:var(--tw-border-style);border-width:2px;border-color:var(--sp-color-secondary,var(--color-background-secondary));background-color:var(--sp-color-primary,var(--color-background-primary));color:var(--sp-text-color-primary,var(--color-text-primary));--tw-shadow:0 0 #0000;box-shadow:var(--tw-inset-shadow), var(--tw-inset-ring-shadow), var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow);border-radius:.25rem}.ts-dropdown .ts-dropdown-content{border-radius:.25rem}.ts-dropdown .option.active,.ts-dropdown .active{background-color:var(--sp-color-secondary,var(--color-background-secondary));color:var(--sp-text-color-primary,var(--color-text-primary))}.ts-dropdown .optgroup-header{--tw-font-weight:var(--sp-font-weight-bold,700);font-weight:var(--sp-font-weight-bold,700);color:var(--sp-text-color-primary,var(--color-text-primary));background-color:#0000}.ts-dropdown .optgroup-header,.ts-dropdown .option,.ts-dropdown [data-selectable]{padding-inline:calc(var(--sp-spacing,.25rem) * 3);padding-block:calc(var(--sp-spacing,.25rem) * 1.5)}.ts-dropdown .option,.ts-dropdown [data-selectable]{cursor:pointer}.ts-dropdown .create,.ts-dropdown .active.create{color:var(--sp-text-color-secondary,var(--color-text-secondary))}.ts-wrapper.loading .ts-control:before{z-index:50;font-family:var(--sp-font-icon,\"Font Awesome 7 Free\");font-size:var(--sp-text-base,1rem);line-height:var(--tw-leading,var(--sp-text-base--line-height,calc(1.5 / 1)));--tw-font-weight:var(--sp-font-weight-bold,700);font-weight:var(--sp-font-weight-bold,700);color:var(--sp-text-color-secondary,var(--color-text-secondary));--tw-content:\"\";content:var(--tw-content);inset-inline-end:calc(var(--sp-spacing,.25rem) * 3);animation:2s linear infinite fa-spin;position:absolute;top:.375rem}.ts-wrapper.single.loading.has-items .ts-control:before{inset-inline-end:calc(var(--sp-spacing,.25rem) * 7)}.ts-wrapper.loading.dropdown-active .ts-control:before{inset-inline-start:auto;height:auto;bottom:auto}.ts-wrapper.disabled .ts-control{opacity:.5}.ts-wrapper.plugin-remove_button:not(.rtl) .item .remove{border-left-style:var(--tw-border-style);border-left-width:0;margin-left:0}.ts-wrapper.plugin-remove_button.rtl .item .remove{border-right-style:var(--tw-border-style);border-right-width:0;margin-right:0}.ts-wrapper.plugin-remove_button .item .remove,.ts-wrapper.plugin-remove_button .item.active .remove{height:100%;font-size:var(--sp-text-sm,.875rem);line-height:var(--tw-leading,var(--sp-text-sm--line-height,calc(1.25 / .875)));inset-inline-end:calc(var(--sp-spacing,.25rem) * 0);right:auto}.ts-wrapper.plugin-remove_button [data-value] .remove,.ts-wrapper.plugin-remove_button [data-value].active .remove{height:100%;font-size:var(--sp-text-sm,.875rem);line-height:var(--tw-leading,var(--sp-text-sm--line-height,calc(1.25 / .875)))}.ts-wrapper.plugin-remove_button [data-value] .remove:hover{opacity:.75;background-color:#0000}.ts-wrapper.plugin-remove_button .item[style*=color] .remove{color:inherit!important}.ts-wrapper.plugin-remove_button .item.unremovable{padding-inline-end:calc(var(--sp-spacing,.25rem) * 2)!important}.ts-wrapper.plugin-remove_button .item.unremovable .remove{display:none}}@property --tw-border-style{syntax:\"*\";inherits:false;initial-value:solid}@property --tw-leading{syntax:\"*\";inherits:false}@property --tw-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-shadow-color{syntax:\"*\";inherits:false}@property --tw-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-inset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-shadow-color{syntax:\"*\";inherits:false}@property --tw-inset-shadow-alpha{syntax:\"<percentage>\";inherits:false;initial-value:100%}@property --tw-ring-color{syntax:\"*\";inherits:false}@property --tw-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-inset-ring-color{syntax:\"*\";inherits:false}@property --tw-inset-ring-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-ring-inset{syntax:\"*\";inherits:false}@property --tw-ring-offset-width{syntax:\"<length>\";inherits:false;initial-value:0}@property --tw-ring-offset-color{syntax:\"*\";inherits:false;initial-value:#fff}@property --tw-ring-offset-shadow{syntax:\"*\";inherits:false;initial-value:0 0 #0000}@property --tw-font-weight{syntax:\"*\";inherits:false}@property --tw-content{syntax:\"*\";inherits:false;initial-value:\"\"}\n";
   styleInject(css_248z);
 
   /**
@@ -4030,49 +4030,7 @@
   }
 
   /**
-   * Max Items Display Plugin
-   * Shows only a limited number of items with a "show more" link
-   */
-  function plugin$3(pluginOptions) {
-    const self = this;
-    const options = Object.assign({
-      max: 3,
-      message: 'Show :count more...',
-      html: function (data, count) {
-        return '<a href="javascript:void(0)" class="selectize-show-more-items sp-description sp:ms-1 sp:leading-6 sp:hover:text-primary"' + ' style="display: block;">' + data.message.replace(':count', count) + '</a>';
-      }
-    }, pluginOptions);
-    this.hook('after', 'setup', () => {
-      const itemsCount = self.items.length;
-
-      // Too few items, don't bother doing anything
-      if (itemsCount <= options.max) {
-        return;
-      }
-      const count = itemsCount - options.max;
-      const $showMore = $(options.html(options, count));
-      $(self.control).append($showMore);
-
-      // Hide items beyond the max
-      const items = self.control.querySelectorAll('.item');
-      items.forEach((item, index) => {
-        if (index >= options.max) {
-          item.style.display = 'none';
-        }
-      });
-
-      // Show all items on click
-      $showMore.on('click', function () {
-        items.forEach(item => {
-          item.style.display = '';
-        });
-        $(this).hide();
-      });
-    });
-  }
-
-  /**
-  * Tom Select v2.6.1
+  * Tom Select v2.6.2
   * Licensed under the Apache License, Version 2.0 (the "License");
   */
 
@@ -4090,14 +4048,6 @@
    *   1         -> '1'
    *
    */
-
-  /**
-   * Escapes a string for use within HTML.
-   *
-   */
-  const escape_html = str => {
-    return (str + '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-  };
 
   /**
    * Prevent default
@@ -4162,27 +4112,30 @@
    *
    */
 
-  function plugin$2(userOptions) {
+  function plugin$3(userOptions) {
+    const self = this;
     const options = Object.assign({
-      label: '&times;',
+      label: '×',
       title: 'Remove',
       className: 'remove',
-      append: true
+      tabindex: -1,
+      role: 'button',
+      html: data => {
+        var _data$tabindex;
+        const el = document.createElement('div');
+        el.className = data.className || '';
+        el.title = data.title || '';
+        el.setAttribute('role', data.role || 'button');
+        el.tabIndex = (_data$tabindex = data.tabindex) != null ? _data$tabindex : -1;
+        el.textContent = data.label || '';
+        return el;
+      }
     }, userOptions);
-
-    //options.className = 'remove-single';
-    var self = this;
-
-    // override the render method to add remove button to each item
-    if (!options.append) {
-      return;
-    }
-    var html = '<a href="javascript:void(0)" class="' + options.className + '" tabindex="-1" title="' + escape_html(options.title) + '">' + options.label + '</a>';
     self.hook('after', 'setupTemplates', () => {
       var orig_render_item = self.settings.render.item;
       self.settings.render.item = (data, escape) => {
         var item = getDom(orig_render_item.call(self, data, escape));
-        var close_button = getDom(html);
+        var close_button = getDom(options.html(options));
         item.appendChild(close_button);
         addEvent(close_button, 'mousedown', evt => {
           preventDefault(evt, true);
@@ -4204,7 +4157,7 @@
   }
 
   /**
-  * Tom Select v2.6.1
+  * Tom Select v2.6.2
   * Licensed under the Apache License, Version 2.0 (the "License");
   */
 
@@ -4223,7 +4176,7 @@
    *
    */
 
-  function plugin$1(userOptions) {
+  function plugin$2(userOptions) {
     const self = this;
     const options = Object.assign({
       text: option => {
@@ -4240,6 +4193,332 @@
           self.setTextboxValue(options.text.call(self, option));
         }
       }
+    });
+  }
+
+  /**
+  * Tom Select v2.6.2
+  * Licensed under the Apache License, Version 2.0 (the "License");
+  */
+
+  /**
+   * Converts a scalar to its best string representation
+   * for hash keys and HTML attribute values.
+   *
+   * Transformations:
+   *   'str'     -> 'str'
+   *   null      -> ''
+   *   undefined -> ''
+   *   true      -> '1'
+   *   false     -> '0'
+   *   0         -> '0'
+   *   1         -> '1'
+   *
+   */
+
+  /**
+   * Iterates over arrays and hashes.
+   *
+   * ```
+   * iterate(this.items, function(item, id) {
+   *    // invoked for each item
+   * });
+   * ```
+   *
+   */
+  const iterate = (object, callback) => {
+    if (Array.isArray(object)) {
+      object.forEach(callback);
+    } else {
+      for (var key in object) {
+        if (object.hasOwnProperty(key)) {
+          callback(object[key], key);
+        }
+      }
+    }
+  };
+
+  /**
+   * Add css classes
+   *
+   */
+  const addClasses = (elmts, ...classes) => {
+    var norm_classes = classesArray(classes);
+    elmts = castAsArray(elmts);
+    elmts.map(el => {
+      norm_classes.map(cls => {
+        el.classList.add(cls);
+      });
+    });
+  };
+
+  /**
+   * Return arguments
+   *
+   */
+  const classesArray = args => {
+    var classes = [];
+    iterate(args, _classes => {
+      if (typeof _classes === 'string') {
+        _classes = _classes.trim().split(/[\t\n\f\r\s]/);
+      }
+      if (Array.isArray(_classes)) {
+        classes = classes.concat(_classes);
+      }
+    });
+    return classes.filter(Boolean);
+  };
+
+  /**
+   * Create an array from arg if it's not already an array
+   *
+   */
+  const castAsArray = arg => {
+    if (!Array.isArray(arg)) {
+      arg = [arg];
+    }
+    return arg;
+  };
+
+  /**
+   * Plugin: "virtual_scroll" (Tom Select)
+   * Copyright (c) contributors
+   *
+   * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this
+   * file except in compliance with the License. You may obtain a copy of the License at:
+   * http://www.apache.org/licenses/LICENSE-2.0
+   *
+   * Unless required by applicable law or agreed to in writing, software distributed under
+   * the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
+   * ANY KIND, either express or implied. See the License for the specific language
+   * governing permissions and limitations under the License.
+   *
+   */
+
+  function plugin$1() {
+    const self = this;
+    const orig_canLoad = self.canLoad;
+    const orig_clearActiveOption = self.clearActiveOption;
+    const orig_loadCallback = self.loadCallback;
+    var pagination = {};
+    var dropdown_content;
+    var loading_more = false;
+    var load_more_opt;
+    var default_values = [];
+    var default_values_loaded = false;
+    var default_pagination;
+    var default_options = [];
+    var html_values = [];
+    if (!self.settings.shouldLoadMore) {
+      // return true if additional results should be loaded
+      self.settings.shouldLoadMore = () => {
+        const scroll_percent = dropdown_content.clientHeight / (dropdown_content.scrollHeight - dropdown_content.scrollTop);
+        if (scroll_percent > 0.9) {
+          return true;
+        }
+        if (self.activeOption) {
+          var selectable = self.selectable();
+          var index = Array.from(selectable).indexOf(self.activeOption);
+          if (index >= selectable.length - 2) {
+            return true;
+          }
+        }
+        return false;
+      };
+    }
+    if (!self.settings.firstUrl) {
+      throw 'virtual_scroll plugin requires a firstUrl() method';
+    }
+
+    // in order for virtual scrolling to work,
+    // options need to be ordered the same way they're returned from the remote data source
+    self.settings.sortField = [{
+      field: '$order'
+    }, {
+      field: '$score'
+    }];
+
+    // can we load more results for given query?
+    const canLoadMore = query => {
+      if (self.settings.maxOptions !== null && typeof self.settings.maxOptions === 'number' && dropdown_content.children.length >= self.settings.maxOptions) {
+        return false;
+      }
+      if (query in pagination && pagination[query]) {
+        return true;
+      }
+      return false;
+    };
+    const clearFilter = (option, value) => {
+      if (self.items.indexOf(value) >= 0 || default_values.indexOf(value) >= 0) {
+        return true;
+      }
+      return false;
+    };
+
+    // set the next url that will be
+    self.setNextUrl = (value, next_url) => {
+      pagination[value] = next_url;
+    };
+
+    // getUrl() to be used in settings.load()
+    self.getUrl = query => {
+      if (query in pagination) {
+        const next_url = pagination[query];
+        pagination[query] = false;
+        return next_url;
+      }
+
+      // if the user goes back to a previous query
+      // we need to load the first page again
+      self.clearPagination();
+      return self.settings.firstUrl.call(self, query);
+    };
+
+    // clear pagination
+    self.clearPagination = () => {
+      pagination = {};
+    };
+
+    // don't clear the active option (and cause unwanted dropdown scroll)
+    // while loading more results
+    self.hook('instead', 'clearActiveOption', () => {
+      if (loading_more) {
+        return;
+      }
+      return orig_clearActiveOption.call(self);
+    });
+
+    // override the canLoad method
+    self.hook('instead', 'canLoad', query => {
+      // first time the query has been seen
+      if (!(query in pagination)) {
+        return orig_canLoad.call(self, query);
+      }
+      return canLoadMore(query);
+    });
+
+    // wrap the load
+    self.hook('instead', 'loadCallback', (options, optgroups) => {
+      if (!loading_more) {
+        // When searching (non-empty query), keep selected items and HTML default options,
+        // but remove preloaded remote options so they don't bleed into search results.
+        // For empty query, use clearFilter (keeps default_values + items).
+        const activeFilter = self.lastValue !== '' ? (_option, value) => self.items.indexOf(value) >= 0 || html_values.indexOf(value) >= 0 : clearFilter;
+        self.clearOptions(activeFilter);
+      } else if (load_more_opt) {
+        const first_option = options[0];
+        if (first_option !== undefined) {
+          load_more_opt.dataset.value = first_option[self.settings.valueField];
+        }
+      }
+      orig_loadCallback.call(self, options, optgroups);
+
+      // After the initial preload (empty query), snapshot default_values and option objects
+      // so they can be restored when the user clears their search. Only latch once a response for the
+      // empty query has actually been applied - a preload response that arrives after the user has
+      // already typed a search must not mark the (empty) defaults as loaded.
+      if (!loading_more && !default_values_loaded && self.lastValue === '') {
+        default_values_loaded = true;
+        default_values = Object.keys(self.options);
+        default_pagination = pagination[''];
+        default_options = Object.values(self.options);
+      }
+      loading_more = false;
+    });
+
+    // as the “loading_more” element will be removed from the dropdown,
+    // we activate the previous option if needed
+    // to avoid the dropdown being scrolled back to the first one
+    self.hook('before', 'refreshOptions', () => {
+      if (self.activeOption && "option" !== self.activeOption.getAttribute("role")) {
+        self.setActiveOption(self.activeOption.previousElementSibling);
+      }
+    });
+
+    // add templates to dropdown
+    //	loading_more if we have another url in the queue
+    //	no_more_results if we don't have another url in the queue
+    self.hook('after', 'refreshOptions', () => {
+      const query = self.lastValue;
+      var option;
+      if (canLoadMore(query)) {
+        option = self.render('loading_more', {
+          query: query
+        });
+        if (option) {
+          option.setAttribute('data-selectable', ''); // so that navigating dropdown with [down] keypresses can navigate to this node
+          load_more_opt = option;
+        }
+      } else if (query in pagination && !dropdown_content.querySelector('.no-results')) {
+        option = self.render('no_more_results', {
+          query: query
+        });
+      }
+      if (option) {
+        addClasses(option, self.settings.optionClass);
+        dropdown_content.append(option);
+      }
+    });
+
+    // Restore preloaded options and pagination when clearing search
+    const restoreDefaults = () => {
+      if (!default_values_loaded) {
+        // The initial preload never completed (e.g. the user typed a search before it returned), so
+        // there is nothing to restore - re-arm the preload so the first page is fetched again.
+        self.wrapper.classList.remove('preloaded');
+        if (self.isFocused) {
+          self.preload();
+        }
+        return;
+      }
+      // Re-add preloaded option objects (clearOptions can only remove, not restore)
+      self.addOptions(default_options);
+      // Remove any search results that are not part of the preloaded defaults
+      self.clearOptions(clearFilter);
+      if (default_pagination) {
+        pagination[''] = default_pagination;
+      }
+    };
+    self.on('type', query => {
+      if (query === '') {
+        restoreDefaults();
+        self.refreshOptions(false);
+      }
+    });
+    self.on('dropdown_close', restoreDefaults);
+
+    // add scroll listener and default templates
+    self.on('initialize', () => {
+      html_values = Object.keys(self.options);
+      default_values = Object.keys(self.options);
+      dropdown_content = self.dropdown_content;
+
+      // default templates
+      self.settings.render = Object.assign({}, {
+        loading_more: () => {
+          return `<div class="loading-more-results">Loading more results ... </div>`;
+        },
+        no_more_results: () => {
+          return `<div class="no-more-results">No more results</div>`;
+        }
+      }, self.settings.render);
+
+      // watch dropdown content scroll position
+      dropdown_content.addEventListener('scroll', () => {
+        if (!self.settings.shouldLoadMore.call(self)) {
+          return;
+        }
+
+        // !important: this will get checked again in load() but we still need to check here otherwise loading_more will be set to true
+        if (!canLoadMore(self.lastValue)) {
+          return;
+        }
+
+        // don't call load() too much
+        if (loading_more) return;
+        loading_more = true;
+        self.load.call(self, self.lastValue);
+      });
     });
   }
 
@@ -4282,12 +4561,12 @@
       return originalRemoveItem.call(self, item, silent);
     });
   }
-  TomSelect.define('remove_button', plugin$2);
-  TomSelect.define('restore_on_backspace', plugin$1);
+  TomSelect.define('remove_button', plugin$3);
+  TomSelect.define('restore_on_backspace', plugin$2);
   TomSelect.define('disable_delete', plugin$5);
   TomSelect.define('load_fn', plugin$4);
-  TomSelect.define('max_items', plugin$3);
   TomSelect.define('unremovable', plugin);
+  TomSelect.define('virtual_scroll', plugin$1);
 
   /**
    * jQuery plugin wrapper for tom-select with selectize API compatibility
@@ -4303,10 +4582,14 @@
       clearAfterSelect: true,
       render: {
         loading: () => null,
-        'no_results': () => {
+        loading_more: (data, escape) => {
+          return '<div class="loading-more-results"><i class=\'fa-solid fa-spinner fa-spin\'></i>&nbsp; ' + escape(Lang.get('core.sLoadingRecords')) + '</div>';
+        },
+        no_results: () => {
           return '<div class="no-results">' + Lang.get('messages.no_results') + '</div>';
         },
-        'option_create': (data, escape) => {
+        no_more_results: () => null,
+        option_create: (data, escape) => {
           return '<div class="create">' + Lang.get('core.add_selectize', {
             'item': escape(data.input)
           }) + '</div>';
@@ -4350,6 +4633,26 @@
       options.plugins = addLoadFnPlugin(userOptions.plugins);
       return options;
     }
+    function initializePopper(selectize) {
+      selectize.popper = Popper.createPopper(selectize.control, selectize.dropdown, {
+        placement: 'bottom-start',
+        modifiers: [{
+          name: 'offset',
+          options: {
+            offset: [0, 4]
+          }
+        }]
+      });
+    }
+    function wrapLifecycleCallback(options, callbackName, wrapper) {
+      const callback = options[callbackName];
+      options[callbackName] = function () {
+        wrapper.apply(this, arguments);
+        if (typeof callback === 'function') {
+          callback.apply(this, arguments);
+        }
+      };
+    }
 
     /**
      * Main selectize method - creates a TomSelect instance wrapped with Selectize API
@@ -4367,10 +4670,24 @@
 
         // Merge user options with defaults
         const mergedOptions = mergeOptions(options || {});
+        wrapLifecycleCallback(mergedOptions, 'onInitialize', function () {
+          initializePopper(this);
+        });
 
         // Initialize tom-select
         this.tomselect = this.selectize = new TomSelect(this, mergedOptions);
         $el.data('selectize', this.tomselect);
+        this.tomselect.on('dropdown_open change', () => this.tomselect.popper.update());
+
+        // Tom-select only removes its own 'tomselect' property on destroy - also remove ours, so the
+        // element can be selectized again (the guard above would otherwise skip it).
+        this.tomselect.on('destroy', () => {
+          this.tomselect.enable();
+          this.tomselect.popper.destroy();
+          $el.removeData('selectize');
+          delete this.selectize;
+          delete this.tomselect;
+        });
       });
     };
   })(jQuery);

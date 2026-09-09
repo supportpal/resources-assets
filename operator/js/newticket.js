@@ -193,44 +193,23 @@ $(document).ready(function () {
     // STEP 2
 
     // Tags
-    $('select[name="tag[]"]').selectize({
+    $('select[name="tag[]"]').selectize(tagSelectizeConfig({
       plugins: ['remove_button'],
-      valueField: 'name',
-      labelField: 'name',
-      searchField: 'name',
-      create: tagPermission ? true : false,
-      createFilter: function (input) {
-        return input.length <= 45;
-      },
-      maxItems: null,
-      placeholder: Lang.get("ticket.type_in_tags"),
-      render: {
-        item: function (item, escape) {
-          return '<div class="item" style="background-color: ' + escape(item.colour) + '; color: ' + item.colour_text + '">' + escape(item.name) + '</div>';
-        },
-        option: function (item, escape) {
-          return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
-        }
-      }
-    });
+      valueField: 'original_name',
+      create: !!tagPermission
+    }));
 
     // Assigned operators
-    $('select[name="assignedto[]"]').selectize({
+    $('select[name="assignedto[]"]').selectize(ajaxSelectizeConfig(function () {
+      return laroute.route('ticket.operator.department.search', {
+        id: $('input[name="department"]').val(),
+        brand_id: $('input[name="brand"]').val()
+      });
+    }, operatorSelectizeConfig({
       plugins: ['remove_button'],
-      valueField: 'id',
-      labelField: 'formatted_name',
-      searchField: ['formatted_name', 'email'],
       delimiter: ',',
       dropdownParent: 'body',
       placeholder: Lang.get('user.select_operators'),
-      render: {
-        item: function (item, escape) {
-          return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-        },
-        option: function (item, escape) {
-          return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-        }
-      },
       onChange: function (value) {
         if ($.isEmptyObject(value)) {
           // None assigned, show all
@@ -243,7 +222,7 @@ $(document).ready(function () {
           });
         }
       }
-    });
+    }), 's'));
 
     // From email input
     $('select[name="department_email"]').selectize({
@@ -253,7 +232,7 @@ $(document).ready(function () {
     });
 
     // CC email input
-    var enablePlugins = ['restore_on_backspace', 'remove_button', 'max_items'];
+    var enablePlugins = ['restore_on_backspace', 'remove_button'];
     $('select[name="cc[]"]').selectize($.extend({}, emailSelectizeConfig(enablePlugins), {
       render: {
         item: function (item, escape) {
@@ -300,11 +279,6 @@ $(document).ready(function () {
         return false;
       }
     }));
-
-    // Toggle between short and full recipients form.
-    $('.sp-simplified-recipients, .sp-full-recipients .sp\\:table-row > .sp\\:table-cell:first-child').on('click', function () {
-      $('.sp-simplified-recipients, .sp-full-recipients').toggleClass('sp:hidden');
-    });
 
     // Send email options, uncheck and show tooltip if disabled
     $.each([$('input[name="send_user_email"]'), $('input[name="send_operators_email"]')], function (index, value) {

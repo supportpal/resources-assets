@@ -17,56 +17,69 @@
       };
       ticket.setParameter(name, new SpFileUpload.FileUpload($.extend(true, {}, defaults, params)));
     };
-    var hideAllForms = function () {
+
+    /**
+     * Fraction of an element that's currently on screen, from 0 to 1. The forms scroll inside #content, so that's
+     * what clips them rather than the window.
+     */
+    var visibleRatio = function ($el) {
+      var rect = $el[0].getBoundingClientRect();
+      if (rect.height <= 0) {
+        return 0;
+      }
+      var $container = $el.closest('#content'),
+        bounds = $container.length ? $container[0].getBoundingClientRect() : {
+          top: 0,
+          bottom: window.innerHeight || document.documentElement.clientHeight
+        },
+        visible = Math.min(rect.bottom, bounds.bottom) - Math.max(rect.top, bounds.top);
+      return Math.max(0, visible) / rect.height;
+    };
+    this.hideAllForms = function () {
       $('.sp-reply-type .sp-action.sp-active').removeClass('sp-active');
       $('.ticket-reply-form, .message-form:not(.edit), .notes-form, .forward-form, .sp-draft-preview').addClass('sp:hidden');
-    };
-    var focusForm = function ($form, type) {
-      $('.sp-reply-type .sp-action[data-type=' + type + ']').addClass('sp-active');
-      if (!$form.hasClass('sp:sticky')) {
-        $form[0].scrollIntoView({
-          behavior: 'smooth',
-          block: 'center'
-        });
-      }
+      localStorage.removeItem('sp-reply-form-open-type');
     };
     this.destroyReplyForm = function () {
       App.TicketEditor.destroy(reply_selector);
     };
-    this.initReplyForm = function (opts) {
+    this.initReplyForm = function (opts, focus) {
       var $form = $('.message-form');
       initFileUploads($form, 'replyFileUpload');
-      return App.TicketEditor.initEditor(reply_selector, $form, $.extend({}, ticket.defaultEditorConfig(), opts));
+      return App.TicketEditor.initEditor(reply_selector, $form, $.extend({}, ticket.defaultEditorConfig(), opts), focus);
     };
-    this.initNotesForm = function (opts) {
+    this.initNotesForm = function (opts, focus) {
       var $form = $('.notes-form');
       initFileUploads($form, 'notesFileUpload');
       return App.TicketEditor.initEditor('#newNote', $form, $.extend({}, ticket.defaultEditorConfig(), opts, {
         excludeInternalArticles: false
-      }));
+      }), focus);
     };
-    this.initForwardForm = function (opts) {
+    this.initForwardForm = function (opts, focus) {
       var $form = $('.forward-form');
       initFileUploads($form, 'forwardFileUpload', {
         cumulativeMaxFileSize: $form.data('cumulative-max-file-size')
       });
-      return App.TicketEditor.initEditor(forward_selector, $form, $.extend({}, ticket.defaultEditorConfig(), opts));
+      return App.TicketEditor.initEditor(forward_selector, $form, $.extend({}, ticket.defaultEditorConfig(), opts), focus);
     };
-    this.toggleReplyForm = function (show = false) {
-      return instance.toggleForm($('.message-form:not(.edit)'), instance.initReplyForm, 0, show);
+    this.toggleReplyForm = function (show = false, focus = true) {
+      return instance.toggleForm($('.message-form:not(.edit)'), instance.initReplyForm, 0, show, focus);
     };
-    this.toggleNotesForm = function (show = false) {
-      return instance.toggleForm($('.notes-form'), instance.initNotesForm, 1, show);
+    this.toggleNotesForm = function (show = false, focus = true) {
+      return instance.toggleForm($('.notes-form'), instance.initNotesForm, 1, show, focus);
     };
-    this.toggleForwardForm = function (show = false) {
-      return instance.toggleForm($('.forward-form'), instance.initForwardForm, 2, show);
+    this.toggleForwardForm = function (show = false, focus = true) {
+      return instance.toggleForm($('.forward-form'), instance.initForwardForm, 2, show, focus);
     };
-    this.toggleForm = function ($form, initFn, type, show = false) {
-      if (!show && $form.is(':visible')) {
-        hideAllForms();
+    this.toggleForm = function ($form, initFn, type, show = false, focus = true) {
+      // Clicking the action for a form that's already open closes it again, unless it's been
+      // scrolled out of view — then the operator wants to get back to it, not close it.
+      if (!show && $form.is(':visible') && visibleRatio($form) >= 0.1) {
+        this.hideAllForms();
         return $.when();
       }
-      hideAllForms();
+      this.hideAllForms();
+      localStorage.setItem('sp-reply-form-open-type', type);
       $form.removeClass('sp:hidden');
       const $parentForm = $form.parent('.ticket-reply-form');
       $parentForm.removeClass('sp:hidden');
@@ -76,8 +89,20 @@
       $parentForm.find('.sp-reply-form-draft[data-type=' + type + ']').removeClass('sp:hidden');
       return initFn({
         min_height: 108
-      }).then(editor => {
-        focusForm($form, type);
+      }, focus).then(editor => {
+        // Set button as active
+        $('.sp-reply-type .sp-action[data-type=' + type + ']').addClass('sp-active');
+
+        // Scroll to editor if we want to focus and it's not pinned.
+        if (focus && !$form.parent().hasClass('sp:sticky')) {
+          $form[0].scrollIntoView({
+            behavior: 'smooth',
+            block: 'center'
+          });
+        }
+
+        // Now the form is on-screen we can size its recipients summary to the width.
+        ticket.updateRecipientsSummary($form.find('.recipients'));
         return editor;
       });
     };
@@ -278,11 +303,12 @@
     };
     this.listen = () => {
       App.Notifications.connector().join('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketId).here(users => {
-        if (users.length > 1) {
-          $.each(users, function (index, user) {
-            instance.addViewingOperator(user);
-          });
-        }
+        // Fires on every (re)subscription, so rebuild the list rather than append to it.
+        $('ul.sp-viewing-operators').empty();
+        $('.ticket-viewing').hide();
+        $.each(users, function (index, user) {
+          instance.addViewingOperator(user);
+        });
       }).joining(user => {
         instance.addViewingOperator(user);
       }).leaving(user => {
@@ -346,19 +372,14 @@
 
           // Create title for draft message preview.
           const title = Lang.get('ticket.drafting_message', {
-            name: e.message.user_name,
+            name: $('<span>').text(e.message.user_name).html(),
             time: '<time class="timeago" datetime="' + new Date(e.message.updated_at * 1000).toISOString() + '">' + timeAgo.format(new Date(e.message.updated_at * 1000)) + '</time>'
           });
-
-          // Simpler title without timeago for tooltip.
-          var $title = $('<span>').html(title);
-          $title.find('time').remove();
 
           // Set data attributes and title.
           $draftButton.attr('data-message-id', e.message.id);
           $draftButton.attr('data-type', e.message.type);
           $draftButton.attr('data-title', title);
-          $draftButton.attr('title', $title.text().trim());
 
           // Show button if form is visible.
           if ($('.message-form:not(.edit)').is(':visible') && e.message.type == 0 || $('.notes-form').is(':visible') && e.message.type == 1 || $('.forward-form').is(':visible') && e.message.type == 2) {
@@ -443,6 +464,9 @@
             ticket.ccSelectize()[0].selectize.refreshOptions(false);
             ticket.ccSelectize()[0].selectize.addItem(value.value, true);
           });
+
+          // The items were added silently, so refresh the recipients section ourselves.
+          ticket.updateRecipientsOptions(ticket.ccSelectize()[0].selectize);
         }
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\DepartmentUpdated', e => {
@@ -456,9 +480,9 @@
       }).listen('.App\\Modules\\Ticket\\Events\\ReplyDueTimeUpdated', e => {
         $('.sp-reply-duetime').html(e.due_time);
         if (e.due_time == Lang.get('ticket.set_reply_due_time')) {
-          $('.update-duetime .remove-duetime').hide();
+          $('a.sp-reply-duetime + .update-duetime .remove').addClass('sp:hidden');
         } else {
-          $('.update-duetime .remove-duetime').show();
+          $('a.sp-reply-duetime + .update-duetime .remove').removeClass('sp:hidden');
         }
         if (e.paused_time == null) {
           $('.paused-duetime').hide();
@@ -469,9 +493,9 @@
       }).listen('.App\\Modules\\Ticket\\Events\\ResolveDueTimeUpdated', e => {
         $('.sp-resolve-duetime').html(e.due_time);
         if (e.due_time == Lang.get('ticket.set_resolution_due_time')) {
-          $('.update-duetime .remove-duetime').hide();
+          $('.sp-resolve-duetime + .update-duetime .remove').addClass('sp:hidden');
         } else {
-          $('.update-duetime .remove-duetime').show();
+          $('.sp-resolve-duetime + .update-duetime .remove').removeClass('sp:hidden');
         }
         if (e.paused_time == null) {
           $('.paused-duetime').hide();
@@ -487,9 +511,7 @@
         // Update status in sidebar
         if ($('select[name="status"]').val() != e.id) {
           $('select[name="status"]').val(e.id);
-
-          // Update the status dropdown in the notes box (only if it's changed)
-          $('.notes-form, .forward-form').find('select[name="to_status"]').val(e.id);
+          App.OperatorTicketView.setToStatus(e.id);
         }
 
         // Update reply options status and if closed, hide close button
@@ -535,18 +557,41 @@
         window.location.reload();
       });
 
-      // Unsubscribe from channel before leaving page.
-      window.addEventListener('beforeunload', function () {
+      // Unsubscribe from channel before leaving page. A page entering the back/forward cache keeps its channel so
+      // that it is re-joined when the connection is restored.
+      window.addEventListener('pagehide', function (e) {
+        if (e.persisted) {
+          return;
+        }
         App.Notifications.connector().leave('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketId);
       });
     };
   }
   App.extend('TicketViewAction', new TicketViewAction());
   App.extend('TicketViewForm', new Form());
+
+  /**
+   * Whether to re-open the editor that was last left open.
+   *
+   * In ascending order the form sits below the messages, where re-opening it is out of the way. In descending order
+   * it's above them, so it would push the newest messages down the page — only worth it when the form is pinned,
+   * which keeps it out of the message flow entirely.
+   */
+  var shouldRestoreForm = function () {
+    return ticket.parameters().replyOrder === 'ASC' || $('.ticket-reply-form').hasClass('sp:sticky');
+  };
   $(document).ready(function () {
-    // Initialise reply editor.
-    if ($('.sp-reply-type .sp-action[data-type=0]').hasClass('sp-active')) {
-      App.TicketViewForm.initReplyForm({}, false);
+    // Re-open whichever editor was open when the page was last left.
+    switch (shouldRestoreForm() ? localStorage.getItem('sp-reply-form-open-type') : null) {
+      case '0':
+        App.TicketViewForm.toggleReplyForm(true, false);
+        break;
+      case '1':
+        App.TicketViewForm.toggleNotesForm(true, false);
+        break;
+      case '2':
+        App.TicketViewForm.toggleForwardForm(true, false);
+        break;
     }
 
     // Date picker
@@ -606,6 +651,9 @@
     // Process block button
     $('.block-ticket').on('click', App.TicketViewAction.block);
 
+    // Copy ticket number
+    App.copyToClipboard('.sp-copy-ticket-number');
+
     /*
      * Handle updating the ticket side bar
      */
@@ -625,9 +673,7 @@
       } else {
         updateTicket(laroute.route('ticket.operator.action.update'), $(this).serializeArray());
       }
-
-      // Update the status in the notes box.
-      $('.notes-form, .forward-form').find('select[name="to_status"]').val($(this).val());
+      App.OperatorTicketView.setToStatus($(this).val());
     });
 
     // Update SLA plan
@@ -738,10 +784,10 @@
           $('.paused-duetime').hide();
 
           // If no time set, hide the trash can icon, else show it
-          if (response.data === null) {
-            $this.parents('.update-duetime').find('.remove-duetime').hide();
+          if ($this.hasClass('remove')) {
+            $this.parents('.update-duetime').find('.remove').addClass('sp:hidden');
           } else {
-            $this.parents('.update-duetime').find('.remove-duetime').show();
+            $this.parents('.update-duetime').find('.remove').removeClass('sp:hidden');
           }
           ticket.updateEscalationsTable();
         } else {
@@ -780,6 +826,12 @@
 
       // Reset subject.
       $(this).find('input[name="subject"]').val('FW: ' + $('<div/>').html($(document).find('.sp-ticket-subject').text()).text().trim());
+
+      // Collapse the recipients back down to the summary.
+      var $recipients = $(this).find('.recipients');
+      $recipients.find('.sp\\:table-row').not('.to-emails').hide();
+      $recipients.find('.sp-recipients-summary').show();
+      ticket.updateRecipientsSummary($recipients);
     });
 
     // Update message
@@ -959,31 +1011,80 @@
       $(this).addClass('sp-selected');
 
       // Update icon in button and show/hide CC emails based on value
+      var $recipients = $(this).parents('.reply-form').find('.recipients');
       $(this).parents('.reply-all').find('.sp-action .sp-icon').removeClass('fa-reply fa-reply-all');
       if (value == '1') {
         $(this).parents('.reply-all').find('.sp-action .sp-icon').addClass('fa-reply-all');
-        $(this).parents('.reply-form').find('.sp-reply-all-recipients, .cc-emails').show();
-        $(this).parents('.reply-form').find('.sp-reply-recipients').hide();
+        $recipients.find('.cc-emails').show();
+        $recipients.find('.sp-summary-cc').removeClass('sp:hidden');
       } else {
         $(this).parents('.reply-all').find('.sp-action .sp-icon').addClass('fa-reply');
-        $(this).parents('.reply-form').find('.sp-reply-all-recipients, .cc-emails').hide();
-        $(this).parents('.reply-form').find('.sp-reply-recipients').show();
+        $recipients.find('.cc-emails').hide();
+        $recipients.find('.sp-summary-cc').addClass('sp:hidden');
       }
+      ticket.updateRecipientsSummary($recipients);
     });
-
-    // Toggle between short and full recipients form.
-    $('.sp-simplified-recipients, .sp-full-recipients .sp\\:table-row > .sp\\:table-cell:first-child').on('click', function () {
-      $('.sp-simplified-recipients, .sp-full-recipients').toggle();
-      const $replyAll = $('.reply-all');
+    var recipientsOutsideClickNamespace = 'click.ticket-recipients-outside';
+    var updateReplyAllPosition = function ($recipients, expanded) {
+      const $replyAll = $recipients.find('.reply-all');
       if (!$replyAll.hasClass('reply-all-permitted')) {
         return;
       }
-      if ($('.sp-full-recipients:visible').length) {
-        $replyAll.prependTo('.to-emails');
+      if (expanded) {
+        $replyAll.prependTo($recipients.find('.to-emails'));
+        $replyAll.find('.sp-action').removeClass('sp:m-1').addClass('sp:me-2');
       } else {
-        $replyAll.prependTo('.recipients .sp\\:flex');
+        $replyAll.prependTo($recipients.find('> .sp\\:flex'));
+        $replyAll.find('.sp-action').addClass('sp:m-1').removeClass('sp:me-2');
       }
-      $replyAll.find('.sp-action').toggleClass('sp:m-1 sp:me-2');
+    };
+    var collapseRecipients = function ($recipients) {
+      $recipients.find('.sp-simplified-recipients').show();
+      $recipients.find('.sp-full-recipients').hide();
+      updateReplyAllPosition($recipients, false);
+      ticket.updateRecipientsSummary($recipients);
+      $(document).off(recipientsOutsideClickNamespace);
+    };
+
+    // Expand to the full recipients form from the simplified summary.
+    $('.message-form .sp-simplified-recipients').on('click', function (event) {
+      event.stopPropagation();
+      const $recipients = $(this).closest('.recipients');
+      $recipients.find('.sp-simplified-recipients').hide();
+      $recipients.find('.sp-full-recipients').show();
+      updateReplyAllPosition($recipients, true);
+
+      // Register listener only while expanded so outside click collapses back.
+      $(document).off(recipientsOutsideClickNamespace).on(recipientsOutsideClickNamespace, function (outsideEvent) {
+        if (!document.body.contains(outsideEvent.target) || $recipients.is(outsideEvent.target) || $recipients.has(outsideEvent.target).length) {
+          return;
+        }
+        collapseRecipients($recipients);
+      });
+    });
+
+    // Show the full recipients form on the forward tab.
+    var forwardRecipientsOutsideClickNamespace = 'click.ticket-forward-recipients-outside';
+    var toggleForwardRecipients = function ($recipients, expanded) {
+      $recipients.find('.sp\\:table-row:not(.to-emails)').toggle(expanded);
+      $recipients.find('.sp-recipients-summary').toggle(!expanded);
+      if (!expanded) {
+        ticket.updateRecipientsSummary($recipients);
+      }
+    };
+    $('.forward-form .sp-recipients-summary').on('click', function (event) {
+      event.stopPropagation();
+      const $recipients = $(this).closest('.recipients');
+      toggleForwardRecipients($recipients, true);
+
+      // Register only while expanded so outside click collapses the section.
+      $(document).off(forwardRecipientsOutsideClickNamespace).on(forwardRecipientsOutsideClickNamespace, function (outsideEvent) {
+        if (!document.body.contains(outsideEvent.target) || $recipients.is(outsideEvent.target) || $recipients.has(outsideEvent.target).length) {
+          return;
+        }
+        toggleForwardRecipients($recipients, false);
+        $(document).off(forwardRecipientsOutsideClickNamespace);
+      });
     });
 
     // From email input
@@ -994,18 +1095,7 @@
     };
     $('select[name="department_email"]').selectize(fromSelectizeConfig);
     ticket.ccSelectize();
-
-    // Show CC email input
-    $('.add-cc').on('click', function () {
-      $(this).parents('.recipients').find('.cc-emails').show();
-      $(this).parents('.recipients').find('.add-cc').hide();
-    });
-
-    // Show BCC email input
-    $('.add-bcc').on('click', function () {
-      $(this).parents('.recipients').find('.bcc-emails').show();
-      $(this).parents('.recipients').find('.add-bcc').hide();
-    });
+    ticket.updateRecipientsSummary($('.message-form .recipients'));
 
     /**
      * Initialise Forward tab.
@@ -1022,10 +1112,6 @@
         load: function (query, callback) {
           if (!query.length) return callback();
 
-          // Hide Add CC / Add BCC to stop spinner from overlapping.
-          var $elements = $('.add-cc:visible, .add-bcc:visible');
-          $elements.hide();
-
           // Search for users
           $.get(laroute.route('user.operator.search'), {
             brand_id: ticket.parameters().brandId,
@@ -1040,8 +1126,6 @@
             callback(res.data);
           }).fail(function () {
             callback();
-          }).always(function () {
-            $elements.show();
           });
         }
       },
@@ -1049,6 +1133,18 @@
       $forwardToSelectize = $('select[name="to_address[]"]').selectize($.extend({}, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig)),
       $forwardCcSelectize = $('select[name="cc_address[]"]').selectize($.extend({}, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig)),
       $forwardBccSelectize = $('select[name="bcc_address[]"]').selectize($.extend({}, emailSelectizeConfig(ticket.defaultSelectizePlugins()), userSearchSelectizeConfig));
+    ticket.updateRecipientsSummary($('.forward-form .recipients'));
+
+    // Recalculate the recipient summaries when the window is resized so the number of hidden
+    // recipients adapts to the available width. Debounced to avoid thrashing during a drag.
+    var recipientsSummaryResizeTimer = null;
+    $(window).on('resize.ticket-recipients-summary', function () {
+      clearTimeout(recipientsSummaryResizeTimer);
+      recipientsSummaryResizeTimer = setTimeout(function () {
+        ticket.updateRecipientsSummary($('.message-form .recipients'));
+        ticket.updateRecipientsSummary($('.forward-form .recipients'));
+      }, 150);
+    });
 
     /**
      * Edit user on ticket
@@ -1175,35 +1271,10 @@
     /**
      * Add tag on ticket
      */
-    $tagSelectize = $('.assign-tags').selectize({
+    $tagSelectize = $('.assign-tags').selectize(tagSelectizeConfig({
       plugins: ['remove_button'],
       valueField: 'original_name',
-      labelField: 'name',
-      searchField: ['name'],
-      create: tagPermission ? true : false,
-      createFilter: function (input) {
-        return input.length <= 45;
-      },
-      maxItems: null,
-      placeholder: Lang.get('ticket.type_in_tags') + '...',
-      render: {
-        item: function (item, escape) {
-          return '<div class="item" style="background-color: ' + escape(item.colour) + '; color: ' + escape(item.colour_text) + '">' + escape(item.name) + '</div>';
-        },
-        option: function (item, escape) {
-          return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
-        }
-      },
-      load: function (query, callback) {
-        if (!query.length) return callback();
-        $.get(laroute.route('ticket.operator.tag.search'), {
-          q: query
-        }).done(function (res) {
-          callback(res.data);
-        }).fail(function () {
-          callback();
-        });
-      },
+      create: !!tagPermission,
       onChange: function (tags) {
         if (!tags) {
           // In case of removing all tags
@@ -1226,43 +1297,21 @@
           $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
         });
       }
-    });
+    }));
 
     /**
      * Assign operator to ticket
      */
-    $assignSelectize = $('#assignOperator').selectize({
+    $assignSelectize = $('#assignOperator').selectize(ajaxSelectizeConfig(function () {
+      // Set the route for the current department
+      return laroute.route('ticket.operator.department.search', {
+        id: $('select[name="department"]').val(),
+        brand_id: ticket.parameters().brandId
+      });
+    }, operatorSelectizeConfig({
       plugins: ['remove_button'],
-      valueField: 'id',
-      labelField: 'formatted_name',
-      searchField: ['formatted_name', 'email'],
       create: false,
-      maxItems: null,
       placeholder: Lang.get('ticket.assign_operator') + '...',
-      render: {
-        item: function (item, escape) {
-          return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-        },
-        option: function (item, escape) {
-          return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-        }
-      },
-      load: function (query, callback) {
-        if (!query.length) return callback();
-
-        // Set the route for the current department
-        var route = laroute.route('ticket.operator.department.search', {
-          id: $('select[name="department"]').val()
-        });
-        $.get(route, {
-          s: query,
-          brand_id: ticket.parameters().brandId
-        }).done(function (res) {
-          callback(res.data);
-        }).fail(function () {
-          callback();
-        });
-      },
       onChange: function (assigned_operators) {
         if (!assigned_operators) {
           // In case of removing all operators
@@ -1285,7 +1334,7 @@
           $('.sp-ticket-update.sp-alert-error').show(500).delay(5000).hide(500);
         });
       }
-    });
+    }), 's'));
 
     /**
      * Linked Tickets
@@ -1535,6 +1584,7 @@
             });
             // Select first option
             $fromSelectize[0].selectize.addItem(first, true);
+            ticket.updateRecipientsSummary($('.message-form .recipients'));
           }
 
           // Update the forward department email list.
@@ -1565,6 +1615,7 @@
 
             // Select first option
             $forwardFromSelectize[0].selectize.addItem(first, true);
+            ticket.updateRecipientsSummary($('.forward-form .recipients'));
           }
 
           // Update custom fields
@@ -1585,11 +1636,9 @@
             }
           }
 
-          // Update department templates.
+          // Update department templates and re-check if we can send the email to user/operators.
           departmentTemplates = response.data.templates;
-
-          // Force run that code that checks if we can send the email to user/operators, by mocking events.
-          $('.message-form select[name="to_status"]').trigger('change');
+          App.OperatorTicketView.updateDepartmentTemplates(departmentTemplates);
 
           // Refresh follow up tab
           refreshFollowUpTab();
@@ -1698,6 +1747,7 @@
   App.KeyboardShortcuts.SHORTCUT_FOCUS_REPLY_FORM.bind(App.TicketViewForm.toggleReplyForm);
   App.KeyboardShortcuts.SHORTCUT_FOCUS_NOTES_FORM.bind(App.TicketViewForm.toggleNotesForm);
   App.KeyboardShortcuts.SHORTCUT_FOCUS_FORWARD_FORM.bind(App.TicketViewForm.toggleForwardForm);
+  App.KeyboardShortcuts.SHORTCUT_MINIMISE_FORM.bind(App.TicketViewForm.hideAllForms);
   App.KeyboardShortcuts.SHORTCUT_TOGGLE_USER_DETAILS.bind(function () {
     if ($('#tabUser').is(':visible')) {
       $('ul.sp-tabs li#Ticket').trigger('click');

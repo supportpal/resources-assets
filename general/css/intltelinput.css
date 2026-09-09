@@ -1,4 +1,4 @@
-@import "../../../../node_modules/intl-tel-input/build/css/intlTelInput.css" layer(components);
+@import "../../../../node_modules/intl-tel-input/dist/css/intlTelInput.css" layer(components);
 
 @reference '#tailwind-base';
 
@@ -28,8 +28,22 @@
     @apply sp:static;
   }
 
-  .iti--inline-dropdown .iti__dropdown-content {
-    @apply sp:mt-1 sp:bg-primary sp:border sp:border-tertiary;
+  .iti__country-selector {
+    @apply sp:mt-0.5 sp:bg-primary sp:rounded;
+  }
+
+  .iti__country-selector {
+    .iti--inline-country-selector & {
+      @apply sp:border sp:border-tertiary;
+    }
+  }
+
+  .iti__search-input-wrapper {
+    @apply sp:border-b-tertiary;
+  }
+
+  .iti__country-check {
+    @apply sp:text-tertiary;
   }
 
   .iti__search-icon {
@@ -41,7 +55,7 @@
   }
 
   .iti__search-input {
-    @apply sp:min-h-0 sp:bg-primary sp:rounded-t sp:rounded-b-none sp:ps-7 sp:pe-3 sp:py-1.5 sp:text-sm;
+    @apply sp:min-h-0 sp:bg-primary sp:rounded-t sp:rounded-b-none sp:ps-9 sp:pe-3 sp:py-1.5 sp:text-sm;
   }
 
   .iti__search-input ~ .iti__country-list {
@@ -65,15 +79,11 @@
   }
 
   .iti__dial-code {
-    @apply sp:flex-none sp:text-tertiary;
+    @apply sp:flex-none sp:text-secondary;
   }
 
   .iti__arrow {
-    @apply sp:border-t-(--color-text-primary);
-  }
-
-  .iti__arrow--up {
-    @apply sp:border-b-(--color-text-primary);
+    @apply sp:border-(--color-text-primary);
   }
 
   .iti__country-container {
@@ -107,13 +117,16 @@
     @apply sp:ps-0;
   }
 
-  .iti--allow-dropdown .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country-primary:hover,
-  .iti--allow-dropdown .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country:has(+ .iti__dropdown-content:hover) .iti__selected-country-primary {
+  .iti--has-country-selector .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country-primary:hover,
+  .iti--has-country-selector .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country:has(+ .iti__country-selector:hover) .iti__selected-country-primary
+  {
     @apply sp:bg-transparent;
   }
 
-  .iti--allow-dropdown .iti__country-container:has(+ input[disabled]) button.iti__selected-country .iti__arrow,
-  .iti--allow-dropdown .iti__country-container:has(+ input[readonly]) button.iti__selected-country .iti__arrow {
-    @apply sp:hidden;
+  :is(.iti--has-country-selector .iti__country-container:has(+ input[disabled]),
+  .iti--has-country-selector .iti__country-container:has(+ input[readonly])) button.iti__selected-country {
+    .iti__arrow {
+      @apply sp:hidden;
+    }
   }
 }

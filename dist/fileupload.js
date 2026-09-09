@@ -1941,13 +1941,11 @@
   }
   var namespaceEmitterExports = requireNamespaceEmitter();
   var ee = /*@__PURE__*/getDefaultExportFromCjs(namespaceEmitterExports);
-
-  /* @ts-self-types="./index.d.ts" */
   let urlAlphabet = 'useandom-26T198340PX75pxJACKVERYMINDBUSHWOLF_GQZbfghjklqvwyzrict';
   let nanoid = (size = 21) => {
     let id = '';
     let i = size | 0;
-    while (i--) {
+    while (i-- > 0) {
       id += urlAlphabet[Math.random() * 64 | 0];
     }
     return id;
@@ -4055,34 +4053,29 @@
   /**
    * Handles drag and drop functionality for file uploads
    */
-  class DragDropHandler {
+  var DragDropHandler = /** @class */function () {
+    function DragDropHandler() {}
     /**
-     * Setup manual drop handler that intercepts images for TinyMCE
+     * Setup manual drop handler that adds dropped files to Uppy
      */
-    static setup(dropZone, $container, uppy) {
-      const dropZoneEl = dropZone[0];
+    DragDropHandler.setup = function (dropZone, uppy) {
       DragDropHandler.setupDragAndDropFeedback(dropZone);
-      dropZoneEl.addEventListener('dragover', e => {
-        e.preventDefault();
-        e.stopPropagation();
-      });
-      dropZoneEl.addEventListener('drop', e => {
-        e.preventDefault();
-        e.stopPropagation();
-        dropZone.addClass('sp:hidden');
-        const files = e.dataTransfer?.files;
-        if (!files || files.length === 0) {
-          return;
-        }
-        // Check if there's an active TinyMCE editor
-        const editor = DragDropHandler.getTinyMceEditor($container);
-        for (let i = 0; i < files.length; i++) {
-          const file = files[i];
-          if (editor && DragDropHandler.isImageFile(file)) {
-            // Send images to TinyMCE
-            DragDropHandler.insertImageIntoTinyMce(editor, file);
-          } else {
-            // Add non-images to Uppy
+      // The drop zone may be a collection (one per form section), each of which must be listened to.
+      dropZone.each(function (_, dropZoneEl) {
+        dropZoneEl.addEventListener('dragover', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        });
+        dropZoneEl.addEventListener('drop', function (e) {
+          var _a;
+          e.preventDefault();
+          e.stopPropagation();
+          var files = (_a = e.dataTransfer) === null || _a === void 0 ? void 0 : _a.files;
+          if (!files || files.length === 0) {
+            return;
+          }
+          for (var i = 0; i < files.length; i++) {
+            var file = files[i];
             try {
               uppy.addFile({
                 name: file.name,
@@ -4095,87 +4088,68 @@
               }
             }
           }
-        }
+        });
+        // In case the drop zone is incorrectly left on display, clicking it will hide it again
+        dropZoneEl.addEventListener('click', function () {
+          dropZone.addClass('sp:hidden');
+        });
       });
-      // In case the drop zone is incorrectly left on display, clicking it will hide it again
-      dropZoneEl.addEventListener('click', () => {
-        dropZone.addClass('sp:hidden');
-      });
-    }
+    };
     /**
      * Setup drag and drop visual feedback
      */
-    static setupDragAndDropFeedback(dropZone) {
+    DragDropHandler.setupDragAndDropFeedback = function (dropZone) {
       if (dropZone && dropZone.length) {
-        $(document.documentElement).on('dragenter', e => {
+        $(document.documentElement).on('dragenter', function (e) {
+          var _a, _b;
           // Only show for file drags
-          if (e.originalEvent.dataTransfer?.types?.includes('Files')) {
+          if ((_b = (_a = e.originalEvent.dataTransfer) === null || _a === void 0 ? void 0 : _a.types) === null || _b === void 0 ? void 0 : _b.includes('Files')) {
             dropZone.removeClass('sp:hidden');
           }
         });
-        $(document.documentElement).on('dragleave', e => {
+        $(document.documentElement).on('dragleave', function (e) {
           // Only hide when leaving the document (relatedTarget is null or outside html element)
           if (!e.relatedTarget || !document.documentElement.contains(e.relatedTarget)) {
             dropZone.addClass('sp:hidden');
           }
         });
+        // A drop doesn't fire dragleave, so every drop zone on the page has to be hidden by the drop itself and
+        // not just the one that was dropped on. Listen on the capture phase, as the drop zone that receives the
+        // drop stops the event propagating.
+        document.documentElement.addEventListener('drop', function () {
+          dropZone.addClass('sp:hidden');
+        }, true);
       }
-    }
-    /**
-     * Check if a file is an image based on its MIME type
-     */
-    static isImageFile(file) {
-      return file.type.startsWith('image/');
-    }
-    /**
-     * Get the TinyMCE editor instance from a form container
-     */
-    static getTinyMceEditor($container) {
-      const $textarea = $container.find('textarea:tinymce');
-      if ($textarea.length) {
-        return window.tinymce?.get($textarea.attr('id'));
-      }
-      return null;
-    }
-    /**
-     * Insert an image file into TinyMCE editor
-     */
-    static insertImageIntoTinyMce(editor, file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        // Insert as a blob that TinyMCE will upload via its images_upload_handler
-        editor.editorUpload.uploadImages();
-        editor.insertContent(`<img src="${reader.result}" alt="${file.name}" />`);
-        // Trigger TinyMCE's automatic image upload
-        editor.uploadImages();
-      };
-      reader.readAsDataURL(file);
-    }
-  }
+    };
+    return DragDropHandler;
+  }();
 
   /**
    * Initializes and configures Uppy instance
    */
-  class UppyInitializer {
+  var UppyInitializer = /** @class */function () {
+    function UppyInitializer() {}
     /**
      * Get the maximum file size from meta tag
      */
-    static getMaxFileSize() {
+    UppyInitializer.getMaxFileSize = function () {
       return Number($('meta[name="max_file_size"]').prop('content'));
-    }
+    };
     /**
      * Create and configure a new Uppy instance
      */
-    static createUppy(settings, maxFileSize, onBeforeFileAdded) {
+    UppyInitializer.createUppy = function (settings, maxFileSize, onBeforeFileAdded) {
       // Get allowed file types
-      const allowedFileTypesPattern = $('meta[name="allowed_files"]').prop('content');
-      const allowedFileTypes = allowedFileTypesPattern && allowedFileTypesPattern !== '*' ? allowedFileTypesPattern.split('|').filter(ext => ext) : null;
+      var allowedFileTypesPattern = $('meta[name="allowed_files"]').prop('content');
+      var allowedFileTypes = allowedFileTypesPattern && allowedFileTypesPattern !== '*' ? allowedFileTypesPattern.split('|').filter(function (ext) {
+        return ext;
+      }) : null;
       // Get upload URL from the file input or form
-      const uploadUrl = settings.$element.data('url') || settings.$container.attr('action') || '/';
+      var uploadUrl = settings.$element.data('url') || settings.$container.attr('action') || '/';
       /*
        * Initialise Uppy.
        */
-      const uppy = new Uppy({
+      var uppy = new Uppy({
         autoProceed: true,
         restrictions: {
           maxFileSize: maxFileSize,
@@ -4187,31 +4161,33 @@
       uppy.use(XHRUpload, {
         endpoint: uploadUrl,
         fieldName: 'files[]',
-        headers: () => ({
-          'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
-        }),
+        headers: function () {
+          return {
+            'X-CSRF-TOKEN': $('meta[name="csrf_token"]').attr('content')
+          };
+        },
         formData: true
       });
       // Add Drag & Drop handling if dropZone is specified
       if (settings.dropZone && settings.dropZone.length) {
-        DragDropHandler.setup(settings.dropZone, settings.$container, uppy);
+        DragDropHandler.setup(settings.dropZone, uppy);
       }
       if (settings.$element && settings.$element.length) {
         UppyInitializer.setupFileInputHandler(settings.$element, uppy);
       }
       return uppy;
-    }
+    };
     /**
      * Setup file input change handler
      */
-    static setupFileInputHandler($element, uppy) {
-      $element.on('change', e => {
-        const files = e.target.files;
+    UppyInitializer.setupFileInputHandler = function ($element, uppy) {
+      $element.on('change', function (e) {
+        var files = e.target.files;
         if (!files || files.length <= 0) {
           return;
         }
         // Add each selected file to Uppy
-        for (let i = 0; i < files.length; i++) {
+        for (var i = 0; i < files.length; i++) {
           try {
             uppy.addFile({
               name: files[i].name,
@@ -4227,31 +4203,31 @@
         // Clear the file input so the same file can be selected again
         e.target.value = '';
       });
-    }
-  }
+    };
+    return UppyInitializer;
+  }();
 
   /**
    * Error handler for file upload UI
    */
-  class ErrorHandler {
-    $container;
-    constructor($container) {
+  var ErrorHandler = /** @class */function () {
+    function ErrorHandler($container) {
       this.$container = $container;
     }
     /**
      * Handle Uppy errors and display them.
      */
-    handleUppyError(message, fileName) {
-      let $box = $('.sp-alert-error.attachment:first');
+    ErrorHandler.prototype.handleUppyError = function (message, fileName) {
+      var $box = $('.sp-alert-error.attachment:first');
       if (!$box.length) {
         $box = $('<div>').addClass('sp-alert sp-alert-error sp:mt-4 sp:mb-0 sp:hidden');
         $box.insertAfter(this.$container.find('.sp-attached-files'));
       }
-      let $container = $box;
+      var $container = $box;
       if ($box.find('.sp\\:container').length) {
         $container = $box.find('.sp\\:container');
       }
-      const reason = fileName ? Lang.get('messages.upload_error', {
+      var reason = fileName ? Lang.get('messages.upload_error', {
         'filename': fileName,
         'reason': message
       }) : message;
@@ -4267,73 +4243,77 @@
           scrollTop: $box.position().top - 24
         }, 500);
       }
-    }
-  }
+    };
+    return ErrorHandler;
+  }();
 
   /**
    * Manages the visual display of uploaded files in the DOM
    */
-  class FileViewManager {
-    $container;
-    inputName;
-    constructor($container, inputName) {
+  var FileViewManager = /** @class */function () {
+    function FileViewManager($container, inputName) {
       this.$container = $container;
       this.inputName = inputName;
     }
     /**
      * Show an uploaded file in the view.
      */
-    addFile(filename, filesize) {
-      const ul = this.$container.find('.sp-attached-files');
+    FileViewManager.prototype.addFile = function (filename, filesize) {
+      var ul = this.$container.find('.sp-attached-files');
       // Copy the first li instance
       ul.find('li:first').clone(true).appendTo(ul);
+      var $item = ul.find('li:last');
       // Set the file information
-      ul.find('li:last span.sp-file-information span.sp-filename').text(filename);
-      ul.find('li:last span.sp-file-information span.sp-filesize').text('(' + filesize.fileSize() + ')');
-      ul.find('li:last').removeClass('sp:hidden');
-      ul.find('li:last .sp-delete-attachment').attr('data-size', filesize).hide();
-      return ul.find('li:last');
-    }
+      $item.find('.sp-filename').attr('data-truncate', filename).text(filename);
+      $item.removeClass('sp:hidden');
+      $item.find('.sp-delete-attachment').attr('data-size', filesize).removeClass('sp:hidden').addClass('sp-disabled').attr('disabled', 'disabled');
+      // New files are always appended last, so scroll the strip all the way to the end to reveal it.
+      ul.scrollLeft(ul.get(0).scrollWidth);
+      return $item;
+    };
     /**
      * Register a completed upload.
      */
-    registerFile($item, filename, hash, delete_url) {
+    FileViewManager.prototype.registerFile = function ($item, filename, hash, delete_url) {
       // The file successfully uploaded
       $item.find('.sp-progress-bar').hide();
-      $item.find('.sp-delete-attachment').data('hash', hash).data('url', delete_url).show();
+      $item.find('.sp-delete-attachment').data('hash', hash).data('url', delete_url).removeAttr('disabled').removeClass('sp-disabled');
       // Create attachment input - we use this to link it to the ticket message
-      const input = this.$container.find('input[name="' + this.inputName + '[]"]').clone().prop('disabled', false).appendTo(this.$container.find('.sp-attachment-details'));
+      var input = this.$container.find('input[name="' + this.inputName + '[]"]').clone().prop('disabled', false).appendTo(this.$container.find('.sp-attachment-details'));
       input.attr('name', this.inputName + '[' + hash + ']');
       input.attr('id', this.inputName + '[' + hash + ']');
       input.val(filename);
-    }
+    };
     /**
      * Update progress bar for a file being uploaded.
      */
-    updateProgress(context, percentage) {
+    FileViewManager.prototype.updateProgress = function (context, percentage) {
       $(context).find('.sp-bar').css('width', percentage + '%');
-    }
+    };
     /**
      * Remove file input element from the DOM.
      */
-    removeFileInput(hash) {
+    FileViewManager.prototype.removeFileInput = function (hash) {
       this.$container.find('input[name="' + this.inputName + '[' + hash + ']"]').remove();
-    }
-  }
+    };
+    return FileViewManager;
+  }();
 
   /**
    * Handles deletion of attachments
    */
-  class AttachmentDeleter {
+  var AttachmentDeleter = /** @class */function () {
+    function AttachmentDeleter() {}
     /**
      * Static method to delete attachments.
      */
-    static deleteAttachment(context, url, data, $listItem, successCallback, silent) {
-      const name = $('<div/>').text($listItem.find('.filename').text()).html();
-      const success = () => {
+    AttachmentDeleter.deleteAttachment = function (context, url, data, $listItem, successCallback, silent) {
+      var _this = this;
+      var name = $('<div/>').text($listItem.find('.filename').text()).html();
+      var success = function () {
         // Call the success callback
         if (typeof successCallback === 'function') {
-          successCallback.call(this, context);
+          successCallback.call(_this, context);
         }
         // Remove the list item from the interface
         if (!silent) {
@@ -4345,7 +4325,7 @@
       };
       // Send AJAX call to delete the attachment.
       if (!silent) {
-        const params = {};
+        var params = {};
         // Special case, if there's no URL then there's no database record so just remove the item from the view.
         if (typeof url !== 'undefined') {
           params.ajax = {
@@ -4353,7 +4333,7 @@
             data: data
           };
         }
-        new deleteAlert(params).fireDefault(Lang.choice('general.attachment', 1), name).then(result => {
+        new deleteAlert(params).fireDefault(Lang.choice('general.attachment', 1), name).then(function (result) {
           if (result.value) {
             success();
           }
@@ -4367,49 +4347,51 @@
           url: url,
           type: 'DELETE',
           data: data
-        }).then(result => {
+        }).then(function (result) {
           if (result.status === 'success') {
             success();
           }
         });
       }
-    }
-  }
+    };
+    return AttachmentDeleter;
+  }();
 
   /**
    * Functions to handle file uploads.
    */
-  class FileUpload {
-    settings;
-    total_files_uploaded = 0;
-    cumulative_file_size = 0;
-    MAX_FILE_SIZE;
-    fileContextMap = new Map();
-    errorHandler;
-    fileViewManager;
-    uppy;
-    cumulativeMaxFileSize;
-    static MAX_FILE_SIZE = UppyInitializer.getMaxFileSize();
-    constructor(parameters) {
+  var FileUpload = /** @class */function () {
+    function FileUpload(parameters) {
+      var _this = this;
+      this.total_files_uploaded = 0;
+      this.cumulative_file_size = 0;
+      this.fileContextMap = new Map();
       // Default function arguments.
-      const $fileUpload = $('.sp-file-upload');
-      const $formContainer = $fileUpload.parents('form:visible');
-      const DEFAULT = {
+      var $fileUpload = $('.sp-file-upload');
+      var $formContainer = $fileUpload.parents('form:visible');
+      var DEFAULT = {
         $element: $fileUpload,
         $container: $formContainer,
         inputName: 'attachment',
         registerEvents: true,
-        dropZone: $formContainer.find('.sp-attachment-dragover'),
+        dropZone: undefined,
         cumulativeMaxFileSize: undefined
       };
       // Merge user provided parameters with the default.
       this.settings = $.extend(true, {}, DEFAULT, parameters);
+      // Unless specified, the drop zone is the one inside this instance's container. A form may hold several upload
+      // containers (e.g. article translations), so it must not be looked up form-wide.
+      if (typeof this.settings.dropZone === 'undefined') {
+        this.settings.dropZone = this.settings.$container.find('.sp-attachment-dragover');
+      }
       this.MAX_FILE_SIZE = FileUpload.MAX_FILE_SIZE;
       // Initialize helpers
       this.errorHandler = new ErrorHandler(this.settings.$container);
       this.fileViewManager = new FileViewManager(this.settings.$container, this.settings.inputName);
       // Create Uppy instance
-      this.uppy = UppyInitializer.createUppy(this.settings, this.MAX_FILE_SIZE, (currentFile, files) => this.onBeforeFileAdded(currentFile, files));
+      this.uppy = UppyInitializer.createUppy(this.settings, this.MAX_FILE_SIZE, function (currentFile, files) {
+        return _this.onBeforeFileAdded(currentFile, files);
+      });
       // Register Uppy event handlers
       this.registerUppyEvents();
       // Store cumulative max file size
@@ -4422,11 +4404,11 @@
     /**
      * Handler called before a file is added to Uppy
      */
-    onBeforeFileAdded(currentFile, files) {
+    FileUpload.prototype.onBeforeFileAdded = function (currentFile, files) {
       // Validate cumulative file size
-      const cumulativeMaxFileSize = this.settings.cumulativeMaxFileSize;
+      var cumulativeMaxFileSize = this.settings.cumulativeMaxFileSize;
       if (typeof cumulativeMaxFileSize !== 'undefined') {
-        const potentialSize = this.cumulative_file_size + currentFile.size;
+        var potentialSize = this.cumulative_file_size + currentFile.size;
         if (potentialSize > cumulativeMaxFileSize) {
           this.errorHandler.handleUppyError(Lang.get('core.attachment_limit_reached', {
             size: cumulativeMaxFileSize.fileSize()
@@ -4435,11 +4417,11 @@
         }
       }
       return currentFile;
-    }
+    };
     /**
      * Handle failed uploads.
      */
-    handleFailedUpload(file, error) {
+    FileUpload.prototype.handleFailedUpload = function (file, error) {
       // Re-enable the form after all files have uploaded.
       if (--this.total_files_uploaded === 0) {
         this.settings.$container.find('input[type=submit]').prop('disabled', false);
@@ -4447,123 +4429,125 @@
       // Decrement cumulative file size count.
       this.decrementTotalUploadedFileSize(file.size);
       // Remove the list item
-      const context = this.fileContextMap.get(file.id);
+      var context = this.fileContextMap.get(file.id);
       if (context) {
         $(context).remove();
         this.fileContextMap.delete(file.id);
       }
       // Show error message
       this.errorHandler.handleUppyError(error, file.name);
-    }
+    };
     /**
      * Register Uppy event handlers.
      */
-    registerUppyEvents() {
+    FileUpload.prototype.registerUppyEvents = function () {
+      var _this = this;
       // Uppy event handlers
-      this.uppy.on('file-added', file => {
-        $(this).trigger('upload:started');
+      this.uppy.on('file-added', function (file) {
+        $(_this).trigger('upload:started');
         // Add file information to the view.
-        const context = this.fileViewManager.addFile(file.name, file.size);
-        this.fileContextMap.set(file.id, context);
+        var context = _this.fileViewManager.addFile(file.name, file.size);
+        _this.fileContextMap.set(file.id, context);
         // Increment the counter
-        this.total_files_uploaded++;
+        _this.total_files_uploaded++;
         // Increment cumulative size
-        this.incrementTotalUploadedFileSize(file.size);
+        _this.incrementTotalUploadedFileSize(file.size);
         // Disable the form submit button
-        this.settings.$container.find('input[type=submit]').prop('disabled', 'disabled');
+        _this.settings.$container.find('input[type=submit]').prop('disabled', 'disabled');
       });
-      this.uppy.on('upload-progress', (file, progress) => {
+      this.uppy.on('upload-progress', function (file, progress) {
         if (!file) return;
-        const context = this.fileContextMap.get(file.id);
+        var context = _this.fileContextMap.get(file.id);
         if (context) {
-          const percentage = Math.round(progress.bytesUploaded / progress.bytesTotal * 100);
-          this.fileViewManager.updateProgress(context, percentage);
+          var percentage = Math.round(progress.bytesUploaded / progress.bytesTotal * 100);
+          _this.fileViewManager.updateProgress(context, percentage);
         }
       });
-      this.uppy.on('upload-success', (file, response) => {
+      this.uppy.on('upload-success', function (file, response) {
         if (!file) return;
-        const context = this.fileContextMap.get(file.id);
+        var context = _this.fileContextMap.get(file.id);
         if (!context) return;
-        let result = response.body;
+        var result = response.body;
         // Handle array response (might be array of results)
         if (Array.isArray(result)) {
           result = result[0];
         }
         // The file failed to upload
         if ('error' in result && result.error) {
-          this.handleFailedUpload(file, result.error);
+          _this.handleFailedUpload(file, result.error);
           return;
         }
         // The file successfully uploaded.
-        this.fileViewManager.registerFile($(context), result.filename, result.hash, result.delete_url);
+        _this.fileViewManager.registerFile($(context), result.filename, result.hash, result.delete_url);
         // Re-enable the form after all files have uploaded.
-        if (--this.total_files_uploaded === 0) {
-          this.settings.$container.find('input[type=submit]').prop('disabled', false);
-          $(this).trigger('upload:complete');
+        if (--_this.total_files_uploaded === 0) {
+          _this.settings.$container.find('input[type=submit]').prop('disabled', false);
+          $(_this).trigger('upload:complete');
         }
       });
-      this.uppy.on('upload-error', (file, error, response) => {
+      this.uppy.on('upload-error', function (file, error, response) {
         if (!file) return;
-        let errorMessage = error.message || error.toString();
+        var errorMessage = error.message || error.toString();
         if (response && response.body && response.body.message) {
           errorMessage = response.body.message;
         }
-        this.handleFailedUpload(file, errorMessage);
+        _this.handleFailedUpload(file, errorMessage);
       });
-      this.uppy.on('restriction-failed', (file, error) => {
-        let message = error.message;
+      this.uppy.on('restriction-failed', function (file, error) {
+        var message = error.message;
         if (message.includes('onBeforeFileAdded returned false')) {
           return;
         }
         // Customize messages for better UX
         if (error.message.includes('exceeds maximum allowed size')) {
           message = Lang.get('messages.upload_max_size', {
-            'size': this.MAX_FILE_SIZE.fileSize()
+            'size': _this.MAX_FILE_SIZE.fileSize()
           });
         } else if (error.message.includes('file type')) {
           message = Lang.get('messages.upload_wrong_type');
         }
-        this.errorHandler.handleUppyError(message, file ? file.name : '');
+        _this.errorHandler.handleUppyError(message, file ? file.name : '');
       });
-    }
+    };
     /**
      * Get the cumulative size of all uploaded files.
      */
-    totalUploadedFileSize() {
+    FileUpload.prototype.totalUploadedFileSize = function () {
       return this.cumulative_file_size;
-    }
+    };
     /**
      * Increment the total size of files that have been uploaded.
      */
-    incrementTotalUploadedFileSize(size) {
+    FileUpload.prototype.incrementTotalUploadedFileSize = function (size) {
       this.cumulative_file_size += size;
-    }
+    };
     /**
      * Decrement the total size of files that have been uploaded.
      */
-    decrementTotalUploadedFileSize(size) {
+    FileUpload.prototype.decrementTotalUploadedFileSize = function (size) {
       this.cumulative_file_size -= size;
-    }
+    };
     /**
      * Show an uploaded file in the view.
      * @deprecated Use fileViewManager.addFile() instead. Kept for backward compatibility.
      */
-    addFile(filename, filesize) {
+    FileUpload.prototype.addFile = function (filename, filesize) {
       return this.fileViewManager.addFile(filename, filesize);
-    }
+    };
     /**
      * Register a completed upload.
      * @deprecated Use fileViewManager.registerFile() instead. Kept for backward compatibility.
      */
-    registerFile($item, filename, hash, delete_url) {
+    FileUpload.prototype.registerFile = function ($item, filename, hash, delete_url) {
       this.fileViewManager.registerFile($item, filename, hash, delete_url);
-    }
+    };
     /**
      * Delete a file that hasn't been attached to a final record (uploaded but form hasn't been submit). May have been
      * attached to a draft so we do still need to feed an ID if we have.
      */
-    deleteNewFile(context, silent) {
-      const data = [];
+    FileUpload.prototype.deleteNewFile = function (context, silent) {
+      var _this = this;
+      var data = [];
       data.push({
         name: 'hash',
         value: $(context).data('hash')
@@ -4574,37 +4558,39 @@
           value: $(context).data('attachment-id')
         });
       }
-      return AttachmentDeleter.deleteAttachment(context, $(context).data('url'), data, $(context).parents('li'), context => {
-        this.fileViewManager.removeFileInput($(context).data().hash);
+      return AttachmentDeleter.deleteAttachment(context, $(context).data('url'), data, $(context).parents('li'), function (context) {
+        _this.fileViewManager.removeFileInput($(context).data().hash);
         // Decrement cumulative file size.
-        this.decrementTotalUploadedFileSize($(context).data('size'));
+        _this.decrementTotalUploadedFileSize($(context).data('size'));
       }, silent);
-    }
+    };
     /**
      * Get parameters.
      */
-    getParameters() {
+    FileUpload.prototype.getParameters = function () {
       return this.settings;
-    }
+    };
     /**
      * Register file upload events.
      */
-    registerEvents() {
+    FileUpload.prototype.registerEvents = function () {
       /*
        * Handle removing attachments from a new ticket reply (they aren't actually associated with anything yet).
        */
-      const self = this;
+      var self = this;
       $(this.settings.$container).on('click', '.sp-attached-files .sp-delete-attachment', function () {
         self.deleteNewFile(this, $(this).data('silent') === true);
       });
-    }
+    };
     /**
      * Static method to delete attachments.
      */
-    static deleteAttachment(context, url, data, $listItem, successCallback, silent) {
+    FileUpload.deleteAttachment = function (context, url, data, $listItem, successCallback, silent) {
       return AttachmentDeleter.deleteAttachment(context, url, data, $listItem, successCallback, silent);
-    }
-  }
+    };
+    FileUpload.MAX_FILE_SIZE = UppyInitializer.getMaxFileSize();
+    return FileUpload;
+  }();
 
   // Import utility to enable fileSize() method on Number prototype
   /**
@@ -4615,7 +4601,7 @@
      * Handle deleting an existing attachment that belongs to a ticket message.
      */
     $(document).on('click', '.sp-message .sp-delete-attachment', function () {
-      const data = [];
+      var data = [];
       data.push({
         name: 'id',
         value: $(this).data('attachment-id')
@@ -4626,9 +4612,9 @@
           value: $(this).data('token')
         });
       }
-      AttachmentDeleter.deleteAttachment(this, $(this).data('url'), data, $(this).parents('li'), context => {
+      AttachmentDeleter.deleteAttachment(this, $(this).data('url'), data, $(this).parents('li'), function (context) {
         // Grab the message that the attachment belongs to
-        const $message = $(context).parents('.sp-message');
+        var $message = $(context).parents('.sp-message');
         // If we deleted the last attachment, hide the attachments area
         if ($message.find('ul.sp-attachments li[data-filename]').length === 1) {
           $message.find('.sp-attachment, ul.sp-attachments').hide();

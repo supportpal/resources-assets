@@ -483,4 +483,33 @@
   .mce-content-body[dir=rtl][data-mce-placeholder]:not(.mce-visualblocks)::before {
     @apply sp:right-auto;
   }
+
+  /* Attachments */
+
+  .tox.tox-tinymce:has(~ ul.sp-attached-files > li:not(.sp\:hidden)) {
+    @apply sp:rounded-b-none;
+  }
+
+  .tox.tox-tinymce ~ ul.sp-attached-files:has(li:not(.sp\:hidden)),
+  .reply-form > ul.sp-attached-files:has(li:not(.sp\:hidden)) {
+    @apply sp:gap-1 sp:p-1 sp:mt-0 sp:bg-secondary sp:border-tertiary sp:border-t-0 sp:rounded-t-none;
+  }
+
+  .reply-form > ul.sp-attached-files:has(li:not(.sp\:hidden)) {
+    @apply sp:rounded-b-none;
+  }
+
+  .ticket-reply-form.sp\:sticky .reply-form > ul.sp-attached-files:has(li:not(.sp\:hidden)) {
+    @apply sp:flex-nowrap sp:overflow-x-auto;
+  }
+
+  .tox.tox-tinymce ~ ul.sp-attached-files .sp-file-information,
+  .reply-form > ul.sp-attached-files .sp-file-information {
+    @apply sp:h-6 sp:bg-primary sp:text-sm;
+  }
+
+  .tox.tox-tinymce ~ ul.sp-attached-files .sp-delete-attachment,
+  .reply-form > ul.sp-attached-files .sp-delete-attachment {
+    @apply sp:h-6 sp:w-6;
+  }
 }

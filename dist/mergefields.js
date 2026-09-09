@@ -40,7 +40,7 @@
      * @private
      */
     var createToolbar = function () {
-      return '' + '<div class="sp:inline-block sp:mt-3">' + '<button class="switch-view visual-preview" type="button">' + Lang.get('general.preview') + '</button>' + '<button class="switch-view code-editor sp:hidden" type="button">' + Lang.get('general.editor') + '</button>' + '</div>';
+      return '' + '<div class="sp:inline-block sp:mt-3">' + '<button class="switch-view mergefields-switch-view visual-preview" type="button">' + '<i class="fa-solid fa-eye"></i>&nbsp; ' + Lang.get('general.preview') + '</button>' + '<button class="switch-view mergefields-switch-view code-editor sp:hidden" type="button">' + '<i class="fa-solid fa-pencil"></i>&nbsp; ' + Lang.get('general.editor') + '</button>' + '</div>';
     };
 
     /**
@@ -90,12 +90,12 @@
     this.showPreview = function () {
       var errorHandler = function (message) {
         // Change the view back to how it was originally.
-        $toolbar.find('button:visible').prop('disabled', false).trigger('click');
+        $toolbar.find('button.mergefields-switch-view:visible').prop('disabled', false).trigger('click');
         Swal.fire(Lang.get('messages.error'), message || Lang.get('messages.general_error'), 'error');
       };
 
       // Determine the height of the editor.
-      $toolbar.find('button.switch-view').prop('disabled', true);
+      $toolbar.find('button.mergefields-switch-view').prop('disabled', true);
       $preview.html('').css($editor.position()).css('width', $editor.outerWidth(true)).css('height', $editor.outerHeight(true)).addClass('loadinggif').show();
 
       // If the form has an input called brand_id, use that value else fall back to the
@@ -129,7 +129,7 @@
           errorHandler(errorThrown);
         }
       }).always(function () {
-        $toolbar.find('button.switch-view').prop('disabled', false);
+        $toolbar.find('button.mergefields-switch-view').prop('disabled', false);
         $preview.removeClass('loadinggif');
       });
     };
@@ -159,12 +159,23 @@
      * @return {void}
      */
     this.init = function ($wrapper) {
-      // Add the toolbar after the wrapper.
-      $editor = $wrapper.after(createContainer());
-      $container = $editor.next('.sp-editor-container');
+      // Add the preview container at the end of the wrapper parent.
+      $editor = $wrapper;
+      $container = $(createContainer()).appendTo($editor.parent());
       $preview = $(createPreview()).hide();
       $container.append($preview);
-      $toolbar = $(createToolbar()).on('click', 'button', function (e) {
+      var $existingToolbar = $editor.parent().find('.sp-editor-buttons-toolbar').first();
+      var $toolbarButtons;
+      if ($existingToolbar.length) {
+        $toolbar = $existingToolbar;
+        $toolbarButtons = $(createToolbar()).children('button');
+        $toolbar.append($toolbarButtons);
+      } else {
+        $toolbar = $(createToolbar());
+        $toolbarButtons = $toolbar.find('button');
+        $container.append($toolbar);
+      }
+      $toolbarButtons.on('click', function (e) {
         e.preventDefault();
         if ($(this).hasClass('visual-preview')) {
           instance.showPreview();
@@ -173,9 +184,8 @@
         }
 
         // Switch buttons
-        $container.find('.switch-view').toggle();
+        $toolbar.find('.mergefields-switch-view').toggleClass('sp:hidden');
       });
-      $container.append($toolbar);
     };
   }
 

@@ -76,6 +76,9 @@ $(function () {
     hideIconDropdown();
     toggleNavSidebar();
     writeCookie('navigation-sidebar', $navPanel.hasClass(sidebarClosedClass) ? sidebarClosedClass : sidebarOpenClass);
+
+    // The context sidebar shares this row, so what fits there has just changed.
+    $(window).trigger('resize.contextsidebar');
   });
 
   // =========================================================================
@@ -89,6 +92,17 @@ $(function () {
     var resizeCookieName = 'context-sidebar-width';
     var contextCookieName = 'context-sidebar';
     var minWidth = 384;
+    // The sidebar can always be dragged out to at least this. Without it the cap lands on minWidth on a tablet-width
+    // screen – worst of all with the navigation sidebar open, which takes 288px out of the same row – leaving the handle
+    // nowhere to go.
+    var baseMaxWidth = 480;
+    // Past that, the sidebar's share of the space it divides with #content, so it can't dominate the page. The handle is
+    // desktop-only, so half of what's available always leaves the content a workable width – it needs no minimum of its own.
+    var maxWidthRatio = 0.5;
+
+    // The width the operator last chose. What's applied is this clamped to what currently fits,
+    // so a preference set on a wide screen survives a narrower one and comes back afterwards.
+    var preferredWidth = parseInt(readCookie(resizeCookieName), 10) || 0;
 
     // Build a tab-strip button from each sp-sidebar-panel's sp-icon.
     $content.find('.sp-sidebar-panel').each(function () {
@@ -123,8 +137,7 @@ $(function () {
     $content.before($resizeHandle);
 
     // Restore width + active panel(s) from cookies.
-    var savedWidth = readCookie(resizeCookieName);
-    if (savedWidth) $content.css('width', parseInt(savedWidth, 10) + 'px');
+    applyWidth();
 
     // Only restore panel state from cookies on desktop; keep closed on mobile by default.
     if ($(window).width() >= 1024) {
@@ -186,26 +199,153 @@ $(function () {
     // Resize drag (desktop only – handle is hidden on mobile via CSS).
     var resizing = false,
       startX = 0,
-      startWidth = 0;
-    $resizeHandle.on('mousedown', function (e) {
-      e.preventDefault();
+      startWidth = 0,
+      touchId = null;
+
+    // Touch scrolling is suppressed by touch-action on the handle itself, as preventDefault()
+    // is ignored in the passive listeners the browser gives us on document.
+    $resizeHandle.on('mousedown touchstart', function (e) {
+      if (resizing) return;
+      if (e.type === 'mousedown') e.preventDefault();
+      e.stopPropagation();
+
+      // Remember which finger started the drag, so that a second one touching down (or the
+      // first being lifted while another is still on screen) can't hijack it and jump the width.
+      var started = e.originalEvent && e.originalEvent.changedTouches ? e.originalEvent.changedTouches[0] : null;
+      touchId = started ? started.identifier : null;
+      var clientX = eventClientX(e);
+      if (clientX === null) {
+        touchId = null;
+        return;
+      }
       resizing = true;
-      startX = e.clientX;
+      startX = clientX;
       startWidth = $content.outerWidth();
       $('body').addClass('sp-context-sidebar-resizing');
     });
-    $(document).on('mousemove.contextsidebar', function (e) {
+    $(document).on('mousemove.contextsidebar touchmove.contextsidebar', function (e) {
       if (!resizing) return;
-      // maxWidth is the larger of 720px or half the page width
-      var maxWidth = Math.max(720, $(window).width() / 2);
-      $content.css('width', Math.min(maxWidth, Math.max(minWidth, startWidth + (startX - e.clientX))) + 'px');
+      var clientX = eventClientX(e);
+      if (clientX === null) return;
+      if (e.type === 'mousemove') e.preventDefault();
+      setWidth(startWidth + (startX - clientX));
     });
-    $(document).on('mouseup.contextsidebar', function () {
+
+    // End the drag on anything that means the pointer is no longer ours: the finger/button
+    // lifting, the gesture being cancelled, the page being hidden or losing focus, etc.
+    $(document).on('mouseup.contextsidebar touchend.contextsidebar touchcancel.contextsidebar ' + 'mouseleave.contextsidebar', stopResize);
+
+    // A right-click interrupts a mouse drag, but on touch a long press raises contextmenu of its own accord – pressing
+    // before dragging shouldn't cancel a finger that's still on the handle.
+    $(document).on('contextmenu.contextsidebar', function () {
+      if (touchId === null) stopResize();
+    });
+    $(document).on('keydown.contextsidebar', function (e) {
+      if (e.key === 'Escape') stopResize();
+    });
+    $(document).on('visibilitychange.contextsidebar', function () {
+      if (document.hidden) stopResize();
+    });
+    $(window).on('blur.contextsidebar', stopResize);
+
+    // Re-clamp against the space now available, without touching the stored preference. Also
+    // triggered by the navigation sidebar toggle, which takes its width from the same row.
+    $(window).on('resize.contextsidebar', function () {
+      if (resizing) return;
+      applyWidth();
+      syncContextSidebarVisibility();
+    });
+    function stopResize() {
       if (!resizing) return;
       resizing = false;
+      startX = 0;
+      startWidth = 0;
+      touchId = null;
       $('body').removeClass('sp-context-sidebar-resizing');
-      writeCookie(resizeCookieName, $content.outerWidth());
-    });
+      // A click that never moved leaves nothing to store.
+      if (preferredWidth) writeCookie(resizeCookieName, preferredWidth);
+    }
+
+    /**
+     * Record a new preferred width and apply it, clamped to what currently fits.
+     *
+     * @param {number} width
+     */
+    function setWidth(width) {
+      preferredWidth = clampWidth(width);
+      applyWidth();
+    }
+
+    /**
+     * Apply the preferred width, clamped to what currently fits. Nothing to do when the operator has never resized
+     * it – the default width comes from the stylesheet.
+     */
+    function applyWidth() {
+      if (preferredWidth) $content.css('width', clampWidth(preferredWidth) + 'px');
+    }
+
+    /**
+     * Hold a width between the sidebar's minimum and the widest it may currently be.
+     *
+     * @param {number} width
+     * @return {number}
+     */
+    function clampWidth(width) {
+      return Math.min(getMaxWidth(), Math.max(minWidth, width));
+    }
+
+    /**
+     * The widest the sidebar may currently be: maxWidthRatio of the space it shares with #content, or baseMaxWidth
+     * when that share is too small to drag within.
+     *
+     * @return {number}
+     */
+    function getMaxWidth() {
+      var $main = $('#content');
+
+      // Widths either side of the resize handle always add up to the same total, so the pair
+      // measures the space available whichever way it's currently divided. Measure the
+      // sidebar only while it's on screen, as a hidden panel reports the width it would take.
+      var available = $main.length ? $main.outerWidth() + ($content.is(':visible') ? $content.outerWidth() : 0) : $(window).width();
+      return Math.max(baseMaxWidth, available * maxWidthRatio);
+    }
+
+    /**
+     * Viewport position of a mouse or touch event. jQuery doesn't copy clientX onto touch
+     * events, so we have to read the touch point we're tracking from the original event.
+     *
+     * @param {jQuery.Event} e
+     * @return {number|null}
+     */
+    function eventClientX(e) {
+      var original = e.originalEvent;
+      if (original && original.changedTouches) {
+        var touch = findTrackedTouch(original);
+        return touch ? touch.clientX : null;
+      }
+      return typeof e.clientX === 'number' ? e.clientX : null;
+    }
+
+    /**
+     * The touch point that started the drag, looked up by identifier. A move only reports the
+     * finger that moved in changedTouches, so fall back to the full list when it isn't in there.
+     *
+     * @param {TouchEvent} event
+     * @return {Touch|null}
+     */
+    function findTrackedTouch(event) {
+      var lists = [event.changedTouches, event.touches];
+      for (var list = 0; list < lists.length; list++) {
+        var touches = lists[list];
+        if (!touches) continue;
+        for (var i = 0; i < touches.length; i++) {
+          if (touchId === null || touches[i].identifier === touchId) {
+            return touches[i];
+          }
+        }
+      }
+      return null;
+    }
     function activatePanel(contextId) {
       var $btn = $tabs.find('[data-context-target="' + contextId + '"]');
       if (!$btn.length) return;
@@ -223,7 +363,18 @@ $(function () {
     function syncContextSidebarVisibility() {
       var hasActive = $content.find('.sp-sidebar-panel.sp-sidebar-panel-active').length > 0;
       $content.toggleClass('sp:hidden', !hasActive);
-      $resizeHandle.toggleClass('sp:hidden', !hasActive);
+      syncResizeHandle(hasActive);
+    }
+
+    /**
+     * Show the resize handle only when a panel is open and there's room to drag it – a handle
+     * that can't move anywhere is worse than no handle at all. Room runs out when the navigation
+     * sidebar is open on a narrow screen; collapsing it brings the handle back.
+     *
+     * @param {boolean} hasActive
+     */
+    function syncResizeHandle(hasActive) {
+      $resizeHandle.toggleClass('sp:hidden', !hasActive || getMaxWidth() <= minWidth);
     }
     function savePanelState() {
       var active = [];
@@ -296,7 +447,7 @@ $(function () {
 
       // If no visible panels are active, hide the entire context sidebar
       $content.toggleClass('sp:hidden', !hasActiveVisible);
-      $resizeHandle.toggleClass('sp:hidden', !hasActiveVisible);
+      syncResizeHandle(hasActiveVisible);
 
       // Save the updated state
       savePanelState();

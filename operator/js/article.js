@@ -71,7 +71,6 @@ function Article(parameters) {
       labelField: 'name',
       searchField: 'name',
       create: false,
-      maxItems: null,
       placeholder: Lang.get("selfservice.associate_category"),
       render: {
         item: function (item, escape) {
@@ -164,7 +163,6 @@ $(document).ready(function () {
     createFilter: function (input) {
       return input.length <= 45;
     },
-    maxItems: null,
     placeholder: Lang.get("selfservice.associate_tag")
   });
 

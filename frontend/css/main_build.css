@@ -588,7 +588,7 @@
   }
 
   button.sp-button-purple:hover,
-  input[type='button'].sp-button-orange:hover,
+  input[type='button'].sp-button-purple:hover,
   .sp-button-purple:hover {
     @apply sp:bg-purple-800 sp:text-white;
   }
@@ -602,11 +602,11 @@
     @apply sp:rounded-none;
   }
 
-  .sp-button-group *:first-child {
+  .sp-button-group *:not(.sp\:hidden):first-child {
     @apply sp:rounded-s;
   }
 
-  .sp-button-group *:last-child {
+  .sp-button-group *:not(.sp\:hidden):not(:has(~ *:not(.sp\:hidden))) {
     @apply sp:rounded-e;
   }
 
@@ -674,15 +674,15 @@
 
   @variant print {
     .sp-form-row {
-      @apply sp:flex sp:items-start;
+      @apply sp:flex sp:items-start sp:mb-3;
     }
 
     .sp-form-row > label {
-      @apply sp:flex-none sp:w-48 sp:py-2 sp:pe-4 sp:mb-0 sp:text-end;
+      @apply sp:flex-none sp:w-48 sp:pe-4 sp:mb-0 sp:text-end;
     }
 
     .sp-form-row .sp-input-container {
-      @apply sp:flex-initial sp:self-center sp:w-full sp:min-w-0;
+      @apply sp:flex-initial sp:w-full sp:min-w-0;
     }
   }
 
@@ -1235,6 +1235,20 @@
     @apply sp:px-4 sp:bg-primary;
   }
 
+  @variant print {
+    .sp-message {
+      @apply sp:px-0;
+    }
+
+    .sp-message[data-type^="log_"] {
+      @apply sp:ps-5;
+    }
+
+    .sp-message[data-type^="log_"]::before {
+      @apply sp:start-0;
+    }
+  }
+
   /* Attachments */
 
   .sp-file-upload {
@@ -1246,23 +1260,23 @@
   }
 
   ul.sp-attached-files {
-    @apply sp:p-0 sp:list-none;
+    @apply sp:flex sp:flex-none sp:flex-wrap sp:items-center sp:gap-3 sp:p-0 sp:list-none sp:overflow-x-auto;
+  }
+
+  ul.sp-attached-files:has(li:not(.sp\:hidden)) {
+    @apply sp:p-3 sp:mt-3 sp:border sp:border-secondary sp:rounded;
   }
 
   ul.sp-attached-files li {
-    @apply sp:relative sp:ps-3 sp:pe-10 sp:py-1 sp:bg-secondary sp:border sp:border-t-0 sp:border-tertiary;
+    @apply sp:flex sp:flex-none sp:max-w-64;
   }
 
-  ul.sp-attached-files li.sp\:hidden + li {
-    @apply sp:mt-3 sp:border-t sp:rounded-t;
+  ul.sp-attached-files .sp-file-information {
+    @apply sp:relative sp:flex sp:items-center sp:grow sp:h-8 sp:px-3 sp:bg-secondary sp:rounded-s;
   }
 
-  ul.sp-attached-files li:not(.sp\-hidden):first-child {
-    @apply sp:rounded-t;
-  }
-
-  ul.sp-attached-files li:not(.sp\:hidden):last-child {
-    @apply sp:rounded-b;
+  ul.sp-attached-files .sp-filename {
+    @apply sp:grow sp:whitespace-nowrap;
   }
 
   ul.sp-attached-files .sp-progress-bar {
@@ -1274,16 +1288,11 @@
   }
 
   ul.sp-attached-files .sp-delete-attachment {
-    @apply sp:px-3 sp:py-2 sp:ms-auto sp:-me-10 sp:-my-1 sp:bg-red-600 sp:leading-none sp:cursor-pointer sp:hover:bg-red-800;
+    @apply sp:flex-none sp:flex sp:items-center sp:justify-center sp:h-8 sp:w-8 sp:bg-red-600 sp:rounded-e sp:text-white sp:text-xs sp:leading-none sp:cursor-pointer sp:hover:bg-red-800;
   }
 
-  ul.sp-attached-files li.sp\:hidden + li .sp-delete-attachment,
-  ul.sp-attached-files li:not(.sp\:hidden):first-child .sp-delete-attachment {
-    @apply sp:rounded-se;
-  }
-
-  ul.sp-attached-files li:not(.sp\:hidden):last-child .sp-delete-attachment {
-    @apply sp:rounded-ee;
+  ul.sp-attached-files .sp-delete-attachment.sp-disabled {
+    @apply sp:opacity-50 sp:pointer-events-none sp:cursor-not-allowed sp:hover:bg-red-600;
   }
 
   .sp-attachment-dragover {
@@ -1299,11 +1308,11 @@
   }
 
   ul.sp-attachments > li {
-    @apply sp:max-w-full sp:sm:max-w-64 sp:flex;
+    @apply sp:max-w-full sp:sm:max-w-96 sp:flex sp:overflow-hidden;
   }
 
   ul.sp-attachments > li a {
-    @apply sp:block sp:h-8 sp:flex sp:items-center sp:gap-x-3 sp:pr-3 sp:bg-secondary sp:rounded;
+    @apply sp:block sp:h-8 sp:flex sp:items-center sp:gap-x-3 sp:pr-3 sp:bg-secondary sp:rounded sp:overflow-hidden;
   }
 
   ul.sp-attachments > li a:has(+ .sp-delete-attachment) {

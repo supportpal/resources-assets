@@ -10,24 +10,7 @@ var ticketGridSidebar = function () {
     storageExpiry = 3600000,
     isRequestInProgress = false;
   var initJQueryListeners = function () {
-    $('select[name="search_tag"]').selectize({
-      valueField: 'id',
-      searchField: ['name'],
-      load: function (query, callback) {
-        if (!query.length) return callback();
-        $.get(laroute.route('ticket.operator.tag.search'), {
-          q: query
-        }).done(function (res) {
-          callback(res.data);
-        }).fail(function () {
-          callback();
-        });
-      },
-      render: {
-        option: function (item, escape) {
-          return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
-        }
-      },
+    $('select[name="search_tag"]').selectize(tagSelectizeConfig({
       onChange: function (value) {
         if (value) {
           Swal.showLoading();
@@ -35,7 +18,7 @@ var ticketGridSidebar = function () {
           this.clear(true);
         }
       }
-    });
+    }));
   };
 
   /**

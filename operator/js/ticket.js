@@ -40,7 +40,7 @@
      *
      * @type {string[]}
      */
-    var selectizePlugins = ['restore_on_backspace', 'remove_button', 'max_items'];
+    var selectizePlugins = ['restore_on_backspace', 'remove_button'];
 
     /**
      * Show a success / failure message for a short period.
@@ -67,7 +67,7 @@
       form.find('button[type="submit"]').prop('disabled', false);
 
       // Remove draft related elements
-      form.find('.draft-success, .discard-draft').hide();
+      App.OperatorDraftMessage.setHasDraft(form, false);
     };
 
     /**
@@ -223,34 +223,15 @@
 
         // If posting a reply to the user, update the status in the notes and forwarding box.
         if ($form.find('input[name="reply_type"]').val() == '0') {
-          $('.notes-form, .forward-form').find('select[name="to_status"]').val($('.message-form').find('select[name="to_status"]').val());
+          App.OperatorTicketView.setToStatus($('.message-form').find('input[name="to_status"]').val());
         }
 
         // Clear ticket attachments
         $form.find('input[name^=attachment]:not(:first)').remove();
         $form.find('ul.sp-attached-files').find('li:not(:first)').remove();
-        const shouldCloseAfterSubmit = $form.find('input[name="close_after_submit"]').val() !== '0';
-        if (shouldCloseAfterSubmit) {
-          // Hide form
-          const formTypes = {
-            'message-form': 'toggleReplyForm',
-            'notes-form': 'toggleNotesForm',
-            'forward-form': 'toggleForwardForm'
-          };
-          for (const [className, methodName] of Object.entries(formTypes)) {
-            if ($form.hasClass(className)) {
-              if (typeof App.TicketViewForm !== 'undefined' && typeof App.TicketViewForm[methodName] === 'function') {
-                App.TicketViewForm[methodName]();
-              } else {
-                $form.addClass('sp:hidden');
-              }
-              break;
-            }
-          }
-        } else {
-          // Form is being kept open, focus on the editor again.
-          $textarea.editor().focus();
-        }
+
+        // Keep the form open after submitting, focus on the editor again.
+        $textarea.editor().focus();
 
         // Redirect to the ticket grid
         if (response.data.redirect !== false) {
@@ -711,7 +692,7 @@
             $message.find('ul.sp-attachments li[data-filename]').each(function (index, attachment) {
               var $attachment = $(attachment),
                 size = $attachment.find('.sp-delete-attachment').data('size'),
-                filename = $attachment.find('.sp-attachment-name').text().trim();
+                filename = $attachment.find('.sp-attachment-name').data('truncate');
 
               // If we've gone above the cumulative file size, don't attach any more.
               parameters.forwardFileUpload.incrementTotalUploadedFileSize(size);
@@ -772,7 +753,7 @@
      * @param $message
      */
     this.loadAttachmentPreviews = function ($message) {
-      App.attachments.loadPreviews($message);
+      App.attachments.loadPreviews($message.find('.sp-attachments'));
     };
 
     /**
@@ -929,20 +910,141 @@
      * @param {Selectize} selectizeInstance
      */
     this.updateRecipientsOptions = function (selectizeInstance) {
-      var ccValues = selectizeInstance.getValue(),
-        hasCc = ccValues.length > 0;
-
       // Show/hide reply all option depending how many CC emails there are.
-      $('.message-form .recipients').toggleClass('with-cc', hasCc);
-      $('.message-form .recipients .reply-all').toggle(hasCc);
+      $('.message-form .recipients .reply-all').toggle(selectizeInstance.getValue().length > 0);
+      instance.updateRecipientsSummary($('.message-form .recipients'));
+    };
 
-      // Update the recipients list of emails based on the current CC list.
-      var toEmailsText = $('.message-form .sp-reply-recipients').text().trim(),
-        parts = toEmailsText ? [toEmailsText] : [];
-      parts = parts.concat(ccValues);
-      $('.message-form .sp-reply-all-recipients').text(parts.join(', '));
-      $('.message-form .sp-reply-recipients').toggle(!hasCc);
-      $('.message-form .sp-reply-all-recipients').toggle(hasCc);
+    /**
+     * Get the value(s) to show for a summary item: an array of addresses for the recipient
+     * (To/Cc/Bcc) fields, or a plain string for the from/subject fields. Recipient fields
+     * return an empty array and the others an empty string when there's nothing to show.
+     *
+     * @param {jQuery} $recipients
+     * @param {jQuery} $item
+     * @returns {string|string[]}
+     */
+    var summaryItemData = function ($recipients, $item) {
+      var select = $recipients.find($item.data('source'))[0];
+      if (!select) {
+        return '';
+      }
+
+      // The subject field is just an input.
+      if ($item.hasClass('sp-summary-subject')) {
+        return $(select).val().trim();
+      }
+
+      // The from field only ever holds a single option, of which we show just the email address.
+      if ($item.hasClass('sp-summary-from')) {
+        var text = $(select).find('option:selected').text().trim(),
+          address = text.match(/<([^>]+)>/);
+        return address ? address[1] : text;
+      }
+      return [].concat(select.selectize ? select.selectize.getValue() : $(select).val() || []);
+    };
+
+    /**
+     * Truncate a list of recipients to the first `visible` addresses followed by a count of the
+     * rest, e.g. "a@b.com, c@d.com, and 2 others". Mirrors EmailLog::truncateRecipients() in PHP.
+     *
+     * @param {string[]} recipients
+     * @param {number} visible
+     * @returns {string}
+     */
+    var truncateRecipients = function (recipients, visible) {
+      // Remove case-insensitive duplicates, keeping the first occurrence of each address.
+      var seen = {},
+        unique = [];
+      $.each(recipients, function (index, recipient) {
+        var key = String(recipient).toLowerCase();
+        if (!seen.hasOwnProperty(key)) {
+          seen[key] = true;
+          unique.push(recipient);
+        }
+      });
+      visible = Math.max(1, visible);
+      var summary = unique.slice(0, visible).join(', ');
+
+      // If there are more addresses than we're showing, say how many others there are.
+      if (unique.length > visible) {
+        var others = unique.length - visible;
+        summary += ', ' + Lang.choice('core.and_number_others', others, {
+          number: others
+        });
+      }
+      return summary;
+    };
+
+    /**
+     * Update the summary shown in place of the collapsed recipients fields, e.g.
+     * "Cc: john@example.com, and 2 others, From: support@example.com".
+     *
+     * Recipient lists are truncated with truncateRecipients() so the summary stays on a single
+     * line: the number of visible addresses grows to fill the available width and shrinks again
+     * as the window (and therefore the summary) gets narrower.
+     *
+     * @param {jQuery} $recipients
+     */
+    this.updateRecipientsSummary = function ($recipients) {
+      var $summary = $recipients.find('.sp-recipients-summary'),
+        summaryEl = $summary[0];
+      if (!summaryEl) {
+        return;
+      }
+
+      // Read each visible item's label and value up front so rendering is a cheap loop.
+      var items = [];
+      $summary.find('.sp-summary-item').not('.sp\\:hidden').each(function () {
+        var $item = $(this);
+        items.push({
+          $item: $item,
+          label: $item.data('label'),
+          data: summaryItemData($recipients, $item)
+        });
+      });
+
+      // Render every item, truncating each recipient list to `visible` addresses.
+      var render = function (visible) {
+        $.each(items, function (index, item) {
+          var text = '';
+          if (Array.isArray(item.data)) {
+            if (item.data.length) {
+              text = item.label + ': ' + truncateRecipients(item.data, visible);
+            }
+          } else if (item.data !== '') {
+            text = item.label + ': ' + item.data;
+          }
+          item.$item.text(text);
+        });
+      };
+
+      // The largest recipient list caps how many addresses we could ever show per field.
+      var maxVisible = 1;
+      $.each(items, function (index, item) {
+        if (Array.isArray(item.data) && item.data.length > maxVisible) {
+          maxVisible = item.data.length;
+        }
+      });
+
+      // We can only size against the available width while the summary is on-screen; fall back
+      // to a fixed number of recipients (matching the PHP default) when it's hidden.
+      if (!$summary.is(':visible')) {
+        render(2);
+        return;
+      }
+
+      // Show a single recipient per list, then grow while the summary still fits on one line.
+      var visible = 1;
+      render(visible);
+      while (visible < maxVisible) {
+        render(visible + 1);
+        if (summaryEl.scrollWidth > summaryEl.clientWidth + 1) {
+          render(visible);
+          break;
+        }
+        visible++;
+      }
     };
 
     /**

@@ -22,4 +22,8 @@
   .tippy-box[data-placement^=right] > .tippy-arrow {
     @apply sp:dark:before:border-e-primary-100;
   }
+
+  .tippy-box button.as-link {
+    @apply sp:text-white sp:dark:text-primary-900 sp:opacity-75 sp:hover:opacity-100;
+  }
 }

@@ -99,7 +99,6 @@ jQuery(function ($) {
     labelField: 'name',
     searchField: 'name',
     create: false,
-    maxItems: null,
     placeholder: Lang.get('user.select_groups'),
     render: {
       item: function (item, escape) {
@@ -109,52 +108,74 @@ jQuery(function ($) {
         return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + ';"></i> &nbsp;' + escape(item.name) + '</div>';
       }
     },
-    onChange: function (values) {
-      updateDefaultAssignedTo(da_xhr, $default_assigned, values, $dept_operators[0].selectize.getValue());
+    onChange: function () {
+      updateDefaultAssignedTo();
     }
   });
 
   /**
    * Department operators.
    */
-  var $dept_operators = $('select[name="dept_operators[]"]');
-  $dept_operators.selectize({
+  var $dept_operators = $('select[name="dept_operators[]"]').selectize(ajaxSelectizeConfig(laroute.route('ticket.operator.operator.search'), operatorSelectizeConfig({
     plugins: ['remove_button'],
-    valueField: 'id',
-    labelField: 'formatted_name',
-    searchField: 'formatted_name',
-    create: false,
-    maxItems: null,
     placeholder: Lang.get('user.select_operators'),
-    render: {
-      item: function (item, escape) {
-        return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-      },
-      option: function (item, escape) {
-        return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-      }
-    },
-    onChange: function (values) {
-      updateDefaultAssignedTo(da_xhr, $default_assigned, $dept_groups[0].selectize.getValue(), values);
+    onChange: function () {
+      updateDefaultAssignedTo();
     }
-  });
+  })));
   var da_xhr;
-  var $default_assigned = $('select[name="default_assignedto[]"]').selectize({
-    plugins: ['remove_button'],
-    valueField: 'id',
-    labelField: 'formatted_name',
-    searchField: 'formatted_name',
-    create: false,
-    maxItems: null,
-    render: {
-      item: function (item, escape) {
-        return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-      },
-      option: function (item, escape) {
-        return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
-      }
-    }
-  });
+
+  /**
+   * Endpoint returning operators eligible for default assignment, based on the groups/operators
+   * currently selected on the form (which may differ from what the department has saved).
+   */
+  function defaultAssignedToUrl() {
+    return laroute.route('ticket.operator.department.search', {
+      id: $('#departmentForm').data('id') || 0,
+      group_ids: ($dept_groups[0].selectize.getValue() || []).join(','),
+      operator_ids: ($dept_operators[0].selectize.getValue() || []).join(',')
+    });
+  }
+  function initDefaultAssignedTo() {
+    return $('select[name="default_assignedto[]"]').selectize(ajaxSelectizeConfig(defaultAssignedToUrl, operatorSelectizeConfig({
+      plugins: ['remove_button']
+    }), 's'));
+  }
+  var $default_assigned = initDefaultAssignedTo();
+
+  /**
+   * The operators eligible for default assignment changed - rebuild the dropdown and remove any
+   * selected operators that no longer meet the group/operator criteria. The response contains the
+   * first page of eligible operators, plus any of the given 'ids' that remain eligible.
+   */
+  function updateDefaultAssignedTo() {
+    var selectize = $default_assigned[0].selectize,
+      // getValue() returns the internal `items` array by reference for multi-selects, so clone it.
+      selected = (selectize.getValue() || []).slice();
+    selectize.disable();
+    da_xhr && da_xhr.abort();
+    da_xhr = $.get(defaultAssignedToUrl(), {
+      ids: selected.join(',')
+    }).done(function (res) {
+      // Recreate the control from scratch so the virtual scroll plugin drops its cached, now
+      // stale, option pages.
+      selectize.destroy();
+      $default_assigned.empty();
+      initDefaultAssignedTo();
+      var fresh = $default_assigned[0].selectize;
+      $.each(res.data, function (index, operator) {
+        fresh.addOption(operator);
+      });
+
+      // Keep the previously selected operators that still meet the criteria - the response
+      // is guaranteed to include any of them that do.
+      fresh.setValue(selected.filter(function (id) {
+        return fresh.options.hasOwnProperty(id);
+      }), true);
+    }).fail(function () {
+      selectize.enable();
+    });
+  }
 
   /**
    * Add a new e-mail address to the department form
@@ -581,42 +602,5 @@ function updateEmailBrands(context, values) {
         selectize.setValue(last_value);
       }
     }
-  });
-}
-
-/**
- * Update the default assigned to drop down.
- *
- * @param xhr
- * @param $default_assigned
- * @param group_ids
- * @param operator_ids
- */
-function updateDefaultAssignedTo(xhr, $default_assigned, group_ids, operator_ids) {
-  var selectize = $default_assigned[0].selectize,
-    selected_items = selectize.getValue();
-  selectize.disable();
-  selectize.load(function (callback) {
-    xhr && xhr.abort();
-    xhr = $.ajax({
-      url: laroute.route('ticket.operator.department.search', {
-        id: $('#departmentForm').data('id') || 0,
-        group_ids: group_ids,
-        operator_ids: operator_ids
-      }),
-      success: function (res) {
-        selectize.clearOptions();
-        selectize.enable();
-        callback(res.data);
-
-        // Select previously selected items.
-        $.each(selected_items, function (index, value) {
-          selectize.addItem(value, true);
-        });
-      },
-      error: function () {
-        callback();
-      }
-    });
   });
 }

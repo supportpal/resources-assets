@@ -26,6 +26,11 @@ $(document).ready(function () {
         };
       }
       return false;
+    },
+    render: {
+      no_results: function () {
+        return '';
+      }
     }
   });
 

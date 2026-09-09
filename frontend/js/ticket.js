@@ -31,10 +31,7 @@ $(document).ready(function () {
   $('select[name="cc[]"]').selectize({
     plugins: {
       'restore_on_backspace': {},
-      'remove_button': {},
-      'max_items': {
-        'message': Lang.get('general.show_count_more')
-      }
+      'remove_button': {}
     },
     delimiter: ',',
     persist: false,
@@ -43,6 +40,9 @@ $(document).ready(function () {
     render: {
       item: function (item, escape) {
         return '<div class="item' + (item.unremovable ? ' unremovable' : '') + '">' + escape(item.value) + '</div>';
+      },
+      no_results: function () {
+        return '';
       }
     },
     createFilter: function (input) {
@@ -160,7 +160,11 @@ $(document).ready(function () {
       });
 
       // Unsubscribe from channel before leaving page.
-      window.addEventListener('beforeunload', function () {
+      window.addEventListener('pagehide', function (e) {
+        // A page entering the back/forward cache keeps its channel so that it is re-joined when the connection is restored.
+        if (e.persisted) {
+          return;
+        }
         App.Notifications.connector().leave('Frontend.App.Modules.Ticket.Models.Ticket.' + ticketId);
       });
     };
@@ -200,6 +204,9 @@ $(document).ready(function () {
         tinymce.activeEditor.setContent('');
         $('.sp-attached-files').find('li:not(:first)').remove();
         $('.sp-attachment-details').find('input[type=hidden][name^="attachment["]:not(:first)').remove();
+
+        // Remove draft related elements, posting the reply discards the draft.
+        App.FrontendDraftMessage.setHasDraft(form, false);
 
         // Only update if status is not undefined/null (loose type check !=).
         // http://contribute.jquery.org/style-guide/js/#equality

@@ -225,15 +225,14 @@
    */
   register('en_US', en_US);
   register('zh_CN', zh_CN);
-  class TimeAgo {
-    locale;
-    constructor() {
+  var TimeAgo = /** @class */function () {
+    function TimeAgo() {
       this.locale = 'supportpal';
     }
-    format(date) {
+    TimeAgo.prototype.format = function (date) {
       return format(date, this.locale);
-    }
-    render(nodes) {
+    };
+    TimeAgo.prototype.render = function (nodes) {
       // Convert jQuery elements to array of HTMLElements
       if (nodes && typeof nodes.jquery !== 'undefined') {
         nodes = nodes.toArray();
@@ -246,15 +245,16 @@
         return;
       }
       render(nodes, this.locale);
-    }
-  }
+    };
+    return TimeAgo;
+  }();
   // Register the SupportPal locale
-  register('supportpal', (number, index, total_sec) => {
+  register('supportpal', function (number, index, total_sec) {
     // Convert weeks to days.
     if ([8, 9].indexOf(index) !== -1 && total_sec !== undefined) {
       total_sec = parseInt(String(total_sec / 86400));
     }
-    const translations = [[Lang.get('general.just_now'), Lang.get('general.shortly')], [Lang.choice('general.minutes_ago', 1, {
+    var translations = [[Lang.get('general.just_now'), Lang.get('general.shortly')], [Lang.choice('general.minutes_ago', 1, {
       'number': 1
     }), Lang.choice('general.in_minutes', 1, {
       'number': 1

@@ -266,22 +266,171 @@ function addNewItem(className, container, $idxElms, attrMapperFn) {
   return index;
 }
 
+/**
+ * Build selectize options for a field that lazily loads results over AJAX using the virtual_scroll
+ * plugin, fetching subsequent pages from the `next_url` returned by the endpoint. This avoids
+ * having to load every record up front on page load.
+ *
+ * @param url The endpoint to fetch the first page of results from, or a function returning it
+ *            (useful when the endpoint depends on other form state at the time of the request).
+ * @param overrides Selectize options, deep merged over the defaults.
+ * @param queryParam The query string parameter the search term is sent under. Defaults to 'q'.
+ * @returns {object}
+ */
+function ajaxSelectizeConfig(url, overrides, queryParam) {
+  overrides = overrides || {};
+  queryParam = queryParam || 'q';
+
+  // jQuery deep merges arrays by index rather than replacing them, so combine the plugin lists
+  // ourselves to make sure 'virtual_scroll' is included exactly once regardless of what (if
+  // anything) the caller passed in.
+  var plugins = (overrides.plugins || []).indexOf('virtual_scroll') === -1 ? (overrides.plugins || []).concat('virtual_scroll') : overrides.plugins;
+  return $.extend(true, {
+    preload: 'focus',
+    firstUrl: function (query) {
+      var base = typeof url === 'function' ? url() : url;
+      if (!query.length) return base;
+      var params = {};
+      params[queryParam] = query;
+      return base + (base.indexOf('?') === -1 ? '?' : '&') + $.param(params);
+    },
+    load: function (query, callback) {
+      var self = this;
+
+      // Abort any in-flight request so a slow, superseded response (e.g. the preload when the
+      // user types immediately) can't apply itself over a newer one.
+      self.loadXhr && self.loadXhr.abort();
+      self.loadXhr = $.get(self.getUrl(query)).done(function (res) {
+        self.setNextUrl(query, res.next_url || null);
+        callback(res.data);
+      }).fail(function () {
+        callback();
+      });
+    }
+  }, overrides, {
+    plugins: plugins
+  });
+}
+App.extend('truncateStrings', function (root) {
+  var DEFAULT_MAX_LENGTH = 25;
+
+  /**
+   * Truncate a string in the middle (macOS Finder style), preserving the tail (e.g. a file extension).
+   */
+  function truncateMiddle(str, max) {
+    if (str.length <= max) return str;
+    var dotIndex = str.lastIndexOf('.');
+    var ext = dotIndex > 0 ? str.slice(dotIndex) : '';
+    var name = dotIndex > 0 ? str.slice(0, dotIndex) : str;
+    var available = max - ext.length - 3;
+    var frontChars = Math.ceil(available * (9 / 14));
+    var backChars = available - frontChars;
+    return name.slice(0, frontChars) + '...' + name.slice(-backChars) + ext;
+  }
+  $(root).find('.sp-truncate-middle[data-truncate]').addBack('.sp-truncate-middle[data-truncate]').each(function () {
+    var $el = $(this),
+      str = $el.attr('data-truncate');
+    if (!str) return;
+    var max = parseInt($el.attr('data-truncate-length'), 10) || DEFAULT_MAX_LENGTH,
+      truncatedStr = truncateMiddle(str, max);
+    if (truncatedStr === str) return;
+    $el.attr('title', str).text(truncatedStr);
+  });
+});
+App.extend('copyToClipboard', function (selector, options) {
+  options = $.extend({
+    copyText: Lang.get('general.copy'),
+    copiedText: Lang.get('general.copied'),
+    duration: 1000,
+    zIndex: 10010,
+    getText: function ($el) {
+      return $el.data('clipboard-text');
+    }
+  }, options);
+  tippy(selector, {
+    content: options.copyText,
+    zIndex: options.zIndex
+  });
+  const copiedTippy = tippy(selector, {
+    trigger: 'manual',
+    content: options.copiedText,
+    zIndex: options.zIndex
+  })[0];
+  $(selector).on('click', function () {
+    navigator.clipboard.writeText(options.getText($(this)));
+    if (copiedTippy) {
+      copiedTippy.show();
+      setTimeout(() => copiedTippy.hide(), options.duration);
+    }
+  });
+});
+
 // Wait for DOM to load before running the below.
 $(function () {
+  // Truncate any strings already in the DOM, and keep watching for more being inserted or updated
+  App.truncateStrings(document);
+  if (typeof MutationObserver !== 'undefined') {
+    new MutationObserver(function (mutations) {
+      mutations.forEach(function (mutation) {
+        if (mutation.type === 'attributes') {
+          App.truncateStrings(mutation.target);
+        } else {
+          $(mutation.addedNodes).each(function () {
+            if (this.nodeType === 1) App.truncateStrings(this);
+          });
+        }
+      });
+    }).observe(document.body, {
+      childList: true,
+      subtree: true,
+      attributes: true,
+      attributeFilter: ['data-truncate']
+    });
+  }
+
+  // Shared config for the tippy.js delegates below; each one only overrides content, target and allowHTML.
+  var tooltipConfig = {
+    onShow: function (instance) {
+      var content = instance.reference.getAttribute('data-tippy-content') || instance.reference.getAttribute('data-title');
+      return !!content && content.length > 0 && !instance.reference.classList.contains('tox-edit-area__iframe') && !instance.reference.classList.contains('tox-collection__item') && (!instance.reference.classList.contains('tox-button') || instance.reference.classList.contains('tox-button--icon')) && !$(instance.reference).closest('.sp-message-collapsed').length;
+    },
+    touch: ['hold', 500],
+    zIndex: 10052
+  };
+
   // Tooltip - tippy.js
-  tippy.delegate(document.body, {
+  tippy.delegate(document.body, $.extend({}, tooltipConfig, {
     content: function (reference) {
       var title = reference.getAttribute('title');
       reference.removeAttribute('title');
       reference.setAttribute('data-tippy-content', title);
       return title;
     },
-    onShow: function (instance) {
-      return instance.reference.hasAttribute('data-tippy-content') && !instance.reference.classList.contains('tox-edit-area__iframe') && !instance.reference.classList.contains('tox-collection__item') && (!instance.reference.classList.contains('tox-button') || instance.reference.classList.contains('tox-button--icon')) && instance.reference.getAttribute('data-tippy-content').length > 0;
+    target: '[title]:not(.sp-copy-tooltip)'
+  }));
+
+  // Tooltip with an embedded copy-to-clipboard button.
+  tippy.delegate(document.body, $.extend({}, tooltipConfig, {
+    content: function (reference) {
+      var title = reference.getAttribute('data-title');
+      var $content = $('<span>').text(title);
+      $('<button type="button" class="copy-to-clipboard as-link sp:ms-2">').attr('data-clipboard-text', reference.getAttribute('data-clipboard-text')).append('<i class="fa-solid fa-copy" aria-hidden="true"></i>').appendTo($content);
+      return $content[0];
     },
-    target: '[title]',
-    touch: ['hold', 500],
-    zIndex: 10052
+    interactive: true,
+    interactiveDebounce: 100,
+    target: '.sp-copy-tooltip'
+  }));
+
+  // Copy button embedded within an interactive tooltip (see the `.sp-copy-tooltip` delegate above).
+  $(document).on('click', '.copy-to-clipboard', function (event) {
+    event.stopPropagation();
+    var $button = $(this);
+    navigator.clipboard.writeText($button.data('clipboard-text'));
+    $button.find('i').removeClass('fa-copy').addClass('fa-check');
+    setTimeout(function () {
+      $button.find('i').removeClass('fa-check').addClass('fa-copy');
+    }, 1000);
   });
 
   // Logout handler.

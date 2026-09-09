@@ -19,7 +19,7 @@ $(function () {
   }
 
   // Add select all checkbox
-  $('.dataTable thead th:first').html('<input type="checkbox" name="select-all" />');
+  $('.dataTable:not(.sp-no-select-all) thead th:first').html('<input type="checkbox" name="select-all" />');
 
   // Toggle all checkboxes
   $('input[name="select-all"]').on('change', function () {

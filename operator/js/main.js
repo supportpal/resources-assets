@@ -287,14 +287,68 @@ function array_map(callback) {
   }
   return tmpArr;
 }
+
+/**
+ * Build selectize options for a paginated tag search/select field.
+ *
+ * @param overrides Selectize options, deep merged over the tag defaults.
+ * @returns {object}
+ */
+function tagSelectizeConfig(overrides) {
+  return ajaxSelectizeConfig(laroute.route('ticket.operator.tag.search'), $.extend(true, {
+    valueField: 'id',
+    labelField: 'name',
+    searchField: ['name'],
+    placeholder: Lang.get('ticket.type_in_tags') + '...',
+    // Only used when 'create' is enabled, but harmless to include otherwise.
+    createFilter: function (input) {
+      if (input.length > 45) return false;
+      var lower = input.toLowerCase();
+      return !Object.values(this.options).some(function (opt) {
+        return opt.name.toLowerCase() === lower;
+      });
+    },
+    render: {
+      item: function (item, escape) {
+        return '<div class="item" style="background-color: ' + escape(item.colour) + '; color: ' + escape(item.colour_text) + '">' + escape(item.name) + '</div>';
+      },
+      option: function (item, escape) {
+        return '<div>' + '<i class="fa-solid fa-circle" style="color: ' + escape(item.colour) + '"></i>' + '&nbsp; ' + escape(item.name) + '</div>';
+      }
+    }
+  }, overrides || {}));
+}
+
+/**
+ * Build selectize options for an operator search/select field. Unlike tagSelectizeConfig, the AJAX
+ * endpoint isn't baked in here as it differs by call site (e.g. searching across all operators vs.
+ * operators eligible for a specific department) - wrap this with ajaxSelectizeConfig() where needed.
+ *
+ * @param overrides Selectize options, deep merged over the operator defaults.
+ * @returns {object}
+ */
+function operatorSelectizeConfig(overrides) {
+  return $.extend(true, {
+    valueField: 'id',
+    labelField: 'formatted_name',
+    searchField: ['formatted_name', 'email'],
+    preload: 'focus',
+    placeholder: Lang.get('user.select_operator'),
+    render: {
+      item: function (item, escape) {
+        return '<div class="item">' + '<img class="sp-avatar sp:max-w-4" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+      },
+      option: function (item, escape) {
+        return '<div>' + '<img class="sp-avatar sp:max-w-5" src="' + escape(item.avatar_url) + '" />&nbsp; ' + escape(item.formatted_name) + '</div>';
+      }
+    }
+  }, overrides || {});
+}
 function emailSelectizeConfig(plugins) {
   var re = /^(([^<>()[\]\.,;:\s@\"]+(\.[^<>()[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i;
   var config = {
     'restore_on_backspace': {},
-    'remove_button': {},
-    'max_items': {
-      'message': Lang.get('general.show_count_more')
-    }
+    'remove_button': {}
   };
   for (var name in config) {
     if (config.hasOwnProperty(name) && plugins.indexOf(name) === -1) {

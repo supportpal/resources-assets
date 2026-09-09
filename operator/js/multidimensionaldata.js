@@ -45,7 +45,7 @@ $(document).ready(function () {
       }
 
       // Initialise file upload.
-      if (typeof FileUpload !== 'undefined' && newElem.find('.sp-file-upload').length > 0) {
+      if (typeof SpFileUpload !== 'undefined' && newElem.find('.sp-file-upload').length > 0) {
         var settings = {
             $element: newElem.find('.sp-file-upload'),
             $container: newElem
@@ -56,7 +56,7 @@ $(document).ready(function () {
         if (inputName.length !== 0) {
           settings.inputName = inputName;
         }
-        new FileUpload(settings);
+        new SpFileUpload.FileUpload(settings);
       }
 
       // Show the element.

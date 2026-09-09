@@ -1,5 +1,94 @@
 function Filtering() {}
 ;
+
+/**
+ * Condition items that support the "is one of" / "is not one of" (IN / NOT IN) operators.
+ * Ticket: Assigned operator, channel, brand, department, priority, status and tag.
+ * User: brand, group.
+ * Organisation: brand.
+ *
+ * @type {number[]}
+ */
+Filtering.multiValueItems = [0, 4, 5, 7, 11, 13, 18, 20, 25, 76];
+
+/**
+ * Show or hide the "is one of" / "is not one of" operator options based on whether the
+ * selected condition item supports multiple values.
+ *
+ * @param $row The condition <tr>
+ * @param item The selected condition item ID
+ */
+Filtering.toggleMultiOperators = function ($row, item) {
+  var $operatorSelect = $($row).find('.condition-operator select.operator0'),
+    capable = $.inArray(item, Filtering.multiValueItems) !== -1,
+    selected = $operatorSelect.val();
+  $operatorSelect.find('option[value=13], option[value=14]').prop('disabled', !capable).toggleClass('sp:hidden', !capable);
+  if (!capable && $.inArray(selected, ['13', '14']) !== -1) {
+    $operatorSelect.val('0');
+  }
+};
+
+/**
+ * Swap the value input between the single value select and a multi-select (selectize) input
+ * for "is one of" / "is not one of" conditions. The multi-select input holds a comma
+ * separated string of values.
+ *
+ * @param row   The condition <tr>
+ * @param value Optional comma separated string of values to preselect
+ */
+Filtering.toggleMultiSelect = function (row, value) {
+  var $row = $(row),
+    item = parseInt($row.find('.condition-item select').val()),
+    $operatorSelect = $row.find('.condition-operator select.operator0'),
+    $select = $row.find('.condition-value select[data-item="' + item + '"][name*="[value]"]'),
+    $input = $row.find('.condition-value .multi-value-input'),
+    multi = $.inArray(item, Filtering.multiValueItems) !== -1 && !$operatorSelect.is(':disabled') && $.inArray($operatorSelect.val(), ['13', '14']) !== -1;
+  if ($input.length) {
+    // Keep the current selections when toggling between "is one of" and "is not one of".
+    if (typeof value === 'undefined' && parseInt($input.attr('data-item')) === item) {
+      value = $input.val();
+    }
+    if ($input[0].selectize) {
+      $input[0].selectize.destroy();
+    }
+    $input.remove();
+
+    // Restore the single value select.
+    $select.prop('disabled', false).removeClass('sp:hidden');
+  }
+  if (!multi) {
+    return;
+  }
+  if (typeof value === 'undefined') {
+    value = $select.val() || '';
+  }
+
+  // Build the multi-select from the single value select options and submit in its place.
+  var options = $select.find('option').map(function () {
+    return {
+      value: this.value,
+      text: this.text
+    };
+  }).get();
+  $input = $('<input>', {
+    'type': 'text',
+    'class': 'multi-value-input',
+    'name': $select.attr('name'),
+    'data-item': item,
+    'value': value
+  });
+  $select.prop('disabled', true).addClass('sp:hidden').after($input);
+  $input.selectize({
+    options: options,
+    delimiter: ',',
+    maxItems: null,
+    plugins: ['remove_button'],
+    valueField: 'value',
+    labelField: 'text',
+    searchField: 'text'
+  });
+};
+
 /**
  * Fetch a unique group ID.
  *
@@ -90,6 +179,15 @@ Filtering.showCondition = function (context) {
       $conditionValue.find('option:not(:disabled):first').prop('selected', true);
     }
   }
+
+  // Only offer "is one of" / "is not one of" for items that support multiple values.
+  Filtering.toggleMultiOperators($(context).parents('tr'), item);
+
+  // Swap the value input to a multi-select if needed. On first render use the raw condition
+  // value (a comma separated string doesn't match any single option in the select).
+  var multiValue = $(context).attr('data-value');
+  $(context).removeAttr('data-value').removeData('value');
+  Filtering.toggleMultiSelect($(context).parents('tr'), multiValue === '' ? undefined : multiValue);
 };
 
 /**
@@ -203,6 +301,14 @@ $(function () {
   });
 
   /**
+   * When selecting an operator, swap the value input between the single and multi-select
+   * inputs as necessary.
+   */
+  $(document.body).on('change', '.condition-operator select', function () {
+    Filtering.toggleMultiSelect($(this).parents('tr'));
+  });
+
+  /**
    * Add Condition Group.
    */
   $(document.body).on('click', '.add-conditiongroup', function () {
@@ -284,6 +390,9 @@ $(function () {
     if (operator === 2) {
       $this.find('.condition:last').find('.datepicker').datepicker();
     }
+
+    // Only offer "is one of" / "is not one of" for items that support multiple values.
+    Filtering.toggleMultiOperators($this.find('.condition:last'), parseInt(selected));
 
     // Show the conditiongroup type dropdown and condition remove button if conditiongroup now has 2 or more conditions
     // Show the remove button always if using in grid filtering or in reports
