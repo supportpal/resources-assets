@@ -43,10 +43,12 @@ function AllowedMethods(parameters) {
    */
   var isAllowed = function (method, deferred) {
     // We need to force a BODY for POST requests, otherwise a 411 error may be thrown by the web server.
+    // Disable the DELETE method override in main.js so the real HTTP method is tested.
     $.ajax({
       url: methodRoute,
       type: method,
-      data: "{}"
+      data: "{}",
+      methodOverride: false
     }).done(function (data, statusText, jqXHR) {
       isExpected(method, data);
     }).fail(function () {

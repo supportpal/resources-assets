@@ -159,13 +159,17 @@ $(document).ready(function () {
         }
       });
 
-      // Unsubscribe from channel before leaving page.
+      // Unsubscribe from channel before leaving page, even when it enters the back/forward cache (which happens on
+      // ordinary link clicks). Join again if the page is restored.
       window.addEventListener('pagehide', function (e) {
-        // A page entering the back/forward cache keeps its channel so that it is re-joined when the connection is restored.
-        if (e.persisted) {
-          return;
-        }
         App.Notifications.connector().leave('Frontend.App.Modules.Ticket.Models.Ticket.' + ticketId);
+        if (e.persisted) {
+          window.addEventListener('pageshow', instance.listen, {
+            once: true
+          });
+        }
+      }, {
+        once: true
       });
     };
   }

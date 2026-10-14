@@ -519,9 +519,34 @@ $(function () {
     }, 500);
   }
 
-  // Global AJAX setup handler to add the CSRF token to ALL POST requests.
+  // Global AJAX setup handler.
   $.ajaxPrefilter(function (options, originalOptions, jqXHR) {
-    if (options.type.toLowerCase() === "post" || options.type.toLowerCase() === "put" || options.type.toLowerCase() === "delete") {
+    var method = options.type.toLowerCase();
+
+    // Tunnel DELETE requests through POST. A request body on DELETE has no defined semantics (RFC 9110
+    // section 9.3.5) and some CDNs, proxies and web servers silently discard it. Use the _method field
+    // rather than the X-HTTP-Method-Override header as WAFs (e.g. OWASP CRS rule 920450) block the header.
+    // Pass { methodOverride: false } to send a real DELETE request.
+    if (method === 'delete' && originalOptions.methodOverride !== false) {
+      options.type = 'POST';
+      method = 'post';
+      // jQuery disables processData when no data is given, so a string must be used in that case.
+      if (typeof options.data === 'string' || options.data == null) {
+        options.data = (options.data ? options.data + '&' : '') + '_method=DELETE';
+      } else if (Array.isArray(options.data)) {
+        options.data = options.data.concat([{
+          name: '_method',
+          value: 'DELETE'
+        }]);
+      } else {
+        options.data = $.extend({}, options.data, {
+          _method: 'DELETE'
+        });
+      }
+    }
+
+    // Add the CSRF token to all state-changing requests.
+    if (['post', 'put', 'patch', 'delete'].includes(method)) {
       jqXHR.setRequestHeader('X-CSRF-Token', $('meta[name=csrf_token]').prop('content'));
     }
   });

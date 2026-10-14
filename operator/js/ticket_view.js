@@ -504,7 +504,7 @@
         }
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\SlaPlanUpdated', e => {
-        $('.edit-slaplan').html(e.sla_plan_name);
+        $('.edit-slaplan').text(e.sla_plan_name);
         $('select[name="slaplan"]').val(e.sla_plan).attr('data-id', e.sla_plan);
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\StatusUpdated', e => {
@@ -557,13 +557,17 @@
         window.location.reload();
       });
 
-      // Unsubscribe from channel before leaving page. A page entering the back/forward cache keeps its channel so
-      // that it is re-joined when the connection is restored.
+      // Unsubscribe from channel before leaving page, even when it enters the back/forward cache (which happens on
+      // ordinary link clicks), otherwise the operator shows as still viewing. Join again if the page is restored.
       window.addEventListener('pagehide', function (e) {
-        if (e.persisted) {
-          return;
-        }
         App.Notifications.connector().leave('App.Modules.Ticket.Models.Ticket.' + ticket.parameters().ticketId);
+        if (e.persisted) {
+          window.addEventListener('pageshow', instance.listen, {
+            once: true
+          });
+        }
+      }, {
+        once: true
       });
     };
   }
@@ -740,7 +744,7 @@
           $('select[name="slaplan"]').attr('data-id', value);
 
           // Switch back to edit link
-          $('.edit-slaplan').addClass('sp-detail-link').html(response.data.name);
+          $('.edit-slaplan').addClass('sp-detail-link').text(response.data.name);
           $('.edit-slaplan, .update-slaplan').toggle();
           ticket.updateEscalationsTable();
         } else {

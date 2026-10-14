@@ -955,8 +955,9 @@
     @apply sp:font-bold;
   }
 
-  .sp-dropdown-container .sp-dropdown select {
-    @apply sp:w-full;
+  .sp-dropdown-container .sp-dropdown select,
+  .sp-dropdown-container .sp-dropdown .ts-control {
+    @apply sp:w-full sp:min-w-auto;
   }
 
   @media (width >= theme(--breakpoint-md)) {
@@ -1236,6 +1237,10 @@
   }
 
   @variant print {
+    .sp-messages-container::before {
+      @apply sp:hidden;
+    }
+
     .sp-message {
       @apply sp:px-0;
     }

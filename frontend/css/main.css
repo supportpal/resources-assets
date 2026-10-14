@@ -3256,8 +3256,9 @@
     --tw-font-weight: var(--sp-font-weight-bold, 700);
     font-weight: var(--sp-font-weight-bold, 700);
   }
-  .sp-dropdown-container .sp-dropdown select {
+  .sp-dropdown-container .sp-dropdown select, .sp-dropdown-container .sp-dropdown .ts-control {
     width: 100%;
+    min-width: auto;
   }
   @media (width >= 48rem) {
     .sp-dropdown-container .sp-dropdown > ul, .sp-dropdown-container .sp-dropdown > div {
@@ -3592,6 +3593,9 @@
     padding-inline: calc(var(--sp-spacing, 0.25rem) * 4);
   }
   @media print {
+    .sp-messages-container::before {
+      display: none;
+    }
     .sp-message {
       padding-inline: 0px;
     }
