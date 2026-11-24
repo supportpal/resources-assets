@@ -735,7 +735,9 @@
           if (failed_attachments.length > 0) {
             Swal.fire({
               title: Lang.get('messages.failed_attachments'),
-              html: failed_attachments.join(', ') + '<br /><br />' + Lang.get('core.attachment_limit_reached', {
+              html: failed_attachments.map(function (name) {
+                return he.encode(String(name));
+              }).join(', ') + '<br /><br />' + Lang.get('core.attachment_limit_reached', {
                 size: parameters.forwardFileUpload.cumulativeMaxFileSize.fileSize()
               }),
               icon: 'info'

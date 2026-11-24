@@ -4232,7 +4232,7 @@
         'reason': message
       }) : message;
       if ($box.is(':visible')) {
-        $container.append('<br />' + reason);
+        $container.append('<br />', document.createTextNode(reason));
       } else {
         $container.text(reason);
       }
@@ -4309,7 +4309,7 @@
      */
     AttachmentDeleter.deleteAttachment = function (context, url, data, $listItem, successCallback, silent) {
       var _this = this;
-      var name = $('<div/>').text($listItem.find('.filename').text()).html();
+      var name = $listItem.find('.filename').text();
       var success = function () {
         // Call the success callback
         if (typeof successCallback === 'function') {

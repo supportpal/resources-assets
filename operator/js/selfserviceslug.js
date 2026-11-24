@@ -81,10 +81,15 @@ var SupportPalSlugGenerator = function (parameters) {
   // Allow editing the slug.
   $('.section-items').on('click', '.edit-slug', function () {
     var self = this,
-      value = $(this).parents('.sp-input-container').find('.slug-text').html();
+      value = $(this).parents('.sp-input-container').find('.slug-text').text(),
+      $input = $('<input>', {
+        type: 'text',
+        id: 'slug-modal-input',
+        size: 30
+      }).attr('value', value);
     Swal.fire({
       title: Lang.get('selfservice.change_slug'),
-      html: "<p><input type='text' value='" + value + "' id='slug-modal-input' size='30' /></p>",
+      html: $('<p>').append($input).prop('outerHTML'),
       showCancelButton: true,
       confirmButtonText: Lang.get('general.update'),
       showLoaderOnConfirm: true,

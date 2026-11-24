@@ -551,8 +551,6 @@
         $('.sp-title-description .sp-locked-icon, .unlock-ticket').addClass('sp:hidden');
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\UserUpdated', e => {
-        $('.edit-user').html(e.name);
-
         // A lot of things change, so let's refresh the page.
         window.location.reload();
       });
@@ -829,7 +827,7 @@
       $forwardBccSelectize[0].selectize.clear(true);
 
       // Reset subject.
-      $(this).find('input[name="subject"]').val('FW: ' + $('<div/>').html($(document).find('.sp-ticket-subject').text()).text().trim());
+      $(this).find('input[name="subject"]').val('FW: ' + $(document).find('.sp-ticket-subject').text().trim());
 
       // Collapse the recipients back down to the summary.
       var $recipients = $(this).find('.recipients');
