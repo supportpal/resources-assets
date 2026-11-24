@@ -185,7 +185,13 @@
       var errorHandler = function (message) {
         // Change the view back to how it was originally.
         $toolbar.find('button:visible').prop('disabled', false).trigger('click');
-        Swal.fire(Lang.get('messages.error'), message || Lang.get('messages.general_error'), 'error');
+
+        // Show as text, the message can include parts of the template (e.g. Twig errors).
+        Swal.fire({
+          title: Lang.get('messages.error'),
+          text: message || Lang.get('messages.general_error'),
+          icon: 'error'
+        });
       };
 
       // Determine the height of the editor.

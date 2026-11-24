@@ -470,7 +470,7 @@
         }
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\SlaPlanUpdated', e => {
-        $('.edit-slaplan').html(e.sla_plan_name);
+        $('.edit-slaplan').text(e.sla_plan_name);
         $('select[name="slaplan"]').val(e.sla_plan).attr('data-id', e.sla_plan);
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\StatusUpdated', e => {
@@ -519,8 +519,6 @@
         $('.sp-title-description .sp-locked-icon, .unlock-ticket').addClass('sp-hidden');
         instance.ticketUpdate();
       }).listen('.App\\Modules\\Ticket\\Events\\UserUpdated', e => {
-        $('.edit-user').html(e.name);
-
         // A lot of things change, so let's refresh the page.
         window.location.reload();
       });
@@ -721,7 +719,7 @@
           $('select[name="slaplan"]').attr('data-id', value);
 
           // Switch back to edit link
-          $('.edit-slaplan').addClass('sp-detail-link').html(response.data.name);
+          $('.edit-slaplan').addClass('sp-detail-link').text(response.data.name);
           $('.edit-slaplan, .update-slaplan').toggle();
 
           // Update log and escalation rules tables
@@ -812,7 +810,7 @@
       $forwardBccSelectize[0].selectize.clear(true);
 
       // Reset subject.
-      $(this).find('input[name="subject"]').val('FW: ' + $('<div/>').html($(document).find('.sp-ticket-subject').text()).text().trim());
+      $(this).find('input[name="subject"]').val('FW: ' + $(document).find('.sp-ticket-subject').text().trim());
     });
 
     // Update message

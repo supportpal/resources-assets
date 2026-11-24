@@ -61,7 +61,8 @@ $container.find('.twig-html-warning').remove();}};/**
      *
      * @return {void}
      */this.showPreview=function(){var errorHandler=function(message){// Change the view back to how it was originally.
-$toolbar.find('button:visible').prop('disabled',false).trigger('click');Swal.fire(Lang.get('messages.error'),message||Lang.get('messages.general_error'),'error');};// Determine the height of the editor.
+$toolbar.find('button:visible').prop('disabled',false).trigger('click');// Show as text, the message can include parts of the template (e.g. Twig errors).
+Swal.fire({title:Lang.get('messages.error'),text:message||Lang.get('messages.general_error'),icon:'error'});};// Determine the height of the editor.
 $toolbar.find('button.switch-view').prop('disabled',true);$preview.html('').css($editor.position()).css('width',$editor.outerWidth(true)).css('height',$editor.outerHeight(true)).addClass('loadinggif').show();// If the form has an input called brand_id, use that value else fall back to the
 // data-brand set on form-row. If nothing is set then it won't be included.
 var brandId=$container.parents('form').find(':input[name="brand_id"]').length?$container.parents('form').find(':input[name="brand_id"]').val():$container.parents('.sp-form-row').data('brand');// Get ticket ID.
